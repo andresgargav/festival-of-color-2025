@@ -7,7 +7,7 @@ import { PIXEL_SCALE } from "features/game/lib/constants";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { useSound } from "lib/utils/hooks/useSound";
 import { PortalContext } from "../../lib/PortalProvider";
-import { PortalMachineState } from "../../lib/christmasDeliveryMayhemMachine";
+import { PortalMachineState } from "../../lib/Machine";
 import { useSelector } from "@xstate/react";
 import classNames from "classnames";
 import { isTouchDevice } from "features/world/lib/device";
