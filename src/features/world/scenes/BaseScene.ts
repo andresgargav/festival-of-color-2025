@@ -56,7 +56,7 @@ export type NPCBumpkin = {
 const SEND_PACKET_RATE = 10;
 const NAME_TAG_OFFSET_PX = 12;
 
-const WALKING_SPEED = 50;
+export const WALKING_SPEED = 50;
 
 type BaseSceneOptions = {
   name: SceneId;
@@ -143,6 +143,8 @@ export abstract class BaseScene extends Phaser.Scene {
   currentTick = 0;
 
   zoom = window.innerWidth < 500 ? 3 : 4;
+
+  velocity = WALKING_SPEED;
 
   layers: Record<string, Phaser.Tilemaps.TilemapLayer> = {};
 
@@ -867,7 +869,7 @@ export abstract class BaseScene extends Phaser.Scene {
   get walkingSpeed() {
     if (this.isCameraFading) return 0;
 
-    return WALKING_SPEED;
+    return this.velocity;
   }
 
   updatePlayer() {
@@ -900,12 +902,12 @@ export abstract class BaseScene extends Phaser.Scene {
         (this.cursorKeys?.left.isDown || this.cursorKeys?.a?.isDown) ?? false;
       const right =
         (this.cursorKeys?.right.isDown || this.cursorKeys?.d?.isDown) ?? false;
-      const up =
-        (this.cursorKeys?.up.isDown || this.cursorKeys?.w?.isDown) ?? false;
-      const down =
-        (this.cursorKeys?.down.isDown || this.cursorKeys?.s?.isDown) ?? false;
+      // const up =
+      //   (this.cursorKeys?.up.isDown || this.cursorKeys?.w?.isDown) ?? false;
+      // const down =
+      //   (this.cursorKeys?.down.isDown || this.cursorKeys?.s?.isDown) ?? false;
 
-      this.movementAngle = this.keysToAngle(left, right, up, down);
+      this.movementAngle = this.keysToAngle(left, right, false, false);
     }
 
     // change player direction if angle is changed from left to right or vise versa
