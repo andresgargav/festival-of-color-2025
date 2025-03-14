@@ -63,12 +63,9 @@ export class NormalSnake extends Phaser.GameObjects.Container {
 
         this.scene.physics.world.enable(this);
 
-        let size = {w: this.sprite.width, h: this.sprite.height};
-        let Offset = {x: this.sprite.width / 2, y: this.sprite.width / 2};
-
         (this.body as Phaser.Physics.Arcade.Body)
-        .setSize(size.w, size.h)
-        .setOffset(Offset.x, Offset.y)
+        .setSize(this.sprite.width, this.sprite.height)
+        .setOffset(this.sprite.width / 2, this.sprite.width / 2)
         .setImmovable(true)
         .setCollideWorldBounds(true);
 
