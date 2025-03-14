@@ -20,8 +20,7 @@ import { NormalSnake } from "./containers/NormalSnake";
 
 export class Scene extends BaseScene {
   sceneId: SceneId = PORTAL_NAME;
-  snake!: NormalSnake;
-
+  normalSnake!: NormalSnake;
 
   constructor() {
     super({
@@ -93,12 +92,13 @@ export class Scene extends BaseScene {
       const startingPoint = [SNAKE_CONFIGURATION.normalSnake.RtoL.x, SNAKE_CONFIGURATION.normalSnake.LtoR.x]
       const ranNum = Math.floor(Math.random() * startingPoint.length);
 
-        this.snake = new NormalSnake({
+        this.normalSnake = new NormalSnake({
           x: startingPoint[ranNum],
           y: Y_axis,
           scene: this,
           player: this.currentPlayer,
         })
+        this.normalSnake.activateNormSnake();
     }
 
   private initializeControls() {
