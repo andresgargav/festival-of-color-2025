@@ -16,7 +16,7 @@ export class NormalSnake extends Phaser.GameObjects.Container {
     public sprite!: Phaser.GameObjects.Sprite;
     private collisionSprite!: Phaser.GameObjects.Sprite;
     private overlapHandler?: Phaser.Physics.Arcade.Collider;
-    public isActive = true; // Flag to track active
+    public isActive = false; // Flag to track active
     private snake: string;
     private numRes!: number;
     private Xaxis!: number;
@@ -56,6 +56,30 @@ export class NormalSnake extends Phaser.GameObjects.Container {
         return this.scene.registry.get("portalService") as
           | MachineInterpreter
           | undefined;
+    }
+
+    public activateNormSnake() {
+        if(this.isActive) {
+            this.isActive = true;
+            this.SnakeAnim();
+            this.Snake();    
+        }
+    }
+
+    public deactivateNormSnake() {
+        if(!this.isActive) {
+            this.isActive = false;
+
+        if (this.overlapHandler) {
+            this.scene.physics.world.removeCollider(this.overlapHandler);
+            this.overlapHandler = undefined;
+          }
+
+          this.scene.tweens.killTweensOf(this);
+          this.sprite.stop();
+          this.scene.physics.world.disable(this);
+          this.sprite.setVisible(false);
+        }
     }
 
     private Snake() {
