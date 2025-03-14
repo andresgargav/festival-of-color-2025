@@ -74,3 +74,12 @@ export const ENEMIES_TABLE: {
 
 // Panel
 export const PANEL_NPC_WEARABLES: Equipped = NPC_WEARABLES["elf"];
+
+//Snakes coordinates
+export const Y_axis = 270;
+export const SNAKE_CONFIGURATION = {
+  normalSnake: {
+    RtoL: {x: 325, y: Y_axis},
+    LtoR: {x: 130, y: Y_axis},
+  },
+}
