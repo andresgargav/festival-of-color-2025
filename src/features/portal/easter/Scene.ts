@@ -6,7 +6,8 @@ import { MachineInterpreter } from "./lib/Machine";
 import { EventObject } from "xstate";
 import { SPAWNS } from "features/world/lib/spawn";
 import { isTouchDevice } from "features/world/lib/device";
-import { PORTAL_NAME } from "./Constants";
+import { PORTAL_NAME, SNAKE_CONFIGURATION, Y_axis } from "./Constants";
+import { NormalSnake } from "./containers/NormalSnake";
 
 // export const NPCS: NPCBumpkin[] = [
 //   {
@@ -19,6 +20,7 @@ import { PORTAL_NAME } from "./Constants";
 
 export class Scene extends BaseScene {
   sceneId: SceneId = PORTAL_NAME;
+  normalSnake!: NormalSnake;
 
   constructor() {
     super({
@@ -32,6 +34,16 @@ export class Scene extends BaseScene {
 
   preload() {
     super.preload();
+
+    this.load.spritesheet("snake_normal", "world/snake_normal.webp", {
+      frameWidth: 20,
+      frameHeight: 19,
+    })
+
+    this.load.spritesheet("snake_normal_collision", "world/snake_normal_collision.webp", {
+      frameWidth: 20,
+      frameHeight: 19,
+    })
   }
 
   async create() {
@@ -44,6 +56,10 @@ export class Scene extends BaseScene {
     this.initializeControls();
     this.initializeRetryEvent();
 
+    // console.log(`Player X position ${this.currentPlayer?.x}`)
+
+    this.createSnake();
+    
     this.physics.world.drawDebug = false;
   }
 
@@ -62,6 +78,8 @@ export class Scene extends BaseScene {
   update() {
     super.update();
 
+    this.createSnake
+
     if (this.isGamePlaying) {
       // The game has started
     } else if (this.isGameReady) {
@@ -69,6 +87,19 @@ export class Scene extends BaseScene {
       this.velocity = WALKING_SPEED;
     }
   }
+
+    private createSnake() {
+      const startingPoint = [SNAKE_CONFIGURATION.normalSnake.RtoL.x, SNAKE_CONFIGURATION.normalSnake.LtoR.x]
+      const ranNum = Math.floor(Math.random() * startingPoint.length);
+
+        this.normalSnake = new NormalSnake({
+          x: startingPoint[ranNum],
+          y: Y_axis,
+          scene: this,
+          player: this.currentPlayer,
+        })
+        this.normalSnake.activateNormSnake();
+    }
 
   private initializeControls() {
     if (isTouchDevice()) {
