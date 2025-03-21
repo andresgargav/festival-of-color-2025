@@ -139,26 +139,37 @@
       "name": "Collision",
       "objects": [
         {
-          "height": 47.9484425349087,
+          "height": 173.6984,
           "id": 5,
           "name": "",
           "rotation": 0,
           "type": "",
           "visible": true,
-          "width": 158.28141783029,
-          "x": 0.515574650912997,
-          "y": 254.69387755102
+          "width": 158.281,
+          "x": 0.515575,
+          "y": 128.944
         },
         {
-          "height": 49.4951664876477,
+          "height": 175.2452,
           "id": 6,
           "name": "",
           "rotation": 0,
           "type": "",
           "visible": true,
-          "width": 159.828141783029,
-          "x": 319.656283566058,
-          "y": 254.178302900107
+          "width": 159.828,
+          "x": 319.656,
+          "y": 128.428
+        },
+        {
+          "height": 18.3636,
+          "id": 7,
+          "name": "",
+          "rotation": 0,
+          "type": "",
+          "visible": true,
+          "width": 160.727,
+          "x": 159.273,
+          "y": 285.636
         }
       ],
       "opacity": 1,
@@ -169,7 +180,7 @@
     }
   ],
   "nextlayerid": 12,
-  "nextobjectid": 7,
+  "nextobjectid": 8,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.10.2",

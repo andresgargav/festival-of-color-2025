@@ -116,7 +116,7 @@ export abstract class BaseScene extends Phaser.Scene {
     [sessionId: string]: BumpkinContainer;
   } = {};
 
-  colliders?: Phaser.GameObjects.Group;
+  colliders?: Phaser.Physics.Arcade.StaticGroup;
   triggerColliders?: Phaser.GameObjects.Group;
   hiddenColliders?: Phaser.GameObjects.Group;
 
@@ -133,6 +133,7 @@ export abstract class BaseScene extends Phaser.Scene {
         s?: Phaser.Input.Keyboard.Key;
         a?: Phaser.Input.Keyboard.Key;
         d?: Phaser.Input.Keyboard.Key;
+        space: Phaser.Input.Keyboard.Key;
       }
     | undefined;
 
@@ -145,6 +146,7 @@ export abstract class BaseScene extends Phaser.Scene {
   zoom = window.innerWidth < 500 ? 3 : 4;
 
   velocity = WALKING_SPEED;
+  isMoving = false;
 
   layers: Record<string, Phaser.Tilemaps.TilemapLayer> = {};
 
@@ -375,7 +377,7 @@ export abstract class BaseScene extends Phaser.Scene {
     ) as Phaser.Tilemaps.Tileset;
 
     // Set up collider layers
-    this.colliders = this.add.group();
+    this.colliders = this.physics.add.staticGroup();
 
     if (this.map.getObjectLayer("Collision")) {
       const collisionPolygons = this.map.createFromObjects("Collision", {
@@ -384,7 +386,7 @@ export abstract class BaseScene extends Phaser.Scene {
       collisionPolygons.forEach((polygon) => {
         this.colliders?.add(polygon);
         this.physics.world.enable(polygon);
-        (polygon.body as Physics.Arcade.Body).setImmovable(true);
+        // (polygon.body as Physics.Arcade.Body).setImmovable(true);
       });
     }
 
@@ -606,18 +608,18 @@ export abstract class BaseScene extends Phaser.Scene {
       const layout = mmoLocalSettings.layout ?? "QWERTY";
 
       // add WASD keys
-      this.cursorKeys.w = this.input.keyboard?.addKey(
-        layout === "QWERTY" ? "W" : "Z",
-        false,
-      );
+      // this.cursorKeys.w = this.input.keyboard?.addKey(
+      //   layout === "QWERTY" ? "W" : "Z",
+      //   false,
+      // );
       this.cursorKeys.a = this.input.keyboard?.addKey(
         layout === "QWERTY" ? "A" : "Q",
         false,
       );
-      this.cursorKeys.s = this.input.keyboard?.addKey("S", false);
+      // this.cursorKeys.s = this.input.keyboard?.addKey("S", false);
       this.cursorKeys.d = this.input.keyboard?.addKey("D", false);
 
-      this.input.keyboard?.removeCapture("SPACE");
+      // this.input.keyboard?.removeCapture("SPACE");
     }
 
     this.input.setTopOnly(true);
@@ -824,8 +826,8 @@ export abstract class BaseScene extends Phaser.Scene {
 
     textObject.setOrigin(0.5);
 
-    this.physics.add.existing(textObject);
-    (textObject.body as Phaser.Physics.Arcade.Body).checkCollision.none = true;
+    // this.physics.add.existing(textObject);
+    // (textObject.body as Phaser.Physics.Arcade.Body).checkCollision.none = true;
 
     return textObject;
   }
@@ -925,18 +927,16 @@ export abstract class BaseScene extends Phaser.Scene {
     const currentPlayerBody = this.currentPlayer
       .body as Phaser.Physics.Arcade.Body;
     if (this.movementAngle !== undefined) {
-      currentPlayerBody.setVelocity(
+      currentPlayerBody.setVelocityX(
         this.walkingSpeed * Math.cos((this.movementAngle * Math.PI) / 180),
-        this.walkingSpeed * Math.sin((this.movementAngle * Math.PI) / 180),
       );
     } else {
-      currentPlayerBody.setVelocity(0, 0);
+      currentPlayerBody.setVelocityX(0);
     }
 
     this.sendPositionToServer();
 
-    const isMoving =
-      this.movementAngle !== undefined && this.walkingSpeed !== 0;
+    this.isMoving = this.movementAngle !== undefined && this.walkingSpeed !== 0;
 
     if (this.soundEffects) {
       this.soundEffects.forEach((audio) =>
@@ -951,17 +951,17 @@ export abstract class BaseScene extends Phaser.Scene {
     }
 
     if (this.walkAudioController) {
-      this.walkAudioController.handleWalkSound(isMoving);
+      this.walkAudioController.handleWalkSound(this.isMoving);
     } else {
       // eslint-disable-next-line no-console
       console.error("walkAudioController is undefined");
     }
 
-    if (isMoving) {
-      this.currentPlayer.walk();
-    } else {
-      this.currentPlayer.idle();
-    }
+    // if (this.isMoving) {
+    //   this.currentPlayer.walk();
+    // } else {
+    //   this.currentPlayer.idle();
+    // }
 
     this.currentPlayer.setDepth(Math.floor(this.currentPlayer.y));
 

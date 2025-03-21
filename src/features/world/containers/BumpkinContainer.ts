@@ -60,6 +60,13 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
   private backAuraAnimationKey: string | undefined;
   private direction: "left" | "right" = "right";
 
+  // Easter
+  private jumpAnimationKey: string | undefined;
+  private hurtAnimationKey: string | undefined;
+  private attackAnimationKey: string | undefined;
+  private carryAnimationKey: string | undefined;
+  private carryIdleAnimationKey: string | undefined;
+
   constructor({
     scene,
     x,
@@ -157,6 +164,11 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     this.walkingAnimationKey = `${this.spriteKey}-bumpkin-walking`;
     this.digAnimationKey = `${this.spriteKey}-bumpkin-dig`;
     this.drillAnimationKey = `${this.spriteKey}-bumpkin-drilling`;
+    this.jumpAnimationKey = `${this.spriteKey}-bumpkin-jump`;
+    this.hurtAnimationKey = `${this.spriteKey}-bumpkin-hurt`;
+    this.attackAnimationKey = `${this.spriteKey}-bumpkin-attack`;
+    this.carryAnimationKey = `${this.spriteKey}-bumpkin-carry`;
+    this.carryIdleAnimationKey = `${this.spriteKey}-bumpkin-carry-idle`;
 
     await buildNPCSheets({
       parts: this.clothing,
@@ -190,6 +202,11 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         "walking",
         "dig",
         "drilling",
+        "jump",
+        "hurt",
+        "attack",
+        "carry",
+        "carry-idle",
       ]);
       const idleLoader = scene.load.spritesheet(this.spriteKey, url, {
         frameWidth: 96,
@@ -221,6 +238,11 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         this.createWalkingAnimation(9, 16);
         this.createDigAnimation(17, 29);
         this.createDrillAnimation(30, 38);
+        this.createJumpAnimation(39, 46);
+        this.createHurtAnimation(47, 54);
+        this.createAttackAnimation(55, 65);
+        this.createCarryAnimation(66, 73);
+        this.createCarryIdleAnimation(74, 82);
         this.sprite.play(this.idleAnimationKey as string, true);
 
         this.ready = true;
@@ -231,6 +253,76 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     }
 
     scene.load.start();
+  }
+
+  private createJumpAnimation(start: number, end: number) {
+    if (!this.scene || !this.scene.anims) return;
+
+    this.scene.anims.create({
+      key: this.jumpAnimationKey,
+      frames: this.scene.anims.generateFrameNumbers(this.spriteKey as string, {
+        start,
+        end,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+  }
+
+  private createHurtAnimation(start: number, end: number) {
+    if (!this.scene || !this.scene.anims) return;
+
+    this.scene.anims.create({
+      key: this.hurtAnimationKey,
+      frames: this.scene.anims.generateFrameNumbers(this.spriteKey as string, {
+        start,
+        end,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+  }
+
+  private createAttackAnimation(start: number, end: number) {
+    if (!this.scene || !this.scene.anims) return;
+
+    this.scene.anims.create({
+      key: this.attackAnimationKey,
+      frames: this.scene.anims.generateFrameNumbers(this.spriteKey as string, {
+        start,
+        end,
+      }),
+      frameRate: 17,
+      repeat: -1,
+    });
+  }
+
+  private createCarryAnimation(start: number, end: number) {
+    if (!this.scene || !this.scene.anims) return;
+
+    this.scene.anims.create({
+      key: this.carryAnimationKey,
+      frames: this.scene.anims.generateFrameNumbers(this.spriteKey as string, {
+        start,
+        end,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+  }
+
+  private createCarryIdleAnimation(start: number, end: number) {
+    if (!this.scene || !this.scene.anims) return;
+
+    this.scene.anims.create({
+      key: this.carryIdleAnimationKey,
+      frames: this.scene.anims.generateFrameNumbers(this.spriteKey as string, {
+        start,
+        end,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
   }
 
   private createDrillAnimation(start: number, end: number) {
@@ -748,6 +840,99 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         // eslint-disable-next-line no-console
         console.log("Bumpkin Container: Error playing idle animation: ", e);
       }
+    }
+  }
+
+  public jump() {
+    if (
+      this.sprite?.anims &&
+      this.scene?.anims.exists(this.jumpAnimationKey as string) &&
+      this.sprite?.anims.getName() !== this.jumpAnimationKey
+    ) {
+      try {
+        this.sprite.anims.play(this.jumpAnimationKey as string, true);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.log("Bumpkin Container: Error playing jump animation: ", e);
+      }
+    }
+  }
+
+  public hurt() {
+    if (
+      this.sprite?.anims &&
+      this.scene?.anims.exists(this.hurtAnimationKey as string) &&
+      this.sprite?.anims.getName() !== this.hurtAnimationKey
+    ) {
+      try {
+        this.sprite.anims.play(this.hurtAnimationKey as string, true);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.log("Bumpkin Container: Error playing hurt animation: ", e);
+      }
+    }
+  }
+
+  public attack() {
+    if (
+      this.sprite?.anims &&
+      this.scene?.anims.exists(this.attackAnimationKey as string) &&
+      this.sprite?.anims.getName() !== this.attackAnimationKey
+    ) {
+      try {
+        this.sprite.anims.play(this.attackAnimationKey as string, true);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.log("Bumpkin Container: Error playing attack animation: ", e);
+      }
+    }
+  }
+
+  public carry() {
+    if (
+      this.sprite?.anims &&
+      this.scene?.anims.exists(this.carryAnimationKey as string) &&
+      this.sprite?.anims.getName() !== this.carryAnimationKey
+    ) {
+      try {
+        this.sprite.anims.play(this.carryAnimationKey as string, true);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.log("Bumpkin Container: Error playing carry animation: ", e);
+      }
+    }
+  }
+
+  public carryIdle() {
+    if (
+      this.sprite?.anims &&
+      this.scene?.anims.exists(this.carryIdleAnimationKey as string) &&
+      this.sprite?.anims.getName() !== this.carryIdleAnimationKey
+    ) {
+      try {
+        this.sprite.anims.play(this.carryIdleAnimationKey as string, true);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.log(
+          "Bumpkin Container: Error playing carry idle animation: ",
+          e,
+        );
+      }
+    }
+  }
+
+  public isAttacking() {
+    const key = this.sprite?.anims.currentAnim?.key as string;
+    const animList = key?.split("-") || [];
+    const animName = animList[animList?.length - 1] || "";
+    if (
+      this.sprite?.anims &&
+      this.sprite?.anims.currentAnim &&
+      animName === "attack"
+    ) {
+      return true;
+    } else {
+      return false;
     }
   }
 

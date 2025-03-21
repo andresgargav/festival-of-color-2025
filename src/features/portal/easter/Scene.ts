@@ -45,6 +45,11 @@ export class Scene extends BaseScene {
     this.initializeRetryEvent();
 
     this.physics.world.drawDebug = false;
+    this.physics.world.gravity.y = 450;
+
+    // this.cursorKeys?.space?.on("down", () => {
+    //   console.log("hola");
+    // });
   }
 
   private get isGameReady() {
@@ -60,14 +65,17 @@ export class Scene extends BaseScene {
   }
 
   update() {
-    super.update();
+    if (!this.currentPlayer) return;
 
     if (this.isGamePlaying) {
       // The game has started
+      this.playAnimation();
     } else if (this.isGameReady) {
       this.portalService?.send("START");
       this.velocity = WALKING_SPEED;
     }
+
+    super.update();
   }
 
   private initializeControls() {
@@ -104,5 +112,31 @@ export class Scene extends BaseScene {
       SPAWNS()[this.sceneId].default.x,
       SPAWNS()[this.sceneId].default.y,
     );
+  }
+
+  private playAnimation() {
+    if (!this.currentPlayer) return;
+
+    if (this.currentPlayer.y >= SPAWNS()[this.sceneId].default.y) {
+      if (this.isMoving) {
+        this.currentPlayer.carry();
+      } else {
+        this.currentPlayer.carryIdle();
+      }
+    }
+
+    const currentPlayerBody = this.currentPlayer
+      .body as Phaser.Physics.Arcade.Body;
+    if (
+      this.cursorKeys?.space.isDown &&
+      this.currentPlayer.y >= SPAWNS()[this.sceneId].default.y
+    ) {
+      this.currentPlayer.jump();
+      currentPlayerBody.setVelocityY(-165);
+    }
+
+    if (currentPlayerBody.velocity.y < 0 && !this.currentPlayer.isAttacking()) {
+      this.currentPlayer.attack();
+    }
   }
 }

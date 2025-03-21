@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef } from "react";
-import { Game, CANVAS } from "phaser";
+import { Game, AUTO } from "phaser";
 import NinePatchPlugin from "phaser3-rex-plugins/plugins/ninepatch-plugin.js";
 import VirtualJoystickPlugin from "phaser3-rex-plugins/plugins/virtualjoystick-plugin.js";
 
@@ -25,7 +25,7 @@ export const Phaser: React.FC = () => {
 
   useEffect(() => {
     const config: Phaser.Types.Core.GameConfig = {
-      type: CANVAS,
+      type: AUTO,
       fps: {
         target: 30,
         smoothStep: true,

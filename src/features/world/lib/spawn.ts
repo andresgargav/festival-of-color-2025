@@ -13,7 +13,7 @@ export const SPAWNS: () => SpawnLocation = () => ({
   easter: {
     default: {
       x: 240,
-      y: 277,
+      y: 275.5,
     },
   },
   infernos: {

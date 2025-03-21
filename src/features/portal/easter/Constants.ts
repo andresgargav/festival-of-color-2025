@@ -11,7 +11,7 @@ export const GAME_LIVES = 5;
 
 // Attempts
 export const UNLIMITED_ATTEMPTS_SFL = -1; // If this value is less than 0, the option disappears
-export const DAILY_ATTEMPTS = 1;
+export const DAILY_ATTEMPTS = 5;
 export const RESTOCK_ATTEMPTS = [
   { attempts: 1, sfl: 3 },
   { attempts: 5, sfl: 12 },
