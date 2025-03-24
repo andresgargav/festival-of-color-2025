@@ -155,10 +155,8 @@ export class Scene extends BaseScene {
   }
 
   private initializeStartEvent() {
-    let time = 0;
     const onStart = (event: EventObject) => {
       if (event.type === "START") {
-        time = time + 1;
         this.enemySpawnInterval = this.time.addEvent({
           delay: ENEMY_SPAWN_INTERVAL,
           callback: () => this.createEnemy(),
