@@ -5,9 +5,28 @@ import { ITEM_DETAILS } from "features/game/types/images";
 
 export const PORTAL_NAME = "easter";
 
+// Enemies
+export const ENEMY_SPAWN_INTERVAL = 10000;
+
+// Snakes coordinates
+export const Y_AXIS = 270;
+export const SNAKE_CONFIGURATION = {
+  normalSnake: {
+    RtoL: { x: 325, y: Y_AXIS },
+    LtoR: { x: 130, y: Y_AXIS },
+  },
+};
+export const SNAKE_INITIAL_SPEED = 30;
+export const SNAKE_COLLISION_SPEED = 20;
+
+// Player
+export const WALKING_SPEED = 50;
+export const PLAYER_JUMP_VELOCITY_Y = -165;
+
 // Game config
 export const GAME_SECONDS = 300;
 export const GAME_LIVES = 5;
+export const GRAVITY = 450;
 
 // Attempts
 export const UNLIMITED_ATTEMPTS_SFL = -1; // If this value is less than 0, the option disappears
@@ -74,12 +93,3 @@ export const ENEMIES_TABLE: {
 
 // Panel
 export const PANEL_NPC_WEARABLES: Equipped = NPC_WEARABLES["elf"];
-
-//Snakes coordinates
-export const Y_axis = 270;
-export const SNAKE_CONFIGURATION = {
-  normalSnake: {
-    RtoL: {x: 325, y: Y_axis},
-    LtoR: {x: 130, y: Y_axis},
-  },
-}

@@ -66,6 +66,8 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
   private attackAnimationKey: string | undefined;
   private carryAnimationKey: string | undefined;
   private carryIdleAnimationKey: string | undefined;
+  private deathAnimationKey: string | undefined;
+  isHurt = false;
 
   constructor({
     scene,
@@ -169,6 +171,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     this.attackAnimationKey = `${this.spriteKey}-bumpkin-attack`;
     this.carryAnimationKey = `${this.spriteKey}-bumpkin-carry`;
     this.carryIdleAnimationKey = `${this.spriteKey}-bumpkin-carry-idle`;
+    this.deathAnimationKey = `${this.spriteKey}-bumpkin-death`;
 
     await buildNPCSheets({
       parts: this.clothing,
@@ -207,6 +210,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         "attack",
         "carry",
         "carry-idle",
+        "death",
       ]);
       const idleLoader = scene.load.spritesheet(this.spriteKey, url, {
         frameWidth: 96,
@@ -239,10 +243,11 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         this.createDigAnimation(17, 29);
         this.createDrillAnimation(30, 38);
         this.createJumpAnimation(39, 46);
-        this.createHurtAnimation(47, 54);
+        this.createHurtAnimation(48, 52);
         this.createAttackAnimation(55, 65);
         this.createCarryAnimation(66, 73);
         this.createCarryIdleAnimation(74, 82);
+        this.createDeathAnimation(83, 95);
         this.sprite.play(this.idleAnimationKey as string, true);
 
         this.ready = true;
@@ -279,7 +284,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         end,
       }),
       frameRate: 10,
-      repeat: -1,
+      repeat: 0,
     });
   }
 
@@ -293,7 +298,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         end,
       }),
       frameRate: 17,
-      repeat: -1,
+      repeat: 0,
     });
   }
 
@@ -322,6 +327,20 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
       }),
       frameRate: 10,
       repeat: -1,
+    });
+  }
+
+  private createDeathAnimation(start: number, end: number) {
+    if (!this.scene || !this.scene.anims) return;
+
+    this.scene.anims.create({
+      key: this.deathAnimationKey,
+      frames: this.scene.anims.generateFrameNumbers(this.spriteKey as string, {
+        start,
+        end,
+      }),
+      frameRate: 10,
+      repeat: 0,
     });
   }
 
@@ -865,7 +884,16 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
       this.sprite?.anims.getName() !== this.hurtAnimationKey
     ) {
       try {
+        this.isHurt = true;
         this.sprite.anims.play(this.hurtAnimationKey as string, true);
+        this.sprite.once(
+          Phaser.Animations.Events.ANIMATION_COMPLETE,
+          (anim: Phaser.Animations.Animation) => {
+            if (anim.key === this.hurtAnimationKey) {
+              this.isHurt = false;
+            }
+          },
+        );
       } catch (e) {
         // eslint-disable-next-line no-console
         console.log("Bumpkin Container: Error playing hurt animation: ", e);
@@ -917,6 +945,21 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
           "Bumpkin Container: Error playing carry idle animation: ",
           e,
         );
+      }
+    }
+  }
+
+  public death() {
+    if (
+      this.sprite?.anims &&
+      this.scene?.anims.exists(this.deathAnimationKey as string) &&
+      this.sprite?.anims.getName() !== this.deathAnimationKey
+    ) {
+      try {
+        this.sprite.anims.play(this.deathAnimationKey as string, true);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.log("Bumpkin Container: Error playing death animation: ", e);
       }
     }
   }

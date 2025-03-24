@@ -1,189 +1,170 @@
 import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
-import { BaseScene } from "features/world/scenes/BaseScene";
 import { MachineInterpreter } from "../lib/Machine";
-import { SNAKE_CONFIGURATION, Y_axis } from "../Constants";
+import {
+  GRAVITY,
+  SNAKE_COLLISION_SPEED,
+  SNAKE_CONFIGURATION,
+  SNAKE_INITIAL_SPEED,
+} from "../Constants";
+import { Scene } from "../Scene";
 
 interface Props {
-    x: number;
-    y: number;
-    scene: BaseScene;
-    player?: BumpkinContainer;
+  x: number;
+  y: number;
+  scene: Scene;
+  player?: BumpkinContainer;
 }
 
 export class NormalSnake extends Phaser.GameObjects.Container {
-    private player?: BumpkinContainer;
-    scene: BaseScene;
-    public sprite!: Phaser.GameObjects.Sprite;
-    private collisionSprite!: Phaser.GameObjects.Sprite;
-    private overlapHandler?: Phaser.Physics.Arcade.Collider;
-    public isActive = false; // Flag to track active
-    private snake: string;
-    private numRes!: number;
-    private Xaxis!: number;
-    private moveRight!: boolean;
-    private RtoL_X!: number;
-    private LtoR_X!: number;
-    
-    constructor({x, y, scene, player}: Props) {
-        super(scene, x, y);
-        this.scene = scene;
-        this.player = player;
+  private player?: BumpkinContainer;
+  scene: Scene;
+  public sprite!: Phaser.GameObjects.Sprite;
+  private collisionSprite!: Phaser.GameObjects.Sprite;
+  private overlapHandler?: Phaser.Physics.Arcade.Collider;
+  public isActive = false; // Flag to track active
+  private snake: string;
+  private numRes!: number;
+  private Xaxis!: number;
+  private moveRight!: boolean;
+  private RtoL_X!: number;
+  private LtoR_X!: number;
 
-        this.RtoL_X = SNAKE_CONFIGURATION.normalSnake.RtoL.x;
-        this.LtoR_X = SNAKE_CONFIGURATION.normalSnake.LtoR.x;
+  constructor({ x, y, scene, player }: Props) {
+    super(scene, x, y);
+    this.scene = scene;
+    this.player = player;
 
-        this.Xaxis = this.x;
+    this.RtoL_X = SNAKE_CONFIGURATION.normalSnake.RtoL.x;
+    this.LtoR_X = SNAKE_CONFIGURATION.normalSnake.LtoR.x;
 
-        this.snake = "snake_normal";
-        if(x == this.RtoL_X) {
-            this.sprite = scene.add.sprite(0, 0, this.snake).setOrigin(0).setDepth(1000).setFlipX(true)
-            this.numRes = this.LtoR_X;
-        } else {
-            this.sprite = scene.add.sprite(0, 0, this.snake).setOrigin(0).setDepth(1000).setFlipX(false)
-            this.numRes = this.RtoL_X;
-        }
- 
-        this.setSize(this.sprite.width, this.sprite.height);
-        this.add(this.sprite);
-        
-        this.SnakeAnim();
-        this.Snake();
-        
-        scene.add.existing(this);
-    }
-    
-    public get portalService() {
-        return this.scene.registry.get("portalService") as
-          | MachineInterpreter
-          | undefined;
+    this.Xaxis = this.x;
+
+    this.snake = "snake_normal";
+    if (x == this.RtoL_X) {
+      this.sprite = scene.add
+        .sprite(0, 0, this.snake)
+        .setOrigin(0)
+        .setDepth(1000)
+        .setFlipX(true);
+      this.numRes = this.LtoR_X;
+    } else {
+      this.sprite = scene.add
+        .sprite(0, 0, this.snake)
+        .setOrigin(0)
+        .setDepth(1000)
+        .setFlipX(false);
+      this.numRes = this.RtoL_X;
     }
 
-    public activateNormSnake() {
-        if(this.isActive) {
-            this.isActive = true;
-            this.SnakeAnim();
-            this.Snake();    
-        }
+    this.setSize(this.sprite.width, this.sprite.height);
+    this.add(this.sprite);
+
+    this.Snake();
+    this.SnakeAnim();
+
+    scene.add.existing(this);
+  }
+
+  public get portalService() {
+    return this.scene.registry.get("portalService") as
+      | MachineInterpreter
+      | undefined;
+  }
+
+  private Snake() {
+    if (!this.player) return;
+
+    this.scene.physics.world.enable(this);
+
+    const snakeBody = this.body as Phaser.Physics.Arcade.Body;
+
+    snakeBody
+      .setSize(this.sprite.width, this.sprite.height)
+      .setOffset(this.sprite.width / 2, this.sprite.width / 2)
+      .setCollideWorldBounds(true)
+      .setGravityY(GRAVITY);
+
+    if (this.Xaxis == this.RtoL_X) {
+      snakeBody.setVelocityX(SNAKE_INITIAL_SPEED * -1);
+      this.destroySnake(this.scene.leftWall as Phaser.GameObjects.GameObject);
+    } else {
+      snakeBody.setVelocityX(SNAKE_INITIAL_SPEED);
+      this.destroySnake(this.scene.rightWall as Phaser.GameObjects.GameObject);
     }
 
-    public deactivateNormSnake() {
-        if(!this.isActive) {
-            this.isActive = false;
+    this.scene.physics.add.collider(
+      this,
+      this.scene.ground as Phaser.GameObjects.GameObject,
+      () => {
+        const lives = this.portalService?.state.context.lives;
+        lives === 0 && this.destroy();
+      },
+    );
 
-        if (this.overlapHandler) {
-            this.scene.physics.world.removeCollider(this.overlapHandler);
-            this.overlapHandler = undefined;
-          }
+    this.overlapHandler = this.scene.physics.add.overlap(
+      this.player as BumpkinContainer,
+      this as Phaser.GameObjects.GameObject,
+      () => this.handleOverlap(),
+    );
+  }
 
-          this.scene.tweens.killTweensOf(this);
-          this.sprite.stop();
-          this.scene.physics.world.disable(this);
-          this.sprite.setVisible(false);
-        }
+  private SnakeAnim() {
+    this.scene.anims.create({
+      key: `snake_anim`,
+      frames: this.scene.anims.generateFrameNumbers(this.snake, {
+        start: 0,
+        end: 8,
+      }),
+      repeat: -1,
+      frameRate: 10,
+    });
+    this.sprite.play(`snake_anim`, true);
+  }
+
+  private handleOverlap() {
+    if (this.overlapHandler) {
+      this.scene.physics.world.removeCollider(this.overlapHandler);
+      this.overlapHandler = undefined;
     }
+    this.removeLife();
+    this.collisionAnim();
+  }
 
-    private Snake() {
-        if (!this.player) return;
-
-        this.scene.physics.world.enable(this);
-
-        (this.body as Phaser.Physics.Arcade.Body)
-        .setSize(this.sprite.width, this.sprite.height)
-        .setOffset(this.sprite.width / 2, this.sprite.width / 2)
-        .setImmovable(true)
-        .setCollideWorldBounds(true);
-
-        this.overlapHandler = this.scene.physics.add.overlap(
-            this.player as Phaser.GameObjects.GameObject,
-            this as Phaser.GameObjects.GameObject,
-            () => this.handleOverlap(),
-        );
+  private removeLife() {
+    if (this.portalService) {
+      const currentLives = this.portalService.state.context.lives;
+      if (currentLives > 0) {
+        this.portalService.send({ type: "LOSE_LIFE" });
+        this.player?.hurt();
+      }
     }
+  }
 
-    private SnakeAnim() {
-        this.scene.anims.create({
-            key: `snake_anim`,
-                frames: this.scene.anims.generateFrameNumbers(this.snake, {
-                    start: 0,
-                    end: 8,
-                }),
-                repeat: -1,
-                frameRate: 10
-        })
-        this.sprite.play(`snake_anim`, true) 
+  private collisionAnim() {
+    this.scene.anims.create({
+      key: `snake_normal_collision_anim`,
+      frames: this.scene.anims.generateFrameNumbers("snake_normal_collision", {
+        start: 0,
+        end: 8,
+      }),
+      repeat: -1,
+      frameRate: 10,
+    });
 
-        this.scene.tweens.add({
-            targets: this,
-            x: this.numRes,
-            y: Y_axis,
-            duration: 15000,
-            ease: "Linear",
-            repeat: 0,
-            onComplete: () => {
-                this.sprite.setVisible(false)
-                this.scene.physics.world.disable(this);
-                this.scene.tweens.killTweensOf(this.sprite)
-                this.sprite.stop();
-            }
-        })
+    this.sprite.anims.play(`snake_normal_collision_anim`, true);
+
+    const collisionSnakeBody = this.body as Phaser.Physics.Arcade.Body;
+
+    if (this.Xaxis == this.RtoL_X) {
+      collisionSnakeBody.setVelocityX(SNAKE_COLLISION_SPEED * -1);
+    } else {
+      collisionSnakeBody.setVelocityX(SNAKE_COLLISION_SPEED);
     }
+  }
 
-    private handleOverlap() {        
-        if (this.overlapHandler) {
-            this.scene.physics.world.removeCollider(this.overlapHandler);
-            this.overlapHandler = undefined;
-        }
-        this.removeLife();
-        this.collisionAnim();
-    }
-
-    private removeLife() {
-            if (this.portalService) {
-              const currentLives = this.portalService.state.context.lives;
-              if (currentLives > 0) {
-                this.portalService.send({ type: "LOSE_LIFE" });
-              }
-            }
-          }
-
-    private collisionAnim() {
-        this.sprite.setVisible(false)
-        console.log(this.Xaxis)
-
-        if(this.Xaxis == this.RtoL_X){
-            this.collisionSprite = this.scene.add.sprite(this.x, this.y, "snake_normal_collision").setOrigin(0).setDepth(1000).setFlipX(true);
-            this.moveRight = true;
-        } else {
-            this.collisionSprite = this.scene.add.sprite(this.x, this.y, "snake_normal_collision").setOrigin(0).setDepth(1000);
-            this.moveRight = false;
-        }
-
-        this.scene.anims.create({
-            key: `snake_normal_collision_anim`,
-                frames: this.scene.anims.generateFrameNumbers("snake_normal_collision", {
-                    start: 0,
-                    end: 8,
-                }),
-                repeat: -1,
-                frameRate: 10
-        })
-
-        this.collisionSprite.play(`snake_normal_collision_anim`, true);
-
-        this.scene.tweens.add({
-            targets: this.collisionSprite,
-            x: this.moveRight ? this.x - 40 : this.x + 40,
-            y: Y_axis,
-            duration: 3000,
-            ease: "Linear",
-            repeat: 0,
-            onComplete: () => {
-                this.collisionSprite.setVisible(false);
-                this.sprite.setVisible(true)
-            }
-        })
-    }
-    
+  private destroySnake(object: Phaser.GameObjects.GameObject) {
+    this.scene.physics.add.overlap(this, object, () => {
+      this.scene.time.delayedCall(1000, () => this.destroy());
+    });
+  }
 }
-
-

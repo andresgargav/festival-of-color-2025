@@ -41,6 +41,7 @@ import {
   PlazaShaders,
   getPlazaShaderSetting,
 } from "lib/utils/hooks/usePlazaShader";
+import { WALKING_SPEED } from "features/portal/easter/Constants";
 
 export type NPCBumpkin = {
   x: number;
@@ -55,8 +56,6 @@ export type NPCBumpkin = {
 // 3 Times per second send position to server
 const SEND_PACKET_RATE = 10;
 const NAME_TAG_OFFSET_PX = 12;
-
-export const WALKING_SPEED = 50;
 
 type BaseSceneOptions = {
   name: SceneId;
@@ -761,6 +760,7 @@ export abstract class BaseScene extends Phaser.Scene {
         this.colliders as Phaser.GameObjects.Group,
         // Read custom Tiled Properties
         async (obj1, obj2) => {
+          // console.log("Player: ", this.colliders);
           const id = (obj2 as any).data?.list?.id;
 
           // See if scene has registered any callbacks to perform
