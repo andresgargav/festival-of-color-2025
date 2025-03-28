@@ -2,6 +2,7 @@ import { Equipped } from "features/game/types/bumpkin";
 import { translate as t } from "lib/i18n/translate";
 import { NPC_WEARABLES } from "lib/npcs";
 import { ITEM_DETAILS } from "features/game/types/images";
+import { SQUARE_WIDTH } from "features/game/lib/constants";
 
 export const PORTAL_NAME = "easter";
 
@@ -9,12 +10,18 @@ export const PORTAL_NAME = "easter";
 export const ENEMY_SPAWN_INTERVAL = 10000;
 
 // Snakes coordinates
-export const Y_AXIS = 270;
+const ranNum: number = Math.floor(Math.random() * (290 - 170) + 170)
+export const Y_AXIS = SQUARE_WIDTH * 17;
+export const SPRITE_SCALE: number = 0.8;
 export const SNAKE_CONFIGURATION = {
-  normalSnake: {
-    RtoL: { x: 325, y: Y_AXIS },
-    LtoR: { x: 130, y: Y_AXIS },
+  snakeX_config: {
+    RtoL: { x: 315 },
+    LtoR: { x: 135 },
   },
+  snake_jumping: {
+    fromX: ranNum,
+    toX: ranNum + 10,
+  }
 };
 export const SNAKE_INITIAL_SPEED = 30;
 export const SNAKE_COLLISION_SPEED = 20;
