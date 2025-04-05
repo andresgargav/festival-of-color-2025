@@ -10,12 +10,19 @@ export const ENEMY_SPAWN_INTERVAL = 10000;
 
 // Snakes coordinates
 export const Y_AXIS = 270;
+export const HAWKSCALE = 0.7;
 export const SNAKE_CONFIGURATION = {
   normalSnake: {
     RtoL: { x: 325, y: Y_AXIS },
     LtoR: { x: 130, y: Y_AXIS },
   },
 };
+export const HAWK_CONFIGURATION = {
+  normalHawk: {
+    RtoL: { x: 325 },
+    LtoR: { x: 130 },
+  }
+}
 export const SNAKE_INITIAL_SPEED = 30;
 export const SNAKE_COLLISION_SPEED = 20;
 
