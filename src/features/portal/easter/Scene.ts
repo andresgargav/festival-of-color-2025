@@ -14,8 +14,10 @@ import {
   GRAVITY,
   PLAYER_JUMP_VELOCITY_Y,
   ENEMY_SPAWN_INTERVAL,
+  HAWK_CONFIGURATION,
 } from "./Constants";
 import { NormalSnake } from "./containers/NormalSnake";
+import { NormalHawk } from "./containers/NormalHawk";
 import { SpecialSnake } from "./containers/SpecialSnake";
 
 // export const NPCS: NPCBumpkin[] = [
@@ -35,6 +37,7 @@ export class Scene extends BaseScene {
   rightWall!: Phaser.GameObjects.GameObject | undefined;
   sceneId: SceneId = PORTAL_NAME;
   normalSnake!: NormalSnake;
+  normalHawk!: NormalHawk;
   specialSnake!: SpecialSnake;
 
   constructor() {
@@ -64,6 +67,17 @@ export class Scene extends BaseScene {
       },
     );
 
+    this.load.spritesheet("hawk_flying", "world/hawk_flying.png", {
+      frameWidth: 48,
+      frameHeight: 19,
+      }
+    );
+
+    this.load.spritesheet("hawk_collision", "world/hawk_collision.png", {
+      frameWidth: 48,
+      frameHeight: 19,
+      }
+    );
     this.load.spritesheet("snake_special", "world/snake_special.png", {
       frameWidth: 20,
       frameHeight: 19,
@@ -78,7 +92,6 @@ export class Scene extends BaseScene {
       frameWidth: 20,
       frameHeight: 19,
     })
-
   }
 
   async create() {
@@ -234,7 +247,18 @@ export class Scene extends BaseScene {
   }
 
   private createHawk() {
-    console.log("createHawk");
+    const startingPoint = [
+      HAWK_CONFIGURATION.normalHawk.RtoL.x,
+      HAWK_CONFIGURATION.normalHawk.LtoR.x,
+    ];
+    const ranNum = Math.floor(Math.random() * startingPoint.length);
+
+    this.normalHawk = new NormalHawk({
+      x: startingPoint[ranNum],
+      y: Y_AXIS,
+      scene: this,
+      player: this.currentPlayer,
+    });
   }
 
   private createSpecialHawk() {
