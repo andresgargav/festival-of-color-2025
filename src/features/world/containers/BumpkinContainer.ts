@@ -14,6 +14,8 @@ import { CONFIG } from "lib/config";
 import { formatNumber } from "lib/utils/formatNumber";
 import { KNOWN_IDS } from "features/game/types";
 import { getTradeableDisplay } from "features/marketplace/lib/tradeables";
+import { Heart } from "features/portal/easter/containers/Heart";
+import { BaseScene } from "../scenes/BaseScene";
 
 const NAME_ALIASES: Partial<Record<NPCName, string>> = {
   "pumpkin' pete": "pete",
@@ -887,11 +889,10 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     ) {
       try {
         this.isHurt = true;
-        // const basketBody = this.basket?.body as Phaser.Physics.Arcade.Body;
-        // const swordBody = this.sword?.body as Phaser.Physics.Arcade.Body;
         this.enableBasket(false);
         this.enableSword(false);
         this.sprite.anims.play(this.hurtAnimationKey as string, true);
+        this.animateRemovalHeart();
         this.sprite.once(
           Phaser.Animations.Events.ANIMATION_COMPLETE,
           (anim: Phaser.Animations.Animation) => {
@@ -1137,5 +1138,14 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     } else if (state && this.direction === "left") {
       this.sword?.setPosition(-25, -20);
     }
+  }
+
+  private animateRemovalHeart() {
+    new Heart({
+      x: this.x,
+      y: this.y,
+      scene: this.scene as BaseScene,
+      removedAnim: true,
+    });
   }
 }

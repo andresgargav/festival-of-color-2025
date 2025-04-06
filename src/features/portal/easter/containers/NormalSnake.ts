@@ -57,6 +57,8 @@ export class NormalSnake extends Phaser.GameObjects.Container {
       this.numRes = this.RtoL_X;
     }
 
+    this.sprite.setAlpha(0);
+
     this.setSize(this.sprite.width, this.sprite.height);
     this.add(this.sprite);
 
@@ -107,6 +109,13 @@ export class NormalSnake extends Phaser.GameObjects.Container {
       this as Phaser.GameObjects.GameObject,
       () => this.handleOverlap(),
     );
+
+    this.scene.tweens.add({
+      targets: this.sprite,
+      alpha: 1,
+      duration: 1000,
+      ease: "Linear",
+    });
   }
 
   private SnakeAnim() {
@@ -165,7 +174,18 @@ export class NormalSnake extends Phaser.GameObjects.Container {
 
   private destroySnake(object: Phaser.GameObjects.GameObject) {
     this.scene.physics.add.overlap(this, object, () => {
-      this.scene.time.delayedCall(1000, () => this.destroy());
+      this.fadeDestroy();
+    });
+  }
+
+  private fadeDestroy() {
+    this.scene.tweens.add({
+      targets: this,
+      alpha: 0,
+      duration: 1000,
+      onComplete: () => {
+        this.destroy();
+      },
     });
   }
 }

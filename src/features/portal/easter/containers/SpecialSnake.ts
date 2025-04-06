@@ -5,9 +5,12 @@ import {
   SNAKE_COLLISION_SPEED,
   SNAKE_CONFIGURATION,
   SNAKE_INITIAL_SPEED,
+  SPECIAL_SNAKE_JUMP_VELOCITY_Y,
   SPRITE_SCALE,
+  Y_AXIS,
 } from "../Constants";
 import { Scene } from "../Scene";
+import { SPAWNS } from "features/world/lib/spawn";
 
 interface Props {
   x: number;
@@ -28,7 +31,8 @@ export class SpecialSnake extends Phaser.GameObjects.Container {
   private Xaxis!: number;
   private RtoL_X!: number;
   private LtoR_X!: number;
-  private isCollide: boolean = false;
+  private isCollide = false;
+  private isJumping = false;
 
   constructor({ x, y, scene, player }: Props) {
     super(scene, x, y);
@@ -59,6 +63,8 @@ export class SpecialSnake extends Phaser.GameObjects.Container {
       this.numRes = this.RtoL_X;
     }
 
+    this.sprite.setAlpha(0);
+
     this.setSize(this.sprite.width, this.sprite.height);
     this.add(this.sprite);
 
@@ -73,11 +79,26 @@ export class SpecialSnake extends Phaser.GameObjects.Container {
 
   public update() {
     if (!this.snakeBody) return;
-    const { fromX, toX} = SNAKE_CONFIGURATION.snake_jumping;
-    if(this.snakeBody.x > fromX && this.snakeBody.x < toX) {
+    const { fromX, toX } = SNAKE_CONFIGURATION.snake_jumping;
+    if (this.snakeBody.x > fromX && this.snakeBody.x < toX && !this.isCollide) {
       this.jumpingAnim();
-    } else if (!this.isCollide)  {
+    } else if (!this.isCollide && !this.isJumping) {
       this.SnakeAnim();
+    }
+
+    if (this.snakeBody.y < Y_AXIS) {
+      const increasedSpeed = SNAKE_INITIAL_SPEED * 2;
+      if (this.Xaxis == this.RtoL_X) {
+        this.snakeBody.setVelocityX(increasedSpeed * -1);
+      } else {
+        this.snakeBody.setVelocityX(increasedSpeed);
+      }
+    } else {
+      if (this.Xaxis == this.RtoL_X) {
+        this.snakeBody.setVelocityX(SNAKE_INITIAL_SPEED * -1);
+      } else {
+        this.snakeBody.setVelocityX(SNAKE_INITIAL_SPEED);
+      }
     }
   }
 
@@ -98,7 +119,7 @@ export class SpecialSnake extends Phaser.GameObjects.Container {
       .setSize(this.sprite.width - 4, this.sprite.height - 5)
       .setOffset(this.sprite.width / 2, this.sprite.width / 2)
       .setCollideWorldBounds(true)
-      .setGravityY(GRAVITY);
+      .setGravityY(250);
 
     if (this.Xaxis == this.RtoL_X) {
       snakeBody.setVelocityX(SNAKE_INITIAL_SPEED * -1);
@@ -122,6 +143,13 @@ export class SpecialSnake extends Phaser.GameObjects.Container {
       this as Phaser.GameObjects.GameObject,
       () => this.handleOverlap(),
     );
+
+    this.scene.tweens.add({
+      targets: this.sprite,
+      alpha: 1,
+      duration: 1000,
+      ease: "Linear",
+    });
   }
 
   public SnakeAnim() {
@@ -158,53 +186,69 @@ export class SpecialSnake extends Phaser.GameObjects.Container {
 
   private collisionAnim() {
     this.isCollide = true;
-    if(this.isCollide)
-    this.scene.anims.create({
-      key: `${this.snake}_col_anim`,
-      frames: this.scene.anims.generateFrameNumbers("snake_special_col", {
-        start: 0,
-        end: 8,
-      }),
-      repeat: -1,
-      frameRate: 10,
-    });
-    
+    if (this.isCollide)
+      this.scene.anims.create({
+        key: `${this.snake}_col_anim`,
+        frames: this.scene.anims.generateFrameNumbers(`${this.snake}_col`, {
+          start: 0,
+          end: 8,
+        }),
+        repeat: -1,
+        frameRate: 10,
+      });
+
     this.sprite.anims.play(`${this.snake}_col_anim`, true);
-    
+
     const collisionSnakeBody = this.body as Phaser.Physics.Arcade.Body;
-    
+
     if (this.Xaxis == this.RtoL_X) {
       collisionSnakeBody.setVelocityX(SNAKE_COLLISION_SPEED * -1);
     } else {
       collisionSnakeBody.setVelocityX(SNAKE_COLLISION_SPEED);
     }
   }
-  
+
   public jumpingAnim() {
+    this.isJumping = true;
     this.scene.anims.create({
       key: `${this.snake}_jump_anim`,
       frames: this.scene.anims.generateFrameNumbers(`${this.snake}_jump`, {
         start: 0,
         end: 8,
       }),
-      repeat: -1,
+      repeat: 0,
       frameRate: 10,
     });
 
     this.sprite.anims.play(`${this.snake}_jump_anim`, true);
+    this.sprite.once(
+      Phaser.Animations.Events.ANIMATION_COMPLETE,
+      (anim: Phaser.Animations.Animation) => {
+        if (anim.key === `${this.snake}_jump_anim`) {
+          this.isJumping = false;
+        }
+      },
+    );
 
-    const jumpingSnake = this.body as Phaser.Physics.Arcade.Body;
+    const jumpingSnakeBody = this.body as Phaser.Physics.Arcade.Body;
 
-    if (this.Xaxis == this.RtoL_X) {
-      jumpingSnake.setVelocityX(SNAKE_INITIAL_SPEED * -1);
-    } else {
-      jumpingSnake.setVelocityX(SNAKE_INITIAL_SPEED);
-    }
+    jumpingSnakeBody.setVelocityY(SPECIAL_SNAKE_JUMP_VELOCITY_Y);
   }
 
   private destroySnake(object: Phaser.GameObjects.GameObject) {
     this.scene.physics.add.overlap(this, object, () => {
-      this.scene.time.delayedCall(1000, () => this.destroy());
+      this.fadeDestroy();
+    });
+  }
+
+  private fadeDestroy() {
+    this.scene.tweens.add({
+      targets: this,
+      alpha: 0,
+      duration: 1000,
+      onComplete: () => {
+        this.destroy();
+      },
     });
   }
 }

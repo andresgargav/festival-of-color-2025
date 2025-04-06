@@ -58,6 +58,8 @@ export class NormalHawk extends Phaser.GameObjects.Container {
       this.numRes = this.RtoL_X;
     }
 
+    this.sprite.setAlpha(0);
+
     this.setSize(this.sprite.width, this.sprite.height);
     this.add(this.sprite);
 
@@ -108,6 +110,13 @@ export class NormalHawk extends Phaser.GameObjects.Container {
       this as Phaser.GameObjects.GameObject,
       () => this.handleOverlap(),
     );
+
+    this.scene.tweens.add({
+      targets: this.sprite,
+      alpha: 1,
+      duration: 1000,
+      ease: "Linear",
+    });
   }
 
   private HawkAnim() {
@@ -143,7 +152,6 @@ export class NormalHawk extends Phaser.GameObjects.Container {
   }
 
   private collisionAnim() {
-
     if (this.Xaxis == this.RtoL_X) {
       this.moveRight = true;
     } else {
@@ -159,12 +167,23 @@ export class NormalHawk extends Phaser.GameObjects.Container {
       duration: 4000,
       ease: "Linear",
       repeat: 0,
-    })
+    });
   }
 
   private destroyHawk(object: Phaser.GameObjects.GameObject) {
     this.scene.physics.add.overlap(this, object, () => {
-      this.scene.time.delayedCall(1000, () => this.destroy());
+      this.fadeDestroy();
+    });
+  }
+
+  private fadeDestroy() {
+    this.scene.tweens.add({
+      targets: this,
+      alpha: 0,
+      duration: 1000,
+      onComplete: () => {
+        this.destroy();
+      },
     });
   }
 }

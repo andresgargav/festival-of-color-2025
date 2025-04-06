@@ -3,6 +3,7 @@ import { translate as t } from "lib/i18n/translate";
 import { NPC_WEARABLES } from "lib/npcs";
 import { ITEM_DETAILS } from "features/game/types/images";
 import { SQUARE_WIDTH } from "features/game/lib/constants";
+import { SPAWNS } from "features/world/lib/spawn";
 
 export const PORTAL_NAME = "easter";
 
@@ -17,29 +18,29 @@ export const ENEMY_SPAWN_INTERVAL = 10000;
 // Snakes coordinates
 export const Y_AXIS = 270;
 export const HAWKSCALE = 0.7;
-const ranNum: number = Math.floor(Math.random() * (290 - 170) + 170)
-export const SPRITE_SCALE: number = 0.8;
+export const SPRITE_SCALE = 0.8;
 export const SNAKE_CONFIGURATION = {
   snakeX_config: {
-    RtoL: { x: 315 },
-    LtoR: { x: 135 },
+    RtoL: { x: 335 },
+    LtoR: { x: 115 },
   },
   snake_jumping: {
-    fromX: ranNum,
-    toX: ranNum + 10,
-  }
+    fromX: SPAWNS().easter.default.x - 1,
+    toX: SPAWNS().easter.default.x + 1,
+  },
 };
 export const HAWK_CONFIGURATION = {
   normalHawk: {
-    RtoL: { x: 325 },
-    LtoR: { x: 130 },
-  }
-}
+    RtoL: { x: 335 },
+    LtoR: { x: 115 },
+  },
+};
 export const SNAKE_INITIAL_SPEED = 30;
 export const SNAKE_COLLISION_SPEED = 20;
+export const SPECIAL_SNAKE_JUMP_VELOCITY_Y = -250;
 
 // Player
-export const WALKING_SPEED = 50;
+export const WALKING_SPEED = 60;
 export const PLAYER_JUMP_VELOCITY_Y = -165;
 
 // Game config
@@ -111,4 +112,4 @@ export const ENEMIES_TABLE: {
 ];
 
 // Panel
-export const PANEL_NPC_WEARABLES: Equipped = NPC_WEARABLES["elf"];
+export const PANEL_NPC_WEARABLES: Equipped = NPC_WEARABLES["hopper"];

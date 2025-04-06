@@ -26,6 +26,7 @@ import { EasterEgg } from "./containers/EasterEgg";
 import { BadEgg } from "./containers/BadEgg";
 import { GoldenEgg } from "./containers/GoldenEgg";
 import { SuperEasterEgg } from "./containers/SuperEasterEgg";
+import { SUNNYSIDE } from "assets/sunnyside";
 
 // export const NPCS: NPCBumpkin[] = [
 //   {
@@ -110,12 +111,12 @@ export class Scene extends BaseScene {
       "golden_egg_disappear",
       "world/golden_egg_disappear.png",
       {
-        frameWidth: 16,
+        frameWidth: 20,
         frameHeight: 16,
       },
     );
     this.load.spritesheet("golden_egg_break", "world/golden_egg_break.png", {
-      frameWidth: 16,
+      frameWidth: 20,
       frameHeight: 16,
     });
 
@@ -128,6 +129,9 @@ export class Scene extends BaseScene {
       frameWidth: 16,
       frameHeight: 16,
     });
+
+    // Heart
+    this.load.image("heart", SUNNYSIDE.icons.heart);
 
     // Enemies
     this.load.spritesheet("snake_normal", "world/snake_normal.webp", {
@@ -185,10 +189,11 @@ export class Scene extends BaseScene {
 
     // Basic config
     this.velocity = 0;
-    this.physics.world.drawDebug = true;
+    this.physics.world.drawDebug = false;
     this.initializeControls();
     this.initializeRetryEvent();
     this.initializeStartEvent();
+    this.initializeFontFamily();
 
     // Game config
     this.currentPlayer?.createBasket();
@@ -225,13 +230,10 @@ export class Scene extends BaseScene {
     } else if (this.isGamePlaying) {
       // The game has started
       this.playAnimation();
+      this.specialSnake?.update();
     } else if (this.isGameReady) {
       this.portalService?.send("START");
       this.velocity = WALKING_SPEED;
-    }
-
-    if (this.specialSnake) {
-      this.specialSnake.update();
     }
 
     super.update();
@@ -295,6 +297,16 @@ export class Scene extends BaseScene {
       }
     };
     this.portalService?.onEvent(onStart);
+  }
+
+  private initializeFontFamily() {
+    this.add
+      .text(0, 0, ".", {
+        fontFamily: "Teeny",
+        fontSize: "1px",
+        color: "#000000",
+      })
+      .setAlpha(0);
   }
 
   private playAnimation() {
@@ -401,7 +413,7 @@ export class Scene extends BaseScene {
     const enemies = {
       snake: () => this.createSnake(),
       specialSnake: () => this.createSpecialSnake(),
-      // hawk: () => this.createHawk(),
+      hawk: () => this.createHawk(),
       // specialHawk: () => this.createSpecialHawk(),
     };
     const enemyNames = Object.keys(enemies) as Array<keyof typeof enemies>;
