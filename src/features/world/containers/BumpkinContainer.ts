@@ -68,6 +68,8 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
   private carryIdleAnimationKey: string | undefined;
   private deathAnimationKey: string | undefined;
   isHurt = false;
+  basket: Phaser.GameObjects.Zone | undefined;
+  sword: Phaser.GameObjects.Zone | undefined;
 
   constructor({
     scene,
@@ -885,6 +887,10 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     ) {
       try {
         this.isHurt = true;
+        // const basketBody = this.basket?.body as Phaser.Physics.Arcade.Body;
+        // const swordBody = this.sword?.body as Phaser.Physics.Arcade.Body;
+        this.enableBasket(false);
+        this.enableSword(false);
         this.sprite.anims.play(this.hurtAnimationKey as string, true);
         this.sprite.once(
           Phaser.Animations.Events.ANIMATION_COMPLETE,
@@ -1098,5 +1104,38 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         }
       },
     );
+  }
+
+  public createBasket() {
+    this.basket = this.scene.add.zone(0, -8, 14, 10);
+    this.scene.physics.world.enable(this.basket);
+    const basketBody = this.basket.body as Phaser.Physics.Arcade.Body;
+    basketBody.setAllowGravity(false);
+    basketBody.enable = false;
+    this.add(this.basket);
+  }
+
+  public createSword() {
+    this.sword = this.scene.add.zone(-15, -20, 40, 20).setOrigin(0);
+    this.scene.physics.world.enable(this.sword);
+    const swordBody = this.sword.body as Phaser.Physics.Arcade.Body;
+    swordBody.setAllowGravity(false);
+    swordBody.enable = false;
+    this.add(this.sword);
+  }
+
+  public enableBasket(state: boolean) {
+    const basketBody = this.basket?.body as Phaser.Physics.Arcade.Body;
+    basketBody.enable = state;
+  }
+
+  public enableSword(state: boolean) {
+    const swordBody = this.sword?.body as Phaser.Physics.Arcade.Body;
+    swordBody.enable = state;
+    if (state && this.direction === "right") {
+      this.sword?.setPosition(-15, -20);
+    } else if (state && this.direction === "left") {
+      this.sword?.setPosition(-25, -20);
+    }
   }
 }

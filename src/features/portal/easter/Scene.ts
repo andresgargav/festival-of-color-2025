@@ -14,8 +14,15 @@ import {
   GRAVITY,
   PLAYER_JUMP_VELOCITY_Y,
   ENEMY_SPAWN_INTERVAL,
+  EGG_SPAWN_INTERVAL,
+  EGG_SPAWN_LEFT_LIMIT,
+  EGG_SPAWN_RIGHT_LIMIT,
 } from "./Constants";
 import { NormalSnake } from "./containers/NormalSnake";
+import { EasterEgg } from "./containers/EasterEgg";
+import { BadEgg } from "./containers/BadEgg";
+import { GoldenEgg } from "./containers/GoldenEgg";
+import { SuperEasterEgg } from "./containers/SuperEasterEgg";
 
 // export const NPCS: NPCBumpkin[] = [
 //   {
@@ -28,12 +35,24 @@ import { NormalSnake } from "./containers/NormalSnake";
 
 export class Scene extends BaseScene {
   private enemySpawnInterval!: Phaser.Time.TimerEvent;
+  private eggSpawnInterval!: Phaser.Time.TimerEvent;
+  private eggCounter = 0;
+  private superEggInitCount = -1000;
 
   ground!: Phaser.GameObjects.GameObject | undefined;
   leftWall!: Phaser.GameObjects.GameObject | undefined;
   rightWall!: Phaser.GameObjects.GameObject | undefined;
-  sceneId: SceneId = PORTAL_NAME;
+
+  // Eggs
+  easterEgg!: EasterEgg;
+  badEgg!: BadEgg;
+  goldenEgg!: GoldenEgg;
+  superEasterEgg!: SuperEasterEgg;
+
+  // Enemies
   normalSnake!: NormalSnake;
+
+  sceneId: SceneId = PORTAL_NAME;
 
   constructor() {
     super({
@@ -48,6 +67,64 @@ export class Scene extends BaseScene {
   preload() {
     super.preload();
 
+    // Eggs
+    this.load.image("easter_egg", "world/easter_egg.png");
+    this.load.spritesheet(
+      "easter_egg_disappear",
+      "world/easter_egg_disappear.png",
+      {
+        frameWidth: 16,
+        frameHeight: 16,
+      },
+    );
+    this.load.spritesheet("easter_egg_break", "world/easter_egg_break.png", {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+
+    this.load.image("super_easter_egg", "world/super_easter_egg.png");
+    this.load.spritesheet(
+      "super_easter_egg_disappear",
+      "world/super_easter_egg_disappear.png",
+      {
+        frameWidth: 16,
+        frameHeight: 16,
+      },
+    );
+    this.load.spritesheet(
+      "super_easter_egg_break",
+      "world/super_easter_egg_break.png",
+      {
+        frameWidth: 16,
+        frameHeight: 16,
+      },
+    );
+
+    this.load.image("golden_egg", "world/golden_egg.png");
+    this.load.spritesheet(
+      "golden_egg_disappear",
+      "world/golden_egg_disappear.png",
+      {
+        frameWidth: 16,
+        frameHeight: 16,
+      },
+    );
+    this.load.spritesheet("golden_egg_break", "world/golden_egg_break.png", {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+
+    this.load.image("bad_egg", "world/bad_egg.png");
+    this.load.spritesheet("bad_egg_disappear", "world/bad_egg_disappear.png", {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("bad_egg_break", "world/bad_egg_break.png", {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+
+    // Enemies
     this.load.spritesheet("snake_normal", "world/snake_normal.webp", {
       frameWidth: 20,
       frameHeight: 19,
@@ -77,6 +154,8 @@ export class Scene extends BaseScene {
     this.initializeStartEvent();
 
     // Game config
+    this.currentPlayer?.createBasket();
+    this.currentPlayer?.createSword();
     this.physics.world.gravity.y = GRAVITY;
     this.leftWall = this.colliders?.children.entries[0];
     this.rightWall = this.colliders?.children.entries[1];
@@ -152,20 +231,129 @@ export class Scene extends BaseScene {
       SPAWNS()[this.sceneId].default.y,
     );
     this.enemySpawnInterval.remove();
+    this.eggSpawnInterval.remove();
+    this.eggCounter = 0;
+    this.superEggInitCount = -1000;
   }
 
   private initializeStartEvent() {
     const onStart = (event: EventObject) => {
       if (event.type === "START") {
+        this.eggSpawnInterval = this.time.addEvent({
+          delay: EGG_SPAWN_INTERVAL,
+          callback: () => this.createEgg(),
+          callbackScope: this,
+          repeat: -1,
+        });
         this.enemySpawnInterval = this.time.addEvent({
           delay: ENEMY_SPAWN_INTERVAL,
           callback: () => this.createEnemy(),
           callbackScope: this,
-          loop: true,
+          repeat: -1,
         });
       }
     };
     this.portalService?.onEvent(onStart);
+  }
+
+  private playAnimation() {
+    if (!this.currentPlayer) return;
+    if (this.currentPlayer.isHurt) return;
+    const swordBody = this.currentPlayer.sword
+      ?.body as Phaser.Physics.Arcade.Body;
+
+    if (
+      this.currentPlayer.y >= SPAWNS()[this.sceneId].default.y &&
+      !this.currentPlayer.isHurt
+    ) {
+      this.currentPlayer.enableBasket(true);
+      this.currentPlayer.enableSword(false);
+      if (this.isMoving) {
+        this.currentPlayer.carry();
+      } else {
+        this.currentPlayer.carryIdle();
+      }
+    }
+
+    if (
+      this.cursorKeys?.space.isDown &&
+      this.currentPlayer.y >= SPAWNS()[this.sceneId].default.y &&
+      !this.currentPlayer.isHurt
+    ) {
+      this.currentPlayer.enableBasket(false);
+      this.currentPlayer.enableSword(true);
+      this.currentPlayer.attack();
+      const currentPlayerBody = this.currentPlayer
+        .body as Phaser.Physics.Arcade.Body;
+      currentPlayerBody.setVelocityY(PLAYER_JUMP_VELOCITY_Y);
+    }
+
+    if (swordBody.enable && this.currentPlayer.directionFacing === "right") {
+      this.currentPlayer.sword?.setPosition(-15, -20);
+    } else if (
+      swordBody.enable &&
+      this.currentPlayer.directionFacing === "left"
+    ) {
+      this.currentPlayer.sword?.setPosition(-25, -20);
+    }
+  }
+
+  private setSuperEggInitCount() {
+    this.superEggInitCount = this.eggCounter;
+  }
+
+  private createEgg() {
+    this.eggCounter += 1;
+    const minX = EGG_SPAWN_LEFT_LIMIT;
+    const maxX = EGG_SPAWN_RIGHT_LIMIT;
+    const randomX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+
+    if (this.eggCounter - this.superEggInitCount <= 5) {
+      this.createSuperEasterEgg(randomX);
+    } else if ((this.eggCounter - 10) % 20 === 0) {
+      this.createGoldenEgg(randomX);
+    } else if (this.eggCounter % 20 === 0) {
+      this.createBadEgg(randomX);
+    } else {
+      this.createEasterEgg(randomX);
+    }
+  }
+
+  private createEasterEgg(x: number) {
+    this.easterEgg = new EasterEgg({
+      x: x,
+      y: -1,
+      scene: this,
+      player: this.currentPlayer,
+    });
+  }
+
+  private createSuperEasterEgg(x: number) {
+    this.superEasterEgg = new SuperEasterEgg({
+      x: x,
+      y: -1,
+      scene: this,
+      player: this.currentPlayer,
+    });
+  }
+
+  private createBadEgg(x: number) {
+    this.badEgg = new BadEgg({
+      x: x,
+      y: -1,
+      scene: this,
+      player: this.currentPlayer,
+    });
+  }
+
+  private createGoldenEgg(x: number) {
+    this.goldenEgg = new GoldenEgg({
+      x: x,
+      y: -1,
+      scene: this,
+      player: this.currentPlayer,
+      action: () => this.setSuperEggInitCount(),
+    });
   }
 
   private createEnemy() {
@@ -206,32 +394,5 @@ export class Scene extends BaseScene {
 
   private createSpecialHawk() {
     console.log("createSpecialHawk");
-  }
-
-  private playAnimation() {
-    if (!this.currentPlayer) return;
-    if (this.currentPlayer.isHurt) return;
-
-    if (
-      this.currentPlayer.y >= SPAWNS()[this.sceneId].default.y &&
-      !this.currentPlayer.isHurt
-    ) {
-      if (this.isMoving) {
-        this.currentPlayer.carry();
-      } else {
-        this.currentPlayer.carryIdle();
-      }
-    }
-
-    if (
-      this.cursorKeys?.space.isDown &&
-      this.currentPlayer.y >= SPAWNS()[this.sceneId].default.y &&
-      !this.currentPlayer.isHurt
-    ) {
-      this.currentPlayer.attack();
-      const currentPlayerBody = this.currentPlayer
-        .body as Phaser.Physics.Arcade.Body;
-      currentPlayerBody.setVelocityY(PLAYER_JUMP_VELOCITY_Y);
-    }
   }
 }

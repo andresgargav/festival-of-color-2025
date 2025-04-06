@@ -5,6 +5,11 @@ import { ITEM_DETAILS } from "features/game/types/images";
 
 export const PORTAL_NAME = "easter";
 
+// Eggs
+export const EGG_SPAWN_INTERVAL = 2000;
+export const EGG_SPAWN_LEFT_LIMIT = 165;
+export const EGG_SPAWN_RIGHT_LIMIT = 313;
+
 // Enemies
 export const ENEMY_SPAWN_INTERVAL = 10000;
 
