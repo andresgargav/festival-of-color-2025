@@ -17,8 +17,11 @@ import {
   EGG_SPAWN_INTERVAL,
   EGG_SPAWN_LEFT_LIMIT,
   EGG_SPAWN_RIGHT_LIMIT,
+  HAWK_CONFIGURATION,
 } from "./Constants";
 import { NormalSnake } from "./containers/NormalSnake";
+import { NormalHawk } from "./containers/NormalHawk";
+import { SpecialSnake } from "./containers/SpecialSnake";
 import { EasterEgg } from "./containers/EasterEgg";
 import { BadEgg } from "./containers/BadEgg";
 import { GoldenEgg } from "./containers/GoldenEgg";
@@ -51,6 +54,8 @@ export class Scene extends BaseScene {
 
   // Enemies
   normalSnake!: NormalSnake;
+  normalHawk!: NormalHawk;
+  specialSnake!: SpecialSnake;
 
   sceneId: SceneId = PORTAL_NAME;
 
@@ -138,6 +143,38 @@ export class Scene extends BaseScene {
         frameHeight: 19,
       },
     );
+
+    this.load.spritesheet("hawk_flying", "world/hawk_flying.png", {
+      frameWidth: 48,
+      frameHeight: 19,
+    });
+
+    this.load.spritesheet("hawk_collision", "world/hawk_collision.png", {
+      frameWidth: 48,
+      frameHeight: 19,
+    });
+    this.load.spritesheet("snake_special", "world/snake_special.png", {
+      frameWidth: 20,
+      frameHeight: 19,
+    });
+
+    this.load.spritesheet(
+      "snake_special_col",
+      "world/snake_special_collision.webp",
+      {
+        frameWidth: 20,
+        frameHeight: 19,
+      },
+    );
+
+    this.load.spritesheet(
+      "snake_special_jump",
+      "world/snake_special_jump.webp",
+      {
+        frameWidth: 20,
+        frameHeight: 19,
+      },
+    );
   }
 
   async create() {
@@ -191,6 +228,10 @@ export class Scene extends BaseScene {
     } else if (this.isGameReady) {
       this.portalService?.send("START");
       this.velocity = WALKING_SPEED;
+    }
+
+    if (this.specialSnake) {
+      this.specialSnake.update();
     }
 
     super.update();
@@ -360,19 +401,19 @@ export class Scene extends BaseScene {
     const enemies = {
       snake: () => this.createSnake(),
       specialSnake: () => this.createSpecialSnake(),
-      hawk: () => this.createHawk(),
-      specialHawk: () => this.createSpecialHawk(),
+      // hawk: () => this.createHawk(),
+      // specialHawk: () => this.createSpecialHawk(),
     };
     const enemyNames = Object.keys(enemies) as Array<keyof typeof enemies>;
     const ranNum = Math.floor(Math.random() * enemyNames.length);
-    // enemies[enemyNames[ranNum]]();
-    this.createSnake();
+    enemies[enemyNames[ranNum]]();
+    // this.createSpecialSnake();
   }
 
   private createSnake() {
     const startingPoint = [
-      SNAKE_CONFIGURATION.normalSnake.RtoL.x,
-      SNAKE_CONFIGURATION.normalSnake.LtoR.x,
+      SNAKE_CONFIGURATION.snakeX_config.RtoL.x,
+      SNAKE_CONFIGURATION.snakeX_config.LtoR.x,
     ];
     const ranNum = Math.floor(Math.random() * startingPoint.length);
 
@@ -385,11 +426,33 @@ export class Scene extends BaseScene {
   }
 
   private createSpecialSnake() {
-    console.log("createSpecialSnake");
+    const startingPoint = [
+      SNAKE_CONFIGURATION.snakeX_config.RtoL.x,
+      SNAKE_CONFIGURATION.snakeX_config.LtoR.x,
+    ];
+    const ranNum = Math.floor(Math.random() * startingPoint.length);
+
+    this.specialSnake = new SpecialSnake({
+      x: startingPoint[ranNum],
+      y: Y_AXIS,
+      scene: this,
+      player: this.currentPlayer,
+    });
   }
 
   private createHawk() {
-    console.log("createHawk");
+    const startingPoint = [
+      HAWK_CONFIGURATION.normalHawk.RtoL.x,
+      HAWK_CONFIGURATION.normalHawk.LtoR.x,
+    ];
+    const ranNum = Math.floor(Math.random() * startingPoint.length);
+
+    this.normalHawk = new NormalHawk({
+      x: startingPoint[ranNum],
+      y: Y_AXIS,
+      scene: this,
+      player: this.currentPlayer,
+    });
   }
 
   private createSpecialHawk() {

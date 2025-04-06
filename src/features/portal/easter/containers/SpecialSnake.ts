@@ -16,10 +16,11 @@ interface Props {
   player?: BumpkinContainer;
 }
 
-export class NormalSnake extends Phaser.GameObjects.Container {
+export class SpecialSnake extends Phaser.GameObjects.Container {
   private player?: BumpkinContainer;
   scene: Scene;
   public sprite!: Phaser.GameObjects.Sprite;
+  private collisionSprite!: Phaser.GameObjects.Sprite;
   private overlapHandler?: Phaser.Physics.Arcade.Collider;
   public isActive = false; // Flag to track active
   private snake: string;
@@ -27,6 +28,7 @@ export class NormalSnake extends Phaser.GameObjects.Container {
   private Xaxis!: number;
   private RtoL_X!: number;
   private LtoR_X!: number;
+  private isCollide: boolean = false;
 
   constructor({ x, y, scene, player }: Props) {
     super(scene, x, y);
@@ -38,7 +40,7 @@ export class NormalSnake extends Phaser.GameObjects.Container {
 
     this.Xaxis = this.x;
 
-    this.snake = "snake_normal";
+    this.snake = "snake_special";
     if (x == this.RtoL_X) {
       this.sprite = scene.add
         .sprite(0, 0, this.snake)
@@ -61,9 +63,22 @@ export class NormalSnake extends Phaser.GameObjects.Container {
     this.add(this.sprite);
 
     this.Snake();
-    this.SnakeAnim();
 
     scene.add.existing(this);
+  }
+
+  public get snakeBody(): Phaser.Physics.Arcade.Body {
+    return this.body as Phaser.Physics.Arcade.Body;
+  }
+
+  public update() {
+    if (!this.snakeBody) return;
+    const { fromX, toX} = SNAKE_CONFIGURATION.snake_jumping;
+    if(this.snakeBody.x > fromX && this.snakeBody.x < toX) {
+      this.jumpingAnim();
+    } else if (!this.isCollide)  {
+      this.SnakeAnim();
+    }
   }
 
   public get portalService() {
@@ -109,7 +124,7 @@ export class NormalSnake extends Phaser.GameObjects.Container {
     );
   }
 
-  private SnakeAnim() {
+  public SnakeAnim() {
     this.scene.anims.create({
       key: `${this.snake}_anim`,
       frames: this.scene.anims.generateFrameNumbers(this.snake, {
@@ -142,9 +157,33 @@ export class NormalSnake extends Phaser.GameObjects.Container {
   }
 
   private collisionAnim() {
+    this.isCollide = true;
+    if(this.isCollide)
     this.scene.anims.create({
-      key: `${this.snake}_collision_anim`,
-      frames: this.scene.anims.generateFrameNumbers(`${this.snake}_collision`, {
+      key: `${this.snake}_col_anim`,
+      frames: this.scene.anims.generateFrameNumbers("snake_special_col", {
+        start: 0,
+        end: 8,
+      }),
+      repeat: -1,
+      frameRate: 10,
+    });
+    
+    this.sprite.anims.play(`${this.snake}_col_anim`, true);
+    
+    const collisionSnakeBody = this.body as Phaser.Physics.Arcade.Body;
+    
+    if (this.Xaxis == this.RtoL_X) {
+      collisionSnakeBody.setVelocityX(SNAKE_COLLISION_SPEED * -1);
+    } else {
+      collisionSnakeBody.setVelocityX(SNAKE_COLLISION_SPEED);
+    }
+  }
+  
+  public jumpingAnim() {
+    this.scene.anims.create({
+      key: `${this.snake}_jump_anim`,
+      frames: this.scene.anims.generateFrameNumbers(`${this.snake}_jump`, {
         start: 0,
         end: 8,
       }),
@@ -152,14 +191,14 @@ export class NormalSnake extends Phaser.GameObjects.Container {
       frameRate: 10,
     });
 
-    this.sprite.anims.play(`${this.snake}_collision_anim`, true);
+    this.sprite.anims.play(`${this.snake}_jump_anim`, true);
 
-    const collisionSnakeBody = this.body as Phaser.Physics.Arcade.Body;
+    const jumpingSnake = this.body as Phaser.Physics.Arcade.Body;
 
     if (this.Xaxis == this.RtoL_X) {
-      collisionSnakeBody.setVelocityX(SNAKE_COLLISION_SPEED * -1);
+      jumpingSnake.setVelocityX(SNAKE_INITIAL_SPEED * -1);
     } else {
-      collisionSnakeBody.setVelocityX(SNAKE_COLLISION_SPEED);
+      jumpingSnake.setVelocityX(SNAKE_INITIAL_SPEED);
     }
   }
 
