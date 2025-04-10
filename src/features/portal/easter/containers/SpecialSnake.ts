@@ -6,7 +6,7 @@ import {
   SNAKE_CONFIGURATION,
   SNAKE_INITIAL_SPEED,
   SPECIAL_SNAKE_JUMP_VELOCITY_Y,
-  SPRITE_SCALE,
+  SNAKE_SCALE,
   Y_AXIS,
 } from "../Constants";
 import { Scene } from "../Scene";
@@ -51,7 +51,7 @@ export class SpecialSnake extends Phaser.GameObjects.Container {
         .setOrigin(0)
         .setDepth(1000)
         .setFlipX(true)
-        .setScale(SPRITE_SCALE);
+        .setScale(SNAKE_SCALE);
       this.numRes = this.LtoR_X;
     } else {
       this.sprite = scene.add
@@ -59,7 +59,7 @@ export class SpecialSnake extends Phaser.GameObjects.Container {
         .setOrigin(0)
         .setDepth(1000)
         .setFlipX(false)
-        .setScale(SPRITE_SCALE);
+        .setScale(SNAKE_SCALE);
       this.numRes = this.RtoL_X;
     }
 
