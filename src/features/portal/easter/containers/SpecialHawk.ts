@@ -1,10 +1,6 @@
 import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
 import { MachineInterpreter } from "../lib/Machine";
-import {
-  HAWK_SCALE,
-  HAWK_CONFIGURATION,
-  DIVE_POINT,
-} from "../Constants";
+import { HAWK_SCALE, HAWK_CONFIGURATION, DIVE_POINT } from "../Constants";
 import { Scene } from "../Scene";
 
 interface Props {
@@ -69,23 +65,30 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
       | undefined;
   }
 
-  private HawkAnim() {
+  private HawkAnim(
+    key: string,
+    frameName: string,
+    end: number,
+    repeat: number,
+    frameRate: number,
+    targetSprite: Phaser.GameObjects.Sprite,
+  ): void {
     this.scene.anims.create({
-      key: `${this.hawk}_anim`,
-      frames: this.scene.anims.generateFrameNumbers(this.hawk, {
+      key: key,
+      frames: this.scene.anims.generateFrameNumbers(frameName, {
         start: 0,
-        end: 5,
+        end: end,
       }),
-      repeat: -1,
-      frameRate: 15,
+      repeat: repeat,
+      frameRate: frameRate,
     });
-    this.sprite.play(`${this.hawk}_anim`, true);
+    targetSprite.play(key, true);
   }
 
   private Hawk() {
     if (!this.player) return;
 
-    this.HawkAnim();
+    this.HawkAnim(`${this.hawk}_anim`, this.hawk, 5, -1, 15, this.sprite);
 
     this.scene.tweens.add({
       targets: this.sprite,
@@ -107,16 +110,8 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
 
   private ReadyToDive() {
     const hawkDive = "hawk_readydive";
-    this.scene.anims.create({
-      key: `${hawkDive}_anim`,
-      frames: this.scene.anims.generateFrameNumbers(hawkDive, {
-        start: 0,
-        end: 4,
-      }),
-      repeat: 0,
-      frameRate: 15,
-    });
-    this.sprite.play(`${hawkDive}_anim`, true);
+
+    this.HawkAnim(`${hawkDive}_anim`, hawkDive, 4, 0, 15, this.sprite);
 
     this.scene.tweens.add({
       targets: this.sprite,
@@ -132,16 +127,7 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
   private Dive() {
     const hawkDive = "hawk_dive";
 
-    this.scene.anims.create({
-      key: `${hawkDive}_anim`,
-      frames: this.scene.anims.generateFrameNumbers(hawkDive, {
-        start: 0,
-        end: 1,
-      }),
-      repeat: -1,
-      frameRate: 15,
-    });
-    this.sprite.play(`${hawkDive}_anim`, true);
+    this.HawkAnim(`${hawkDive}_anim`, hawkDive, 1, -1, 15, this.sprite);
 
     this.ranNumDive = Math.floor(Math.random() * (300 - 165 + 1)) + 165;
 
@@ -193,16 +179,14 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
       .setOffset(this.attackSprite.width / 3.5, this.attackSprite.height / 15)
       .setAllowGravity(false);
 
-    this.scene.anims.create({
-      key: `${hawkAttack}_anim`,
-      frames: this.scene.anims.generateFrameNumbers(hawkAttack, {
-        start: 0,
-        end: 5,
-      }),
-      repeat: 0,
-      frameRate: 10,
-    });
-    this.attackSprite.play(`${hawkAttack}_anim`, true);
+    this.HawkAnim(
+      `${hawkAttack}_anim`,
+      hawkAttack,
+      5,
+      0,
+      10,
+      this.attackSprite,
+    );
 
     this.attackSprite.scene.physics.add.collider(
       this.attackSprite,
@@ -245,7 +229,7 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
 
   private collisionAnim() {
     this.sprite.setVisible(true);
-    this.HawkAnim();
+    this.HawkAnim(`${this.hawk}_anim`, this.hawk, 5, -1, 15, this.sprite);
 
     const scapeDirection = this.x + 100;
 
@@ -267,12 +251,12 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
     this.scene.tweens.add({
       targets: this.sprite,
       alpha: 0,
-      duration: 4000,
+      duration: 5000,
       onComplete: () => {
         this.sprite.setVisible(false);
         this.scene.tweens.killTweensOf(this.sprite);
         this.sprite.stop();
-      }
+      },
     });
   }
 }
