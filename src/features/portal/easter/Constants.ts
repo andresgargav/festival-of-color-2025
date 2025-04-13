@@ -2,7 +2,6 @@ import { Equipped } from "features/game/types/bumpkin";
 import { translate as t } from "lib/i18n/translate";
 import { NPC_WEARABLES } from "lib/npcs";
 import { ITEM_DETAILS } from "features/game/types/images";
-import { SQUARE_WIDTH } from "features/game/lib/constants";
 import { SPAWNS } from "features/world/lib/spawn";
 
 export const PORTAL_NAME = "easter";
@@ -17,8 +16,10 @@ export const ENEMY_SPAWN_INTERVAL = 10000;
 
 // Snakes coordinates
 export const Y_AXIS = SPAWNS().easter.default.y - 6;
-export const HAWKSCALE = 0.7;
-export const SPRITE_SCALE = 0.8;
+export const SPECIALHAWK_Y = 248;
+export const HAWK_SCALE = 0.7;
+export const SNAKE_SCALE = 0.8;
+export const DIVE_POINT = 100;
 export const SNAKE_CONFIGURATION = {
   snakeX_config: {
     RtoL: { x: 335 },
@@ -33,6 +34,10 @@ export const HAWK_CONFIGURATION = {
   normalHawk: {
     RtoL: { x: 335 },
     LtoR: { x: 115 },
+  },
+  specialHawk: {
+    RtoL: { x: 0 },
+    LtoR: { x: 450 },
   },
 };
 export const SNAKE_INITIAL_SPEED = 30;

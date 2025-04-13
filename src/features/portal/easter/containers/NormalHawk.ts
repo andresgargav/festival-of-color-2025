@@ -2,9 +2,8 @@ import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
 import { MachineInterpreter } from "../lib/Machine";
 import {
   GRAVITY,
-  HAWKSCALE,
+  HAWK_SCALE,
   HAWK_CONFIGURATION,
-  SNAKE_COLLISION_SPEED,
   SNAKE_INITIAL_SPEED,
 } from "../Constants";
 import { Scene } from "../Scene";
@@ -46,7 +45,7 @@ export class NormalHawk extends Phaser.GameObjects.Container {
         .setOrigin(0)
         .setDepth(1000)
         .setFlipX(true)
-        .setScale(HAWKSCALE);
+        .setScale(HAWK_SCALE);
       this.numRes = this.LtoR_X;
     } else {
       this.sprite = scene.add
@@ -54,7 +53,7 @@ export class NormalHawk extends Phaser.GameObjects.Container {
         .setOrigin(0)
         .setDepth(1000)
         .setFlipX(false)
-        .setScale(HAWKSCALE);
+        .setScale(HAWK_SCALE);
       this.numRes = this.RtoL_X;
     }
 

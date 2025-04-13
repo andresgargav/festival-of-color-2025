@@ -18,10 +18,12 @@ import {
   EGG_SPAWN_LEFT_LIMIT,
   EGG_SPAWN_RIGHT_LIMIT,
   HAWK_CONFIGURATION,
+  SPECIALHAWK_Y,
 } from "./Constants";
 import { NormalSnake } from "./containers/NormalSnake";
 import { NormalHawk } from "./containers/NormalHawk";
 import { SpecialSnake } from "./containers/SpecialSnake";
+import { SpecialHawk } from "./containers/SpecialHawk";
 import { EasterEgg } from "./containers/EasterEgg";
 import { BadEgg } from "./containers/BadEgg";
 import { GoldenEgg } from "./containers/GoldenEgg";
@@ -58,6 +60,7 @@ export class Scene extends BaseScene {
   normalSnake!: NormalSnake;
   normalHawk!: NormalHawk;
   specialSnake!: SpecialSnake;
+  specialHawk!: SpecialHawk;
 
   sceneId: SceneId = PORTAL_NAME;
 
@@ -181,6 +184,22 @@ export class Scene extends BaseScene {
       },
     );
 
+    this.load.spritesheet("hawk_readydive", "world/hawk_readydive.png", {
+      frameWidth: 48,
+      frameHeight: 22,
+    });
+
+    this.load.spritesheet("hawk_dive", "world/hawk_dive.png", {
+      frameWidth: 48,
+      frameHeight: 35,
+    });
+
+    this.load.spritesheet("hawk_attack", "world/hawk_attack.png", {
+      frameWidth: 48,
+      frameHeight: 21,
+    });
+
+    // Mobile buttons
     this.load.image("left_button", "world/left_button.png");
     this.load.image("left_button_pressed", "world/left_button_pressed.png");
     this.load.image("up_button", "world/up_button.png");
@@ -481,12 +500,12 @@ export class Scene extends BaseScene {
       snake: () => this.createSnake(),
       specialSnake: () => this.createSpecialSnake(),
       hawk: () => this.createHawk(),
-      // specialHawk: () => this.createSpecialHawk(),
+      specialHawk: () => this.createSpecialHawk(),
     };
     const enemyNames = Object.keys(enemies) as Array<keyof typeof enemies>;
     const ranNum = Math.floor(Math.random() * enemyNames.length);
-    enemies[enemyNames[ranNum]]();
-    // this.createSpecialSnake();
+    // enemies[enemyNames[ranNum]]();
+    this.createSpecialHawk();
   }
 
   private createSnake() {
@@ -535,6 +554,17 @@ export class Scene extends BaseScene {
   }
 
   private createSpecialHawk() {
-    console.log("createSpecialHawk");
+    const startingPoint = [
+      HAWK_CONFIGURATION.specialHawk.RtoL.x,
+      HAWK_CONFIGURATION.specialHawk.LtoR.x,
+    ];
+    const ranNum = Math.floor(Math.random() * startingPoint.length);
+
+    this.specialHawk = new SpecialHawk({
+      x: startingPoint[ranNum],
+      y: SPECIALHAWK_Y,
+      scene: this,
+      player: this.currentPlayer,
+    });
   }
 }
