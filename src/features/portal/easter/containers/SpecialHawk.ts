@@ -1,7 +1,13 @@
 import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
 import { MachineInterpreter } from "../lib/Machine";
-import { HAWK_SCALE, HAWK_CONFIGURATION, DIVE_POINT } from "../Constants";
+import {
+  HAWK_SCALE,
+  HAWK_CONFIGURATION,
+  DIVE_POINT,
+  Y_AXIS,
+} from "../Constants";
 import { Scene } from "../Scene";
+import { SQUARE_WIDTH } from "features/game/lib/constants";
 
 interface Props {
   x: number;
@@ -131,9 +137,18 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
 
     this.ranNumDive = Math.floor(Math.random() * (300 - 165 + 1)) + 165;
 
+    let positionX;
+    if (this.player) {
+      positionX = !this.numRes
+        ? this.player.x - 10
+        : this.player.x - this.scene.map.width * SQUARE_WIDTH + 10;
+    } else {
+      positionX = !this.numRes ? this.ranNumDive : -this.ranNumDive;
+    }
+
     this.scene.tweens.add({
       targets: this.sprite,
-      x: this.numRes == 0 ? this.ranNumDive : -this.ranNumDive,
+      x: positionX,
       y: 130,
       duration: 1200,
       ease: "Linear",
@@ -167,7 +182,7 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
 
     this.attackSprite.setPosition(
       this.numRes == 0 ? this.sprite.x : 225 + (225 + this.sprite.x),
-      270,
+      Y_AXIS,
     );
 
     this.scene.physics.world.enable(this.attackSprite);
@@ -199,7 +214,7 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
 
     this.overlapHandler = this.attackSprite.scene.physics.add.overlap(
       this.player as BumpkinContainer,
-      this.attackSprite as Phaser.GameObjects.GameObject,
+      this.attackSprite,
       () => this.handleOverlap(),
     );
 
