@@ -5,7 +5,7 @@ import {
   SNAKE_COLLISION_SPEED,
   SNAKE_CONFIGURATION,
   SNAKE_INITIAL_SPEED,
-  SPRITE_SCALE,
+  SNAKE_SCALE,
 } from "../Constants";
 import { Scene } from "../Scene";
 
@@ -45,7 +45,7 @@ export class NormalSnake extends Phaser.GameObjects.Container {
         .setOrigin(0)
         .setDepth(1000)
         .setFlipX(true)
-        .setScale(SPRITE_SCALE);
+        .setScale(SNAKE_SCALE);
       this.numRes = this.LtoR_X;
     } else {
       this.sprite = scene.add
@@ -53,7 +53,7 @@ export class NormalSnake extends Phaser.GameObjects.Container {
         .setOrigin(0)
         .setDepth(1000)
         .setFlipX(false)
-        .setScale(SPRITE_SCALE);
+        .setScale(SNAKE_SCALE);
       this.numRes = this.RtoL_X;
     }
 
