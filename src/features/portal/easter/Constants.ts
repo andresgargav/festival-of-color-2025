@@ -16,7 +16,7 @@ export const EGG_SPAWN_RIGHT_LIMIT = 313;
 export const ENEMY_SPAWN_INTERVAL = 10000;
 
 // Snakes coordinates
-export const Y_AXIS = 270;
+export const Y_AXIS = SPAWNS().easter.default.y - 6;
 export const HAWKSCALE = 0.7;
 export const SPRITE_SCALE = 0.8;
 export const SNAKE_CONFIGURATION = {

@@ -122,6 +122,12 @@ export abstract class BaseScene extends Phaser.Scene {
   soundEffects: AudioController[] = [];
   walkAudioController?: WalkAudioController;
 
+  mobileKeys: { left: boolean; right: boolean; jump: boolean } = {
+    left: false,
+    right: false,
+    jump: false,
+  };
+
   cursorKeys:
     | {
         up: Phaser.Input.Keyboard.Key;
@@ -142,7 +148,7 @@ export abstract class BaseScene extends Phaser.Scene {
 
   currentTick = 0;
 
-  zoom = window.innerWidth < 500 ? 3 : 4;
+  zoom = window.innerWidth < 500 ? 2 : 3;
 
   velocity = WALKING_SPEED;
   isMoving = false;
@@ -495,10 +501,18 @@ export abstract class BaseScene extends Phaser.Scene {
     camera.setZoom(this.zoom);
 
     // Center it on canvas
-    const offsetX = (window.innerWidth - this.map.width * 4 * SQUARE_WIDTH) / 2;
-    const offsetY =
-      (window.innerHeight - this.map.height * 4 * SQUARE_WIDTH) / 2;
-    camera.setPosition(Math.max(offsetX, 0), Math.max(offsetY, 0));
+    const offsetX =
+      (window.innerWidth - this.map.width * this.zoom * SQUARE_WIDTH) / 2;
+    let offsetY =
+      window.innerHeight - this.map.height * this.zoom * SQUARE_WIDTH;
+    if (window.innerWidth >= 500) {
+      offsetY = offsetY + SQUARE_WIDTH * 2 * this.zoom;
+    }
+    camera.setPosition(offsetX, offsetY);
+    camera.setSize(
+      this.map.width * this.zoom * SQUARE_WIDTH,
+      this.map.height * this.zoom * SQUARE_WIDTH,
+    );
 
     camera.fadeIn(500);
 
@@ -587,15 +601,15 @@ export abstract class BaseScene extends Phaser.Scene {
   public initialiseControls() {
     if (isTouchDevice()) {
       // Initialise joystick
-      const { centerX, centerY, height } = this.cameras.main;
-      this.joystick = new VirtualJoystick(this, {
-        x: centerX,
-        y: centerY - 35 + height / this.zoom / 2,
-        radius: 15,
-        base: this.add.circle(0, 0, 15, 0x000000, 0.2).setDepth(1000000000),
-        thumb: this.add.circle(0, 0, 7, 0xffffff, 0.2).setDepth(1000000000),
-        forceMin: 2,
-      });
+      // const { centerX, centerY, height, width } = this.cameras.main;
+      // this.joystick = new VirtualJoystick(this, {
+      //   x: (this.map.width * this.zoom * SQUARE_WIDTH) / 2,
+      //   y: this.map.height * this.zoom * SQUARE_WIDTH - 275,
+      //   radius: 15,
+      //   base: this.add.circle(0, 0, 15, 0x000000, 0.2).setDepth(1000000000),
+      //   thumb: this.add.circle(0, 0, 7, 0xffffff, 0.2).setDepth(1000000000),
+      //   forceMin: 2,
+      // });
     }
 
     // Initialise Keyboard
@@ -752,7 +766,7 @@ export abstract class BaseScene extends Phaser.Scene {
       );
 
       // Follow player with camera
-      this.cameras.main.startFollow(this.currentPlayer);
+      // this.cameras.main.startFollow(this.currentPlayer);
 
       // Callback to fire on collisions
       this.physics.add.collider(
@@ -846,7 +860,7 @@ export abstract class BaseScene extends Phaser.Scene {
     this.switchScene();
     this.updatePlayer();
     this.updateOtherPlayers();
-    this.updateShaders();
+    // this.updateShaders();
     this.updateUsernames();
     this.updateFactions();
   }
@@ -900,14 +914,22 @@ export abstract class BaseScene extends Phaser.Scene {
     if (this.movementAngle === undefined) {
       if (document.activeElement?.tagName === "INPUT") return;
 
-      const left =
-        (this.cursorKeys?.left.isDown || this.cursorKeys?.a?.isDown) ?? false;
-      const right =
-        (this.cursorKeys?.right.isDown || this.cursorKeys?.d?.isDown) ?? false;
-      // const up =
-      //   (this.cursorKeys?.up.isDown || this.cursorKeys?.w?.isDown) ?? false;
-      // const down =
-      //   (this.cursorKeys?.down.isDown || this.cursorKeys?.s?.isDown) ?? false;
+      let left, right;
+
+      if (isTouchDevice()) {
+        left = this.mobileKeys.left;
+        right = this.mobileKeys.right;
+      } else {
+        left =
+          (this.cursorKeys?.left.isDown || this.cursorKeys?.a?.isDown) ?? false;
+        right =
+          (this.cursorKeys?.right.isDown || this.cursorKeys?.d?.isDown) ??
+          false;
+        // const up =
+        //   (this.cursorKeys?.up.isDown || this.cursorKeys?.w?.isDown) ?? false;
+        // const down =
+        //   (this.cursorKeys?.down.isDown || this.cursorKeys?.s?.isDown) ?? false;
+      }
 
       this.movementAngle = this.keysToAngle(left, right, false, false);
     }

@@ -27,6 +27,7 @@ import { BadEgg } from "./containers/BadEgg";
 import { GoldenEgg } from "./containers/GoldenEgg";
 import { SuperEasterEgg } from "./containers/SuperEasterEgg";
 import { SUNNYSIDE } from "assets/sunnyside";
+import { SQUARE_WIDTH } from "features/game/lib/constants";
 
 // export const NPCS: NPCBumpkin[] = [
 //   {
@@ -179,6 +180,11 @@ export class Scene extends BaseScene {
         frameHeight: 19,
       },
     );
+
+    this.load.image("left_button", "world/left_button.png");
+    this.load.image("left_button_pressed", "world/left_button_pressed.png");
+    this.load.image("up_button", "world/up_button.png");
+    this.load.image("up_button_pressed", "world/up_button_pressed.png");
   }
 
   async create() {
@@ -198,6 +204,7 @@ export class Scene extends BaseScene {
     // Game config
     this.currentPlayer?.createBasket();
     this.currentPlayer?.createSword();
+    this.input.addPointer(3);
     this.physics.world.gravity.y = GRAVITY;
     this.leftWall = this.colliders?.children.entries[0];
     this.rightWall = this.colliders?.children.entries[1];
@@ -241,6 +248,66 @@ export class Scene extends BaseScene {
 
   private initializeControls() {
     if (isTouchDevice()) {
+      const buttonY = (this.map.height * this.zoom * SQUARE_WIDTH - 75) / 2;
+      const leftButtonX = (this.map.width * this.zoom * SQUARE_WIDTH) / 4 - 60;
+
+      const leftButton = this.add
+        .image(leftButtonX, buttonY, "left_button")
+        .setAlpha(0.8)
+        .setInteractive()
+        .setDepth(1000)
+        .on("pointerdown", () => {
+          this.mobileKeys.left = true;
+          leftButton.setTexture("left_button_pressed");
+        })
+        .on("pointerup", () => {
+          this.mobileKeys.left = false;
+          leftButton.setTexture("left_button");
+        })
+        .on("pointerout", () => {
+          this.mobileKeys.left = false;
+          leftButton.setTexture("left_button");
+        });
+
+      const rightButton = this.add
+        .image(leftButtonX + leftButton.width + 5, buttonY, "left_button")
+        .setAlpha(0.8)
+        .setInteractive()
+        .setDepth(1000)
+        .on("pointerdown", () => {
+          this.mobileKeys.right = true;
+          rightButton.setTexture("left_button_pressed");
+        })
+        .on("pointerup", () => {
+          this.mobileKeys.right = false;
+          rightButton.setTexture("left_button");
+        })
+        .on("pointerout", () => {
+          this.mobileKeys.right = false;
+          rightButton.setTexture("left_button");
+        });
+
+      rightButton.flipX = true;
+
+      // Jump
+      const jumpButton = this.add
+        .image(leftButtonX + (leftButton.width + 5) * 3, buttonY, "up_button")
+        .setAlpha(0.8)
+        .setInteractive()
+        .setDepth(1000)
+        .on("pointerdown", () => {
+          this.mobileKeys.jump = true;
+          jumpButton.setTexture("up_button_pressed");
+        })
+        .on("pointerup", () => {
+          this.mobileKeys.jump = false;
+          jumpButton.setTexture("up_button");
+        })
+        .on("pointerout", () => {
+          this.mobileKeys.jump = false;
+          jumpButton.setTexture("up_button");
+        });
+
       this.portalService?.send("SET_JOYSTICK_ACTIVE", {
         isJoystickActive: true,
       });
@@ -329,7 +396,7 @@ export class Scene extends BaseScene {
     }
 
     if (
-      this.cursorKeys?.space.isDown &&
+      (this.cursorKeys?.space.isDown || this.mobileKeys.jump) &&
       this.currentPlayer.y >= SPAWNS()[this.sceneId].default.y &&
       !this.currentPlayer.isHurt
     ) {

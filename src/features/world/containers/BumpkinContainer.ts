@@ -7,7 +7,7 @@ import debounce from "lodash.debounce";
 import { Player } from "../types/Room";
 import { NPCName, acknowledgedNPCs } from "lib/npcs";
 import { ReactionName } from "features/pumpkinPlaza/components/Reactions";
-import { getAnimationUrl } from "../lib/animations";
+import { ANIMATION, getAnimationUrl } from "../lib/animations";
 import { FactionName, InventoryItemName } from "features/game/types/game";
 import { BumpkinItem, ITEM_IDS } from "features/game/types/bumpkin";
 import { CONFIG } from "lib/config";
@@ -209,12 +209,12 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         "walking",
         "dig",
         "drilling",
-        "jump",
-        "hurt",
-        "attack",
-        "carry",
-        "carry-idle",
-        "death",
+        // "hurt",
+        // "attack",
+        // "carry",
+        // "carry-idle",
+        // "death",
+        // "jump",
       ]);
       const idleLoader = scene.load.spritesheet(this.spriteKey, url, {
         frameWidth: 96,
@@ -246,18 +246,53 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         this.createWalkingAnimation(9, 16);
         this.createDigAnimation(17, 29);
         this.createDrillAnimation(30, 38);
-        this.createJumpAnimation(39, 46);
-        this.createHurtAnimation(48, 52);
-        this.createAttackAnimation(55, 65);
-        this.createCarryAnimation(66, 73);
-        this.createCarryIdleAnimation(74, 82);
-        this.createDeathAnimation(83, 95);
+        // this.createJumpAnimation(0, 8);
+        // this.createHurtAnimation(0, 8);
+        // this.createAttackAnimation(0, 8);
+        // this.createCarryAnimation(0, 8);
+        // this.createCarryIdleAnimation(0, 8);
+        // this.createDeathAnimation(0, 8);
         this.sprite.play(this.idleAnimationKey as string, true);
 
         this.ready = true;
         if (this.silhouette?.active) {
           this.silhouette?.destroy();
         }
+      });
+
+      const animations = [
+        "jump",
+        "hurt",
+        "attack",
+        "carry",
+        "carry-idle",
+        "death",
+      ] as const;
+
+      const createAnimations: Record<(typeof animations)[number], () => void> =
+        {
+          jump: () => this.createJumpAnimation(0, 7),
+          hurt: () => this.createHurtAnimation(1, 5),
+          attack: () => this.createAttackAnimation(0, 9),
+          carry: () => this.createCarryAnimation(0, 7),
+          "carry-idle": () => this.createCarryIdleAnimation(0, 8),
+          death: () => this.createDeathAnimation(0, 12),
+        };
+
+      animations.forEach((anim) => {
+        const urlAdditionalAnimations = getAnimationUrl(this.clothing, [anim]);
+        const additionalAnimations = scene.load.spritesheet(
+          `${anim}-animations`,
+          urlAdditionalAnimations,
+          {
+            frameWidth: 96,
+            frameHeight: 64,
+          },
+        );
+        additionalAnimations.once(
+          `filecomplete-spritesheet-${anim}-animations`,
+          createAnimations[anim],
+        );
       });
     }
 
@@ -269,7 +304,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
 
     this.scene.anims.create({
       key: this.jumpAnimationKey,
-      frames: this.scene.anims.generateFrameNumbers(this.spriteKey as string, {
+      frames: this.scene.anims.generateFrameNumbers("jump-animations", {
         start,
         end,
       }),
@@ -283,7 +318,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
 
     this.scene.anims.create({
       key: this.hurtAnimationKey,
-      frames: this.scene.anims.generateFrameNumbers(this.spriteKey as string, {
+      frames: this.scene.anims.generateFrameNumbers("hurt-animations", {
         start,
         end,
       }),
@@ -297,7 +332,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
 
     this.scene.anims.create({
       key: this.attackAnimationKey,
-      frames: this.scene.anims.generateFrameNumbers(this.spriteKey as string, {
+      frames: this.scene.anims.generateFrameNumbers("attack-animations", {
         start,
         end,
       }),
@@ -311,7 +346,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
 
     this.scene.anims.create({
       key: this.carryAnimationKey,
-      frames: this.scene.anims.generateFrameNumbers(this.spriteKey as string, {
+      frames: this.scene.anims.generateFrameNumbers("carry-animations", {
         start,
         end,
       }),
@@ -325,7 +360,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
 
     this.scene.anims.create({
       key: this.carryIdleAnimationKey,
-      frames: this.scene.anims.generateFrameNumbers(this.spriteKey as string, {
+      frames: this.scene.anims.generateFrameNumbers("carry-idle-animations", {
         start,
         end,
       }),
@@ -339,7 +374,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
 
     this.scene.anims.create({
       key: this.deathAnimationKey,
-      frames: this.scene.anims.generateFrameNumbers(this.spriteKey as string, {
+      frames: this.scene.anims.generateFrameNumbers("death-animations", {
         start,
         end,
       }),
