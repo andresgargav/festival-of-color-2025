@@ -504,8 +504,7 @@ export class Scene extends BaseScene {
     };
     const enemyNames = Object.keys(enemies) as Array<keyof typeof enemies>;
     const ranNum = Math.floor(Math.random() * enemyNames.length);
-    // enemies[enemyNames[ranNum]]();
-    this.createSpecialHawk();
+    enemies[enemyNames[ranNum]]();
   }
 
   private createSnake() {
