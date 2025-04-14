@@ -363,6 +363,7 @@ export class Scene extends BaseScene {
     this.eggSpawnInterval.remove();
     this.eggCounter = 0;
     this.superEggInitCount = -1000;
+    this.currentPlayer?.setIsHurt(false);
   }
 
   private initializeStartEvent() {

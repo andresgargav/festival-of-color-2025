@@ -7,7 +7,7 @@ import debounce from "lodash.debounce";
 import { Player } from "../types/Room";
 import { NPCName, acknowledgedNPCs } from "lib/npcs";
 import { ReactionName } from "features/pumpkinPlaza/components/Reactions";
-import { ANIMATION, getAnimationUrl } from "../lib/animations";
+import { getAnimationUrl } from "../lib/animations";
 import { FactionName, InventoryItemName } from "features/game/types/game";
 import { BumpkinItem, ITEM_IDS } from "features/game/types/bumpkin";
 import { CONFIG } from "lib/config";
@@ -1182,5 +1182,9 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
       scene: this.scene as BaseScene,
       removedAnim: true,
     });
+  }
+
+  public setIsHurt(value: boolean) {
+    this.isHurt = value;
   }
 }
