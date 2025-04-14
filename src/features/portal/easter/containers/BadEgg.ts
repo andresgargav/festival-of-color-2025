@@ -93,6 +93,7 @@ export class BadEgg extends Phaser.GameObjects.Container {
           (this.body as Phaser.Physics.Arcade.Body).bottom <=
           (this.player?.basket?.body as Phaser.Physics.Arcade.Body).top + 5
         ) {
+          this.createFriedEggGroup();
           this.destroy();
         }
       },
