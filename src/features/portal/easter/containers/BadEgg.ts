@@ -1,5 +1,7 @@
 import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
 import { Scene } from "../Scene";
+import { FriedEgg } from "./FriedEgg";
+import { FRIED_EGGS_CONFIG } from "../Constants";
 
 interface Props {
   x: number;
@@ -121,6 +123,8 @@ export class BadEgg extends Phaser.GameObjects.Container {
   }
 
   private break() {
+    this.createFriedEggGroup();
+
     this.sprite.anims.play(`${this.spriteName}_break`, true);
     this.sprite.once(
       Phaser.Animations.Events.ANIMATION_COMPLETE,
@@ -130,5 +134,15 @@ export class BadEgg extends Phaser.GameObjects.Container {
         }
       },
     );
+  }
+
+  private createFriedEggGroup() {
+    FRIED_EGGS_CONFIG.forEach((config) => {
+      new FriedEgg({
+        x: config.x,
+        y: config.y,
+        scene: this.scene,
+      });
+    });
   }
 }

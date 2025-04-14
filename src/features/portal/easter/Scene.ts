@@ -134,6 +134,36 @@ export class Scene extends BaseScene {
       frameHeight: 16,
     });
 
+    this.load.image("fried_egg_1", "world/fried_egg_1.png");
+    this.load.spritesheet(
+      "fried_egg_1_disappear",
+      "world/fried_egg_1_disappear.png",
+      {
+        frameWidth: 16,
+        frameHeight: 16,
+      },
+    );
+
+    this.load.image("fried_egg_2", "world/fried_egg_2.png");
+    this.load.spritesheet(
+      "fried_egg_2_disappear",
+      "world/fried_egg_2_disappear.png",
+      {
+        frameWidth: 16,
+        frameHeight: 16,
+      },
+    );
+
+    this.load.image("fried_egg_3", "world/fried_egg_3.png");
+    this.load.spritesheet(
+      "fried_egg_3_disappear",
+      "world/fried_egg_3_disappear.png",
+      {
+        frameWidth: 16,
+        frameHeight: 16,
+      },
+    );
+
     // Heart
     this.load.image("heart", SUNNYSIDE.icons.heart);
 
