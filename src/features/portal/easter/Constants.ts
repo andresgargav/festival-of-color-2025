@@ -175,3 +175,7 @@ export const ENEMIES_TABLE: {
 
 // Panel
 export const PANEL_NPC_WEARABLES: Equipped = NPC_WEARABLES["hopper"];
+
+//Sound
+export const NEW_EGG_TIME_DELAY = 2500;
+export const PORTAL_VOLUME = 0.3;

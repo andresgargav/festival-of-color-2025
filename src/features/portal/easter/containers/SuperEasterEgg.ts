@@ -1,6 +1,7 @@
 import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
 import { Scene } from "../Scene";
 import { MachineInterpreter } from "../lib/Machine";
+import { NEW_EGG_TIME_DELAY, PORTAL_VOLUME } from "../Constants";
 
 interface Props {
   x: number;
@@ -87,6 +88,10 @@ export class SuperEasterEgg extends Phaser.GameObjects.Container {
       repeat: 0,
       frameRate: 10,
     });
+    //sound
+    this.scene.time.delayedCall(NEW_EGG_TIME_DELAY, () => {
+      this.scene.sound.play("new_egg", {volume: PORTAL_VOLUME})
+    });
   }
 
   private overlapWithBasket() {
@@ -101,6 +106,7 @@ export class SuperEasterEgg extends Phaser.GameObjects.Container {
           this.portalService?.send("GAIN_POINTS", {
             points: 2,
           });
+          this.scene.sound.play("normal_egg", {volume: PORTAL_VOLUME}),
           this.destroy();
         }
       },
@@ -119,6 +125,7 @@ export class SuperEasterEgg extends Phaser.GameObjects.Container {
   }
 
   private dissapear() {
+    this.scene.sound.play("egg_crack", {volume: PORTAL_VOLUME}),
     this.sprite.anims.play(`${this.spriteName}_disappear`, true);
     this.sprite.once(
       Phaser.Animations.Events.ANIMATION_COMPLETE,
@@ -131,6 +138,7 @@ export class SuperEasterEgg extends Phaser.GameObjects.Container {
   }
 
   private break() {
+    this.scene.sound.play("egg_break", {volume: PORTAL_VOLUME}),
     this.sprite.anims.play(`${this.spriteName}_break`, true);
     this.sprite.once(
       Phaser.Animations.Events.ANIMATION_COMPLETE,

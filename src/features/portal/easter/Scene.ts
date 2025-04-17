@@ -234,6 +234,26 @@ export class Scene extends BaseScene {
     this.load.image("left_button_pressed", "world/left_button_pressed.png");
     this.load.image("up_button", "world/up_button.png");
     this.load.image("up_button_pressed", "world/up_button_pressed.png");
+
+    //Egg sounds
+    this.load.audio("golden_egg", "world/sound-effects/golden_egg.mp3"); //
+    this.load.audio("normal_egg", "world/sound-effects/normal_egg.mp3");
+    this.load.audio("egg_break", "world/sound-effects/egg_break.mp3");
+    this.load.audio("egg_crack", "world/sound-effects/egg_crack.mp3");
+    this.load.audio("new_egg", "world/sound-effects/new_egg.mp3");
+    //Snake sounds
+    this.load.audio("jump_snake", "world/sound-effects/jump_snake.mp3");
+    this.load.audio("snake", "world/sound-effects/snake.mp3");
+    //Hawk sounds
+    this.load.audio("wings_flap", "world/sound-effects/wings_flap.mp3");
+    this.load.audio("dive", "world/sound-effects/dive.mp3");
+    this.load.audio("fly_away", "world/sound-effects/fly_away.mp3");
+    this.load.audio("attack", "world/sound-effects/attack.mp3");
+    this.load.audio("hawk_sound", "world/sound-effects/hawk_sound.mp3");
+    //Player sounds
+    this.load.audio("sword", "world/sound-effects/sword.mp3");
+    this.load.audio("lose_life", "world/sound-effects/lose_life.mp3");
+    this.load.audio("ambience", "world/sound-effects/ambience.mp3");    
   }
 
   async create() {

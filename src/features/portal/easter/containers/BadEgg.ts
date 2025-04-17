@@ -1,5 +1,6 @@
 import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
 import { Scene } from "../Scene";
+import { NEW_EGG_TIME_DELAY, PORTAL_VOLUME } from "../Constants";
 import { FriedEgg } from "./FriedEgg";
 import { FRIED_EGGS_CONFIG } from "../Constants";
 
@@ -25,26 +26,26 @@ export class BadEgg extends Phaser.GameObjects.Container {
     // Bad Egg Sprite
     this.spriteName = "bad_egg";
     this.sprite = scene.add.sprite(0, 0, this.spriteName);
-
+    
     // Collisions
     this.setCollisions();
-
+    
     // Animation
     this.createAnimations();
-
+    
     // Action - Overlap
     this.overlapWithBasket();
     this.overlapWithSword();
-
+    
     this.setDepth(1000000000);
     this.setSize(this.sprite.width, this.sprite.height);
     this.add(this.sprite);
-
+    
     this.scene.physics.world.enable(this);
     (this.body as Phaser.Physics.Arcade.Body)
-      .setAllowGravity(false)
-      .setVelocityY(50);
-
+    .setAllowGravity(false)
+    .setVelocityY(50);
+    
     scene.add.existing(this);
   }
 
@@ -69,7 +70,7 @@ export class BadEgg extends Phaser.GameObjects.Container {
       repeat: 0,
       frameRate: 15,
     });
-
+    
     this.scene.anims.create({
       key: `${this.spriteName}_break`,
       frames: this.scene.anims.generateFrameNumbers(
@@ -81,6 +82,10 @@ export class BadEgg extends Phaser.GameObjects.Container {
       ),
       repeat: 0,
       frameRate: 10,
+    }); 
+    //sound
+    this.scene.time.delayedCall(NEW_EGG_TIME_DELAY, () => {
+      this.scene.sound.play("new_egg", {volume: PORTAL_VOLUME})
     });
   }
 
@@ -93,6 +98,7 @@ export class BadEgg extends Phaser.GameObjects.Container {
           (this.body as Phaser.Physics.Arcade.Body).bottom <=
           (this.player?.basket?.body as Phaser.Physics.Arcade.Body).top + 5
         ) {
+          this.scene.sound.play("egg_break", {volume: PORTAL_VOLUME}),
           this.createFriedEggGroup();
           this.destroy();
         }
@@ -112,6 +118,7 @@ export class BadEgg extends Phaser.GameObjects.Container {
   }
 
   private dissapear() {
+    this.scene.sound.play("egg_crack", {volume: PORTAL_VOLUME}),
     this.sprite.anims.play(`${this.spriteName}_disappear`, true);
     this.sprite.once(
       Phaser.Animations.Events.ANIMATION_COMPLETE,
@@ -124,6 +131,7 @@ export class BadEgg extends Phaser.GameObjects.Container {
   }
 
   private break() {
+    this.scene.sound.play("egg_break", {volume: PORTAL_VOLUME}),
     this.createFriedEggGroup();
 
     this.sprite.anims.play(`${this.spriteName}_break`, true);
