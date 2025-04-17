@@ -254,7 +254,7 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
   private collisionAnim() {
     this.sprite.setVisible(true);
     this.HawkAnim(`${this.hawk}_anim`, this.hawk, 5, -1, 15, this.sprite);
-    this.scene.sound.play("fly_away", {volume: 1.5})
+    this.scene.sound.play("fly_away", {volume: 1})
 
     const scapeDirection = this.x + 100;
 

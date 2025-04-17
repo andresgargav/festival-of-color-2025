@@ -71,7 +71,6 @@ export const FRIED_EGGS_CONFIG = [
 // Enemies
 export const ENEMY_SPAWN_INTERVAL = 10000;
 
-// Snakes coordinates
 export const Y_AXIS = SPAWNS().easter.default.y - 6;
 export const SPECIALHAWK_Y = 248;
 export const HAWK_SCALE = 0.7;

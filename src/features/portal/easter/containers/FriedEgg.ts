@@ -1,4 +1,5 @@
 import { Scene } from "../Scene";
+import { PORTAL_VOLUME } from "../Constants";
 
 interface Props {
   x: number;
@@ -31,6 +32,9 @@ export class FriedEgg extends Phaser.GameObjects.Container {
 
     this.scene.physics.world.enable(this);
     (this.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+
+    this.scene.sound.play("fried_egg", {volume: PORTAL_VOLUME})
+  
 
     scene.add.existing(this);
   }

@@ -19,6 +19,7 @@ import {
   EGG_SPAWN_RIGHT_LIMIT,
   HAWK_CONFIGURATION,
   SPECIALHAWK_Y,
+  PORTAL_VOLUME,
 } from "./Constants";
 import { NormalSnake } from "./containers/NormalSnake";
 import { NormalHawk } from "./containers/NormalHawk";
@@ -241,6 +242,7 @@ export class Scene extends BaseScene {
     this.load.audio("egg_break", "world/sound-effects/egg_break.mp3");
     this.load.audio("egg_crack", "world/sound-effects/egg_crack.mp3");
     this.load.audio("new_egg", "world/sound-effects/new_egg.mp3");
+    this.load.audio("fried_egg", "world/sound-effects/fried_egg.mp3");
     //Snake sounds
     this.load.audio("jump_snake", "world/sound-effects/jump_snake.mp3");
     this.load.audio("snake", "world/sound-effects/snake.mp3");
@@ -253,7 +255,7 @@ export class Scene extends BaseScene {
     //Player sounds
     this.load.audio("sword", "world/sound-effects/sword.mp3");
     this.load.audio("lose_life", "world/sound-effects/lose_life.mp3");
-    this.load.audio("ambience", "world/sound-effects/ambience.mp3");    
+    this.load.audio("ambience", "world/sound-effects/ambience.mp3");  
   }
 
   async create() {
@@ -278,6 +280,8 @@ export class Scene extends BaseScene {
     this.leftWall = this.colliders?.children.entries[0];
     this.rightWall = this.colliders?.children.entries[1];
     this.ground = this.colliders?.children.entries[2];
+
+    this.sound.play("ambience", {volume: PORTAL_VOLUME, loop: true})
   }
 
   private get isGameReady() {
@@ -555,7 +559,8 @@ export class Scene extends BaseScene {
     };
     const enemyNames = Object.keys(enemies) as Array<keyof typeof enemies>;
     const ranNum = Math.floor(Math.random() * enemyNames.length);
-    enemies[enemyNames[ranNum]]();
+    // enemies[enemyNames[ranNum]]();
+    this.createHawk()
   }
 
   private createSnake() {

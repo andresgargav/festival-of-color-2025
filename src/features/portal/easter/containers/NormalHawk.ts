@@ -143,7 +143,7 @@ export class NormalHawk extends Phaser.GameObjects.Container {
     this.removeLife();
     this.collisionAnim();
     this.hawkSound?.stop();
-    this.scene.sound.play("fly_away", {volume: 1.5})
+    this.scene.sound.play("fly_away", {volume: 1})
   }
 
   private removeLife() {
