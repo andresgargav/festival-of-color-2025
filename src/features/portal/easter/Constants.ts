@@ -306,6 +306,10 @@ export const ENEMIES_TABLE: {
     description: t(`${PORTAL_NAME}.enemy4`),
     width: 16,
   },
+  {
+    image: badEgg,
+    description: t(`${PORTAL_NAME}.enemy5`),
+  },
 ];
 
 // Panel

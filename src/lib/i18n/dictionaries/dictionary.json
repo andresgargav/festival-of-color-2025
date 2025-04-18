@@ -852,6 +852,7 @@
   "easter-eggstravaganza.enemy2": "The special snake will appear halfway through the path and will jump. Touch it, and you lose 1 life.",
   "easter-eggstravaganza.enemy3": "The hawk flies along the path. Touch it, and you lose 1 life.",
   "easter-eggstravaganza.enemy4": "The special hawk flies through the skies and will try to hunt you down. Touch it, and you lose 1 life.",
+  "easter-eggstravaganza.enemy5": "The bad egg will limit your vision if you touch it or drop it. The only way to defeat it is with you sword.",
   "easter-eggstravaganza.guideDescription": "{{description}}",
   "easter-eggstravaganza.scoreTitle": "Score:",
   "easter-eggstravaganza.score": "Score: {{score}}",
