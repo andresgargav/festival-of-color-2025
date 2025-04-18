@@ -16,6 +16,7 @@ import { KNOWN_IDS } from "features/game/types";
 import { getTradeableDisplay } from "features/marketplace/lib/tradeables";
 import { Heart } from "features/portal/easter/containers/Heart";
 import { BaseScene } from "../scenes/BaseScene";
+import { PORTAL_VOLUME } from "features/portal/easter/Constants";
 
 const NAME_ALIASES: Partial<Record<NPCName, string>> = {
   "pumpkin' pete": "pete",
@@ -1170,12 +1171,15 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     swordBody.enable = state;
     if (state && this.direction === "right") {
       this.sword?.setPosition(-15, -20);
+      this.scene.sound.play("sword", {volume: PORTAL_VOLUME})
     } else if (state && this.direction === "left") {
       this.sword?.setPosition(-25, -20);
+      this.scene.sound.play("sword", {volume: PORTAL_VOLUME})
     }
   }
 
   private animateRemovalHeart() {
+    this.scene.sound.play("lose_life", {volume: PORTAL_VOLUME})
     new Heart({
       x: this.x,
       y: this.y,

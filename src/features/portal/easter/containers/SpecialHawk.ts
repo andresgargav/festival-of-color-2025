@@ -5,6 +5,7 @@ import {
   HAWK_CONFIGURATION,
   DIVE_POINT,
   Y_AXIS,
+  PORTAL_VOLUME
 } from "../Constants";
 import { Scene } from "../Scene";
 import { SQUARE_WIDTH } from "features/game/lib/constants";
@@ -28,6 +29,7 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
   private RtoL_X!: number;
   private LtoR_X!: number;
   private ranNumDive!: number;
+  private hawkSound?: Phaser.Sound.BaseSound;
 
   constructor({ x, y, scene, player }: Props) {
     super(scene, x, y);
@@ -60,6 +62,9 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
 
     this.setSize(this.sprite.width, this.sprite.height);
     this.add(this.sprite);
+
+    this.hawkSound = this.scene.sound.add("wings_flap", { loop: true, rate: 2, volume: PORTAL_VOLUME});
+    this.hawkSound.play();
 
     this.Hawk();
     scene.add.existing(this);
@@ -116,6 +121,7 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
 
   private ReadyToDive() {
     const hawkDive = "hawk_readydive";
+    this.scene.sound.play("hawk_sound", {volume: PORTAL_VOLUME})
 
     this.HawkAnim(`${hawkDive}_anim`, hawkDive, 4, 0, 15, this.sprite);
 
@@ -126,12 +132,14 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
       ease: "Linear",
       onComplete: () => {
         this.Dive();
+        this.hawkSound?.stop();
       },
     });
   }
 
   private Dive() {
     const hawkDive = "hawk_dive";
+    this.scene.sound.play("dive", {volume: PORTAL_VOLUME})
 
     this.HawkAnim(`${hawkDive}_anim`, hawkDive, 1, -1, 15, this.sprite);
 
@@ -161,6 +169,7 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
 
   private Attack() {
     const hawkAttack = "hawk_collision";
+    this.scene.sound.play("attack", {volume: PORTAL_VOLUME})
 
     if (this.x == this.RtoL_X) {
       this.attackSprite = this.scene.add
@@ -245,6 +254,7 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
   private collisionAnim() {
     this.sprite.setVisible(true);
     this.HawkAnim(`${this.hawk}_anim`, this.hawk, 5, -1, 15, this.sprite);
+    this.scene.sound.play("fly_away", {volume: 1})
 
     const scapeDirection = this.x + 100;
 

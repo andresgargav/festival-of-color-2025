@@ -1,5 +1,6 @@
 import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
 import { Scene } from "../Scene";
+import { NEW_EGG_TIME_DELAY, PORTAL_VOLUME } from "../Constants";
 
 interface Props {
   x: number;
@@ -58,6 +59,7 @@ export class GoldenEgg extends Phaser.GameObjects.Container {
   }
 
   private createAnimations() {
+    
     this.scene.anims.create({
       key: `${this.spriteName}_disappear`,
       frames: this.scene.anims.generateFrameNumbers(
@@ -70,7 +72,7 @@ export class GoldenEgg extends Phaser.GameObjects.Container {
       repeat: 0,
       frameRate: 15,
     });
-
+    
     this.scene.anims.create({
       key: `${this.spriteName}_break`,
       frames: this.scene.anims.generateFrameNumbers(
@@ -83,6 +85,10 @@ export class GoldenEgg extends Phaser.GameObjects.Container {
       repeat: 0,
       frameRate: 10,
     });
+    //sound
+    this.scene.time.delayedCall(NEW_EGG_TIME_DELAY, () => {
+      this.scene.sound.play("new_egg", {volume: PORTAL_VOLUME})
+    });
   }
 
   private overlapWithBasket() {
@@ -94,6 +100,7 @@ export class GoldenEgg extends Phaser.GameObjects.Container {
           (this.body as Phaser.Physics.Arcade.Body).bottom <=
           (this.player?.basket?.body as Phaser.Physics.Arcade.Body).top + 5
         ) {
+          this.scene.sound.play("golden_egg", {volume: PORTAL_VOLUME}),
           this.destroy();
           this.action();
         }
@@ -102,6 +109,7 @@ export class GoldenEgg extends Phaser.GameObjects.Container {
   }
 
   private overlapWithSword() {
+    this.scene.sound.play("egg_break", {volume: PORTAL_VOLUME}),
     this.scene.physics.add.overlap(
       this,
       this.player?.sword as Phaser.GameObjects.Zone,
@@ -113,6 +121,7 @@ export class GoldenEgg extends Phaser.GameObjects.Container {
   }
 
   private dissapear() {
+    this.scene.sound.play("egg_crack", {volume: PORTAL_VOLUME}),
     this.sprite.anims.play(`${this.spriteName}_disappear`, true);
     this.sprite.once(
       Phaser.Animations.Events.ANIMATION_COMPLETE,
@@ -125,6 +134,7 @@ export class GoldenEgg extends Phaser.GameObjects.Container {
   }
 
   private break() {
+    this.scene.sound.play("egg_break", {volume: PORTAL_VOLUME}),
     this.sprite.anims.play(`${this.spriteName}_break`, true);
     this.sprite.once(
       Phaser.Animations.Events.ANIMATION_COMPLETE,
