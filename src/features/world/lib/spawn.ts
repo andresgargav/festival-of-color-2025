@@ -10,7 +10,7 @@ const randomXOffset = Math.random() * 60;
 const randomYOffset = Math.random() * 20;
 
 export const SPAWNS: () => SpawnLocation = () => ({
-  easter: {
+  "easter-eggstravaganza": {
     default: {
       x: 352,
       y: 341,

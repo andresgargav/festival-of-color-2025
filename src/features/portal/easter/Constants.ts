@@ -12,7 +12,7 @@ import specialSnake from "public/world/special_snake.gif";
 import hawk from "public/world/hawk.png";
 import specialHawk from "public/world/special_hawk.png";
 
-export const PORTAL_NAME = "easter";
+export const PORTAL_NAME = "easter-eggstravaganza";
 
 // Eggs
 export const EGG_SPAWN_INTERVAL = 2000;
@@ -190,7 +190,7 @@ export const ENEMY_SPAWN_INTERVAL = 10000;
 export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 2000;
 export const MINIMUM_ENEMY_SPAWN_INTERVAL = 2000;
 
-export const Y_AXIS = SPAWNS().easter.default.y - 6;
+export const Y_AXIS = SPAWNS()[PORTAL_NAME].default.y - 6;
 export const SPECIALHAWK_Y = 184;
 export const HAWK_SCALE = 0.7;
 export const SNAKE_SCALE = 0.8;
@@ -201,8 +201,8 @@ export const SNAKE_CONFIGURATION = {
     LtoR: { x: 232 },
   },
   snake_jumping: {
-    fromX: SPAWNS().easter.default.x - 1,
-    toX: SPAWNS().easter.default.x + 1,
+    fromX: SPAWNS()[PORTAL_NAME].default.x - 1,
+    toX: SPAWNS()[PORTAL_NAME].default.x + 1,
   },
 };
 export const HAWK_CONFIGURATION = {
