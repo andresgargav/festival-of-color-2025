@@ -190,7 +190,6 @@ export const ENEMY_SPAWN_INTERVAL = 10000;
 export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 2000;
 export const MINIMUM_ENEMY_SPAWN_INTERVAL = 2000;
 
-// Snakes coordinates
 export const Y_AXIS = SPAWNS().easter.default.y - 6;
 export const SPECIALHAWK_Y = 184;
 export const HAWK_SCALE = 0.7;
@@ -311,3 +310,7 @@ export const ENEMIES_TABLE: {
 
 // Panel
 export const PANEL_NPC_WEARABLES: Equipped = NPC_WEARABLES["hopper"];
+
+//Sound
+export const NEW_EGG_TIME_DELAY = 2500;
+export const PORTAL_VOLUME = 0.3;

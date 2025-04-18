@@ -5,6 +5,7 @@ import {
   HAWK_SCALE,
   HAWK_CONFIGURATION,
   SNAKE_INITIAL_SPEED,
+  PORTAL_VOLUME,
 } from "../Constants";
 import { Scene } from "../Scene";
 
@@ -27,6 +28,7 @@ export class NormalHawk extends Phaser.GameObjects.Container {
   private Xaxis!: number;
   private RtoL_X!: number;
   private LtoR_X!: number;
+  private hawkSound?: Phaser.Sound.BaseSound;
 
   constructor({ x, y, scene, player }: Props) {
     super(scene, x, y);
@@ -64,6 +66,12 @@ export class NormalHawk extends Phaser.GameObjects.Container {
 
     this.Hawk();
     this.HawkAnim();
+    this.hawkSound = this.scene.sound.add("wings_flap", {
+      loop: true,
+      rate: 1.5,
+      volume: PORTAL_VOLUME,
+    });
+    this.hawkSound.play();
 
     scene.add.existing(this);
   }
@@ -138,6 +146,8 @@ export class NormalHawk extends Phaser.GameObjects.Container {
     }
     this.removeLife();
     this.collisionAnim();
+    this.hawkSound?.stop();
+    this.scene.sound.play("fly_away", { volume: 1 });
   }
 
   private removeLife() {
@@ -182,6 +192,7 @@ export class NormalHawk extends Phaser.GameObjects.Container {
       duration: 1000,
       onComplete: () => {
         this.destroy();
+        this.hawkSound?.stop();
       },
     });
   }

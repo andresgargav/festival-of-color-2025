@@ -7,6 +7,7 @@ import {
   SPECIAL_SNAKE_JUMP_VELOCITY_Y,
   SNAKE_SCALE,
   Y_AXIS,
+  PORTAL_VOLUME,
 } from "../Constants";
 import { Scene } from "../Scene";
 
@@ -67,6 +68,8 @@ export class SpecialSnake extends Phaser.GameObjects.Container {
     this.add(this.sprite);
 
     this.Snake();
+
+    this.scene.sound.play("snake", { volume: PORTAL_VOLUME });
 
     scene.add.existing(this);
   }
@@ -208,6 +211,7 @@ export class SpecialSnake extends Phaser.GameObjects.Container {
 
   public jumpingAnim() {
     this.isJumping = true;
+    this.scene.sound.play("jump_snake", { volume: PORTAL_VOLUME });
     this.scene.anims.create({
       key: `${this.snake}_jump_anim`,
       frames: this.scene.anims.generateFrameNumbers(`${this.snake}_jump`, {

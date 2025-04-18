@@ -6,6 +6,7 @@ import {
   SNAKE_CONFIGURATION,
   SNAKE_INITIAL_SPEED,
   SNAKE_SCALE,
+  PORTAL_VOLUME,
 } from "../Constants";
 import { Scene } from "../Scene";
 
@@ -64,6 +65,8 @@ export class NormalSnake extends Phaser.GameObjects.Container {
 
     this.Snake();
     this.SnakeAnim();
+
+    this.scene.sound.play("snake", { volume: PORTAL_VOLUME });
 
     scene.add.existing(this);
   }
