@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
-import { SUNNYSIDE } from "assets/sunnyside";
 import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import { Mission } from "./Mission";
 import { PANEL_NPC_WEARABLES, PORTAL_NAME } from "../../Constants";
+import { ITEM_DETAILS } from "features/game/types/images";
 
 interface Props {
   mode: "introduction" | "success" | "failed";
@@ -31,8 +31,8 @@ export const RulesPanel: React.FC<Props> = ({
       setCurrentTab={setTab}
       tabs={[
         {
-          icon: SUNNYSIDE.icons.plant,
-          name: t(`${PORTAL_NAME}.mission`),
+          icon: ITEM_DETAILS["Carrot Sword"].image,
+          name: t(`${PORTAL_NAME}.portal.title`),
         },
       ]}
     >

@@ -12,8 +12,8 @@ const randomYOffset = Math.random() * 20;
 export const SPAWNS: () => SpawnLocation = () => ({
   easter: {
     default: {
-      x: 240,
-      y: 403.5,
+      x: 352,
+      y: 341,
     },
   },
   infernos: {

@@ -1,5 +1,5 @@
-import mapJson from "assets/map/easter-test.json";
-// import tilesetconfig from "assets/map/tileset.json";
+import mapJson from "assets/map/easter.json";
+import tilesetconfig from "assets/map/easter_tileset.json";
 import { SceneId } from "features/world/mmoMachine";
 import { BaseScene } from "features/world/scenes/BaseScene";
 import { MachineInterpreter } from "./lib/Machine";
@@ -19,6 +19,9 @@ import {
   EGG_SPAWN_RIGHT_LIMIT,
   HAWK_CONFIGURATION,
   SPECIALHAWK_Y,
+  GAME_SECONDS,
+  ENEMY_SPAWN_REDUCTION_PER_MINUTE,
+  MINIMUM_ENEMY_SPAWN_INTERVAL,
 } from "./Constants";
 import { NormalSnake } from "./containers/NormalSnake";
 import { NormalHawk } from "./containers/NormalHawk";
@@ -62,6 +65,9 @@ export class Scene extends BaseScene {
   specialSnake!: SpecialSnake;
   specialHawk!: SpecialHawk;
 
+  // Times
+  currentEnemySpawnInterval = ENEMY_SPAWN_INTERVAL;
+
   sceneId: SceneId = PORTAL_NAME;
 
   constructor() {
@@ -69,6 +75,8 @@ export class Scene extends BaseScene {
       name: PORTAL_NAME,
       map: {
         json: mapJson,
+        imageKey: "easter-tileset",
+        defaultTilesetConfig: tilesetconfig,
       },
       audio: { fx: { walk_key: "dirt_footstep" } },
     });
@@ -234,6 +242,40 @@ export class Scene extends BaseScene {
     this.load.image("left_button_pressed", "world/left_button_pressed.png");
     this.load.image("up_button", "world/up_button.png");
     this.load.image("up_button_pressed", "world/up_button_pressed.png");
+
+    // Decorations
+    this.load.spritesheet("goblin_farting", "world/goblin_farting.png", {
+      frameWidth: 29,
+      frameHeight: 22,
+    });
+    this.load.spritesheet("goblin_snorkling", "world/goblin_snorkling.png", {
+      frameWidth: 24,
+      frameHeight: 24,
+    });
+    this.load.spritesheet("dragonfly", "world/dragonfly.png", {
+      frameWidth: 13,
+      frameHeight: 4,
+    });
+    this.load.spritesheet("snake_jump", "world/snake_jump.png", {
+      frameWidth: 20,
+      frameHeight: 19,
+    });
+    this.load.spritesheet(
+      "egg_central_island",
+      "world/egg_central_island.png",
+      {
+        frameWidth: 52,
+        frameHeight: 64,
+      },
+    );
+    this.load.spritesheet(
+      "thematic_decoration",
+      "world/thematic_decoration.png",
+      {
+        frameWidth: 16,
+        frameHeight: 32,
+      },
+    );
   }
 
   async create() {
@@ -245,6 +287,7 @@ export class Scene extends BaseScene {
     // Basic config
     this.velocity = 0;
     this.physics.world.drawDebug = false;
+    this.addDecorations();
     this.initializeControls();
     this.initializeRetryEvent();
     this.initializeStartEvent();
@@ -255,9 +298,9 @@ export class Scene extends BaseScene {
     this.currentPlayer?.createSword();
     this.input.addPointer(3);
     this.physics.world.gravity.y = GRAVITY;
-    this.leftWall = this.colliders?.children.entries[0];
-    this.rightWall = this.colliders?.children.entries[1];
-    this.ground = this.colliders?.children.entries[2];
+    this.ground = this.colliders?.children.entries[0];
+    this.leftWall = this.colliders?.children.entries[1];
+    this.rightWall = this.colliders?.children.entries[2];
   }
 
   private get isGameReady() {
@@ -279,6 +322,9 @@ export class Scene extends BaseScene {
 
     if (lives === 0) {
       this.currentPlayer.death();
+      this.eggSpawnInterval.remove();
+      this.enemySpawnInterval.remove();
+      this.badEgg.destroyAllFriedEggs();
       this.velocity = 0;
       this.time.delayedCall(1000, () => {
         this.portalService?.send({ type: "GAME_OVER" });
@@ -297,8 +343,12 @@ export class Scene extends BaseScene {
 
   private initializeControls() {
     if (isTouchDevice()) {
-      const buttonY = (this.map.height * this.zoom * SQUARE_WIDTH - 75) / 2;
-      const leftButtonX = (this.map.width * this.zoom * SQUARE_WIDTH) / 4 - 60;
+      const buttonY = this.map.height * SQUARE_WIDTH - 3.5 * SQUARE_WIDTH;
+      const leftButtonX =
+        (this.map.width * SQUARE_WIDTH) / 2 -
+        window.innerWidth / (2 * this.zoom) +
+        6 +
+        SQUARE_WIDTH;
 
       const leftButton = this.add
         .image(leftButtonX, buttonY, "left_button")
@@ -340,7 +390,7 @@ export class Scene extends BaseScene {
 
       // Jump
       const jumpButton = this.add
-        .image(leftButtonX + (leftButton.width + 5) * 3, buttonY, "up_button")
+        .image(leftButtonX, buttonY, "up_button")
         .setAlpha(0.8)
         .setInteractive()
         .setDepth(1000)
@@ -356,6 +406,19 @@ export class Scene extends BaseScene {
           this.mobileKeys.jump = false;
           jumpButton.setTexture("up_button");
         });
+
+      jumpButton.setPosition(
+        (this.map.width * SQUARE_WIDTH) / 2 +
+          window.innerWidth / (2 * this.zoom) +
+          6 -
+          SQUARE_WIDTH -
+          jumpButton.width,
+        buttonY,
+      );
+
+      leftButton.setDepth(1000000000000);
+      rightButton.setDepth(1000000000000);
+      jumpButton.setDepth(1000000000000);
 
       this.portalService?.send("SET_JOYSTICK_ACTIVE", {
         isJoystickActive: true,
@@ -394,6 +457,7 @@ export class Scene extends BaseScene {
     this.eggCounter = 0;
     this.superEggInitCount = -1000;
     this.currentPlayer?.setIsHurt(false);
+    this.currentEnemySpawnInterval = ENEMY_SPAWN_INTERVAL;
   }
 
   private initializeStartEvent() {
@@ -406,7 +470,7 @@ export class Scene extends BaseScene {
           repeat: -1,
         });
         this.enemySpawnInterval = this.time.addEvent({
-          delay: ENEMY_SPAWN_INTERVAL,
+          delay: this.currentEnemySpawnInterval,
           callback: () => this.createEnemy(),
           callbackScope: this,
           repeat: -1,
@@ -526,7 +590,27 @@ export class Scene extends BaseScene {
     });
   }
 
+  private updateEnemySpawnInterval() {
+    const minutesElapsed = Math.floor(this.secondsElapsed / 60);
+    const newEnemySpawnInterval = Math.max(
+      ENEMY_SPAWN_INTERVAL - minutesElapsed * ENEMY_SPAWN_REDUCTION_PER_MINUTE,
+      MINIMUM_ENEMY_SPAWN_INTERVAL,
+    );
+    if (this.currentEnemySpawnInterval !== newEnemySpawnInterval) {
+      this.currentEnemySpawnInterval = newEnemySpawnInterval;
+      this.enemySpawnInterval.remove();
+      this.enemySpawnInterval = this.time.addEvent({
+        delay: this.currentEnemySpawnInterval,
+        callback: () => this.createEnemy(),
+        callbackScope: this,
+        repeat: -1,
+      });
+    }
+  }
+
   private createEnemy() {
+    this.updateEnemySpawnInterval();
+
     const enemies = {
       snake: () => this.createSnake(),
       specialSnake: () => this.createSpecialSnake(),
@@ -596,5 +680,62 @@ export class Scene extends BaseScene {
       scene: this,
       player: this.currentPlayer,
     });
+  }
+
+  private get secondsLeft() {
+    const endAt = this.portalService?.state.context.endAt;
+    const secondsLeft = !endAt
+      ? GAME_SECONDS
+      : Math.max(endAt - Date.now(), 0) / 1000;
+    return secondsLeft;
+  }
+
+  private get secondsElapsed() {
+    return GAME_SECONDS - this.secondsLeft;
+  }
+
+  private addDecorations() {
+    const goblinFartingName = "goblin_farting";
+    const goblinSnorklingName = "goblin_snorkling";
+    const dragonflyName = "dragonfly";
+    const snakeJumpName = "snake_jump";
+    const eggCentralIslandName = "egg_central_island";
+    const thematicDecorationName = "thematic_decoration";
+
+    const goblinFarting = this.add.sprite(378, 34, goblinFartingName);
+    const goblinSnorkling = this.add.sprite(278, 17, goblinSnorklingName);
+    const dragonfly = this.add.sprite(374, 146, dragonflyName);
+    const snakeJump = this.add.sprite(228, 157, snakeJumpName);
+    const eggCentralIsland = this.add.sprite(340, 141, eggCentralIslandName);
+    const thematicDecoration = this.add.sprite(
+      408,
+      100,
+      thematicDecorationName,
+    );
+
+    this.createAnimation(goblinFarting, goblinFartingName, 0, 62);
+    this.createAnimation(goblinSnorkling, goblinSnorklingName, 0, 45);
+    this.createAnimation(dragonfly, dragonflyName, 0, 1);
+    this.createAnimation(snakeJump, snakeJumpName, 0, 8);
+    this.createAnimation(eggCentralIsland, eggCentralIslandName, 0, 35);
+    this.createAnimation(thematicDecoration, thematicDecorationName, 0, 8);
+  }
+
+  private createAnimation(
+    sprite: Phaser.GameObjects.Sprite,
+    spriteName: string,
+    start: number,
+    end: number,
+  ) {
+    this.anims.create({
+      key: `${spriteName}_anim`,
+      frames: this.anims.generateFrameNumbers(spriteName, {
+        start,
+        end,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    sprite.play(`${spriteName}_anim`, true);
   }
 }

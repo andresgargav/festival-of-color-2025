@@ -51,7 +51,7 @@ export class FriedEgg extends Phaser.GameObjects.Container {
   }
 
   private appear() {
-    const randScale = Math.round((Math.random() * (2 - 1) + 1) * 10) / 10;
+    const randScale = Math.round((Math.random() * (2.5 - 1) + 1) * 10) / 10;
     const duration = 300;
     const onUpdate = (tween: Phaser.Tweens.Tween) => {
       const value = tween.getValue();
@@ -78,11 +78,11 @@ export class FriedEgg extends Phaser.GameObjects.Container {
       },
     });
 
-    this.scene.time.delayedCall(20000, () => this.fadeDestroy());
+    this.scene.time.delayedCall(20000, () => this?.fadeDestroy());
   }
 
-  private fadeDestroy() {
-    this.scene.tweens.add({
+  fadeDestroy() {
+    this?.scene?.tweens?.add({
       targets: this,
       alpha: 0,
       duration: 3000,

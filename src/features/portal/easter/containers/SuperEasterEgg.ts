@@ -101,6 +101,7 @@ export class SuperEasterEgg extends Phaser.GameObjects.Container {
           this.portalService?.send("GAIN_POINTS", {
             points: 2,
           });
+          this.player?.addLabel(2);
           this.destroy();
         }
       },

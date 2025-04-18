@@ -101,6 +101,7 @@ export class EasterEgg extends Phaser.GameObjects.Container {
           this.portalService?.send("GAIN_POINTS", {
             points: 1,
           });
+          this.player?.addLabel(1);
           this.destroy();
         }
       },

@@ -181,7 +181,9 @@ export class SpecialHawk extends Phaser.GameObjects.Container {
     }
 
     this.attackSprite.setPosition(
-      this.numRes == 0 ? this.sprite.x : 225 + (225 + this.sprite.x),
+      this.numRes == 0
+        ? this.sprite.x
+        : this.sprite.x + this.scene.map.width * SQUARE_WIDTH - 25,
       Y_AXIS,
     );
 

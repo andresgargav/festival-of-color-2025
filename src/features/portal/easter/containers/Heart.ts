@@ -27,14 +27,15 @@ export class Heart extends Phaser.GameObjects.Container {
     if (removedAnim) {
       this.sprite.setScale(0.6).setOrigin(0.5);
 
-      const label = this.scene.add.text(-9, -2, "-1", {
-        fontSize: "3px",
+      const label = this.scene.add.text(-11, -4, "-1", {
+        fontSize: "3.5px",
         fontFamily: "Teeny",
         color: "#FFFFFF",
         resolution: 10,
-        stroke: "#000000",
-        strokeThickness: 1,
+        padding: { x: 2, y: 2 },
       });
+
+      label.setShadow(4, 4, "#161424", 0, true, true);
       this.add(label);
       this.playRemovalAnimation();
     }

@@ -1,0 +1,15 @@
+[
+  {
+    "columns": 81,
+    "firstgid": 1,
+    "image": "map.png",
+    "imageheight": 432,
+    "imagewidth": 1296,
+    "margin": 0,
+    "name": "Sunnyside V3",
+    "spacing": 0,
+    "tilecount": 2187,
+    "tileheight": 16,
+    "tilewidth": 16
+  }
+]

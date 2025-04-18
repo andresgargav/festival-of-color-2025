@@ -14,6 +14,7 @@ export class BadEgg extends Phaser.GameObjects.Container {
   private player?: BumpkinContainer;
   private sprite: Phaser.GameObjects.Sprite;
   private spriteName: string;
+  private friedEggs: FriedEgg[] = [];
 
   scene: Scene;
 
@@ -139,11 +140,19 @@ export class BadEgg extends Phaser.GameObjects.Container {
 
   private createFriedEggGroup() {
     FRIED_EGGS_CONFIG.forEach((config) => {
-      new FriedEgg({
-        x: config.x,
-        y: config.y,
-        scene: this.scene,
-      });
+      this.friedEggs.push(
+        new FriedEgg({
+          x: config.x,
+          y: config.y,
+          scene: this.scene,
+        }),
+      );
+    });
+  }
+
+  destroyAllFriedEggs() {
+    this.friedEggs.forEach((friedEgg) => {
+      friedEgg.fadeDestroy();
     });
   }
 }

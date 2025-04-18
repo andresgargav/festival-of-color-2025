@@ -706,7 +706,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
    */
   destroyReaction = debounce(() => {
     this.stopReaction();
-  }, 5000);
+  }, 1000);
 
   public stopReaction() {
     this.reaction.clear(true, true);
@@ -1186,5 +1186,26 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
 
   public setIsHurt(value: boolean) {
     this.isHurt = value;
+  }
+
+  public addLabel(value: number | string) {
+    if (typeof value === "number") {
+      value = `${value > 0 ? "+" : "-"}${Math.abs(value)}`;
+    }
+
+    const label = this.scene.add
+      .text(1, -23, value, {
+        fontSize: "5px",
+        fontFamily: "Teeny",
+        color: "#FFFFFF",
+        resolution: 10,
+        padding: { x: 2, y: 2 },
+      })
+      .setOrigin(0.5);
+
+    label.setShadow(4, 4, "#161424", 0, true, true);
+    this.add(label);
+
+    this.scene.time.delayedCall(1000, () => label.destroy());
   }
 }

@@ -334,6 +334,7 @@ export abstract class BaseScene extends Phaser.Scene {
         // gameService
         clothing: {
           ...(this.gameState.bumpkin?.equipped as BumpkinParts),
+          onesie: "Bunny Onesie",
           updatedAt: 0,
         },
         experience: 0,
@@ -377,8 +378,8 @@ export abstract class BaseScene extends Phaser.Scene {
       imageKey,
       16,
       16,
-      1,
-      2,
+      -1,
+      0,
     ) as Phaser.Tilemaps.Tileset;
 
     // Set up collider layers
@@ -501,12 +502,16 @@ export abstract class BaseScene extends Phaser.Scene {
     camera.setZoom(this.zoom);
 
     // Center it on canvas
-    const offsetX =
+    let offsetX =
       (window.innerWidth - this.map.width * this.zoom * SQUARE_WIDTH) / 2;
     let offsetY =
       window.innerHeight - this.map.height * this.zoom * SQUARE_WIDTH;
     if (window.innerWidth >= 500) {
-      offsetY = offsetY + SQUARE_WIDTH * 2 * this.zoom;
+      offsetY = offsetY + SQUARE_WIDTH * 4 * this.zoom;
+    }
+    if (window.innerWidth < 500) {
+      offsetX = offsetX + 20;
+      offsetY = offsetY + SQUARE_WIDTH * 1 * this.zoom;
     }
     camera.setPosition(offsetX, offsetY);
     camera.setSize(
