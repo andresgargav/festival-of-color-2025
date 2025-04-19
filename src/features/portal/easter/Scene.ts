@@ -312,7 +312,7 @@ export class Scene extends BaseScene {
 
     // Basic config
     this.velocity = 0;
-    this.physics.world.drawDebug = true;
+    this.physics.world.drawDebug = false;
     this.addDecorations();
     this.initializeControls();
     this.initializeRetryEvent();
