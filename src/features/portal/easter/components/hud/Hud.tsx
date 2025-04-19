@@ -8,7 +8,7 @@ import { Score } from "./Score";
 import { Settings } from "./Settings";
 import { Travel } from "./Travel";
 import { Timer } from "./Timer";
-// import { Target } from "./Target";
+import { Target } from "./Target";
 import { Lives } from "./Lives";
 import { useAchievementToast } from "../../providers/AchievementToastProvider";
 import { PORTAL_NAME } from "../../Constants";
@@ -57,7 +57,7 @@ export const Hud: React.FC = () => {
         >
           {isPlaying && (
             <>
-              {/* <Target /> */}
+              <Target />
               <Timer />
               <Lives />
               <Score />

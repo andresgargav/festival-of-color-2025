@@ -1,6 +1,7 @@
 import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
 import { Scene } from "../Scene";
 import { NEW_EGG_TIME_DELAY, PORTAL_VOLUME } from "../Constants";
+import { MachineInterpreter } from "../lib/Machine";
 
 interface Props {
   x: number;
@@ -48,6 +49,12 @@ export class GoldenEgg extends Phaser.GameObjects.Container {
       .setVelocityY(50);
 
     scene.add.existing(this);
+  }
+
+  private get portalService() {
+    return this.scene.registry.get("portalService") as
+      | MachineInterpreter
+      | undefined;
   }
 
   private setCollisions() {
@@ -99,8 +106,12 @@ export class GoldenEgg extends Phaser.GameObjects.Container {
           (this.body as Phaser.Physics.Arcade.Body).bottom <=
           (this.player?.basket?.body as Phaser.Physics.Arcade.Body).top + 5
         ) {
-          this.scene.sound.play("golden_egg", { volume: PORTAL_VOLUME }),
-            this.destroy();
+          this.portalService?.send("GAIN_POINTS", {
+            points: 3,
+          });
+          this.player?.addLabel(3);
+          this.scene.sound.play("golden_egg", { volume: PORTAL_VOLUME });
+          this.destroy();
           this.action();
         }
       },

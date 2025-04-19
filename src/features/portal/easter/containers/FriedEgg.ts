@@ -16,8 +16,10 @@ export class FriedEgg extends Phaser.GameObjects.Container {
     super(scene, x, y);
     this.scene = scene;
 
+    const randomNum = Math.floor(Math.random() * 3) + 1;
+
     // Fried Egg Sprite
-    this.spriteName = "fried_egg_1";
+    this.spriteName = `fried_egg_${randomNum}`;
     this.sprite = scene.add.sprite(0, 0, this.spriteName).setScale(0);
 
     // Animation

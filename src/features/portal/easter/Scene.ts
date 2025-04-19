@@ -277,6 +277,10 @@ export class Scene extends BaseScene {
         frameHeight: 32,
       },
     );
+    this.load.spritesheet("bunny_shop", "world/bunny_shop.png", {
+      frameWidth: 20,
+      frameHeight: 24,
+    });
 
     //Egg sounds
     this.load.audio("golden_egg", "world/sound-effects/golden_egg.mp3");
@@ -308,7 +312,7 @@ export class Scene extends BaseScene {
 
     // Basic config
     this.velocity = 0;
-    this.physics.world.drawDebug = false;
+    this.physics.world.drawDebug = true;
     this.addDecorations();
     this.initializeControls();
     this.initializeRetryEvent();
@@ -547,12 +551,12 @@ export class Scene extends BaseScene {
     }
 
     if (swordBody.enable && this.currentPlayer.directionFacing === "right") {
-      this.currentPlayer.sword?.setPosition(-15, -20);
+      this.currentPlayer.sword?.setPosition(-12, -17);
     } else if (
       swordBody.enable &&
       this.currentPlayer.directionFacing === "left"
     ) {
-      this.currentPlayer.sword?.setPosition(-25, -20);
+      this.currentPlayer.sword?.setPosition(-22, -17);
     }
   }
 
@@ -725,6 +729,7 @@ export class Scene extends BaseScene {
     const snakeJumpName = "snake_jump";
     const eggCentralIslandName = "egg_central_island";
     const thematicDecorationName = "thematic_decoration";
+    const bunnyShopName = "bunny_shop";
 
     const goblinFarting = this.add.sprite(378, 34, goblinFartingName);
     const goblinSnorkling = this.add.sprite(278, 17, goblinSnorklingName);
@@ -736,6 +741,7 @@ export class Scene extends BaseScene {
       100,
       thematicDecorationName,
     );
+    const bunnyShop = this.add.sprite(344, 249, thematicDecorationName);
 
     this.createAnimation(goblinFarting, goblinFartingName, 0, 62);
     this.createAnimation(goblinSnorkling, goblinSnorklingName, 0, 45);
@@ -743,6 +749,7 @@ export class Scene extends BaseScene {
     this.createAnimation(snakeJump, snakeJumpName, 0, 8);
     this.createAnimation(eggCentralIsland, eggCentralIslandName, 0, 35);
     this.createAnimation(thematicDecoration, thematicDecorationName, 0, 8);
+    this.createAnimation(bunnyShop, bunnyShopName, 0, 8);
   }
 
   private createAnimation(

@@ -1153,7 +1153,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
   }
 
   public createSword() {
-    this.sword = this.scene.add.zone(-15, -20, 40, 20).setOrigin(0);
+    this.sword = this.scene.add.zone(-12, -17, 35, 15).setOrigin(0);
     this.scene.physics.world.enable(this.sword);
     const swordBody = this.sword.body as Phaser.Physics.Arcade.Body;
     swordBody.setAllowGravity(false);
@@ -1170,10 +1170,10 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     const swordBody = this.sword?.body as Phaser.Physics.Arcade.Body;
     swordBody.enable = state;
     if (state && this.direction === "right") {
-      this.sword?.setPosition(-15, -20);
+      this.sword?.setPosition(-12, -17);
       this.scene.sound.play("sword", { volume: PORTAL_VOLUME });
     } else if (state && this.direction === "left") {
-      this.sword?.setPosition(-25, -20);
+      this.sword?.setPosition(-22, -17);
       this.scene.sound.play("sword", { volume: PORTAL_VOLUME });
     }
   }
