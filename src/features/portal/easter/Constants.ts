@@ -187,8 +187,8 @@ export const FRIED_EGGS_CONFIG = [
 
 // Enemies
 export const ENEMY_SPAWN_INTERVAL = 10000;
-export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 2000;
-export const MINIMUM_ENEMY_SPAWN_INTERVAL = 2000;
+export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 3500;
+export const MINIMUM_ENEMY_SPAWN_INTERVAL = 3000;
 
 export const Y_AXIS = SPAWNS()[PORTAL_NAME].default.y - 6;
 export const SPECIALHAWK_Y = 184;
@@ -224,7 +224,7 @@ export const WALKING_SPEED = 60;
 export const PLAYER_JUMP_VELOCITY_Y = -165;
 
 // Game config
-export const GAME_SECONDS = 300;
+export const GAME_SECONDS = 180;
 export const GAME_LIVES = 5;
 export const GRAVITY = 450;
 
