@@ -4,7 +4,7 @@ import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import { Mission } from "./Mission";
 import { PANEL_NPC_WEARABLES, PORTAL_NAME } from "../../Constants";
-import { ITEM_DETAILS } from "features/game/types/images";
+import easterEgg from "public/world/easter_egg.png";
 
 interface Props {
   mode: "introduction" | "success" | "failed";
@@ -31,7 +31,7 @@ export const RulesPanel: React.FC<Props> = ({
       setCurrentTab={setTab}
       tabs={[
         {
-          icon: ITEM_DETAILS["Carrot Sword"].image,
+          icon: easterEgg,
           name: t(`${PORTAL_NAME}.portal.title`),
         },
       ]}

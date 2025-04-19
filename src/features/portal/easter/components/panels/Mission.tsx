@@ -80,7 +80,7 @@ export const Mission: React.FC<Props> = ({
                     {t("guide")}
                   </div>
                 </Button>
-                {!isJoystickActive && (
+                {window.innerWidth >= 500 && (
                   <>
                     <Button
                       className="whitespace-nowrap capitalize w-32 p-0"
@@ -97,27 +97,11 @@ export const Mission: React.FC<Props> = ({
             </div>
 
             <div className="w-full px-1 mb-3">
-              <div className="flex flex-row gap-1 items-center italic">
-                <SquareIcon icon={ITEM_DETAILS["Jelly Lamp"].image} width={7} />
-                {t(`${PORTAL_NAME}.description1`)}
-              </div>
+              <div className="italic">{t(`${PORTAL_NAME}.description1`)}</div>
               <div>{t(`${PORTAL_NAME}.description2`)}</div>
-              <div className="flex flex-row gap-1 items-center">
-                {t(`${PORTAL_NAME}.description3`)}
-                <SquareIcon
-                  icon={ITEM_DETAILS["Pablo The Bunny"].image}
-                  width={7}
-                />
-              </div>
-              <div className="flex flex-row gap-1 items-center">
-                {t(`${PORTAL_NAME}.description4`)}
-                <SquareIcon
-                  icon={ITEM_DETAILS["Carrot Sword"].image}
-                  width={7}
-                />
-              </div>
+              <div>{t(`${PORTAL_NAME}.description3`)}</div>
+              <div>{t(`${PORTAL_NAME}.description4`)}</div>
               <div>{t(`${PORTAL_NAME}.description5`)}</div>
-              <div>{t(`${PORTAL_NAME}.description6`)}</div>
             </div>
 
             <div className="w-full flex flex-row gap-1 mb-3">
