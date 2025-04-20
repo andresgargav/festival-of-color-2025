@@ -1,7 +1,6 @@
 import { Equipped } from "features/game/types/bumpkin";
 import { translate as t } from "lib/i18n/translate";
 import { NPC_WEARABLES } from "lib/npcs";
-import { ITEM_DETAILS } from "features/game/types/images";
 import { SPAWNS } from "features/world/lib/spawn";
 import easterEgg from "public/world/easter_egg.png";
 import superEasterEgg from "public/world/super_easter_egg.png";
@@ -11,6 +10,7 @@ import snake from "public/world/snake.gif";
 import specialSnake from "public/world/special_snake.gif";
 import hawk from "public/world/hawk.png";
 import specialHawk from "public/world/special_hawk.png";
+import stoneSword from "public/world/sword.png";
 
 export const PORTAL_NAME = "easter-eggstravaganza";
 
@@ -252,7 +252,7 @@ export const INSTRUCTIONS: {
     description: t(`${PORTAL_NAME}.instructions2`),
   },
   {
-    image: ITEM_DETAILS["Carrot Sword"].image,
+    image: stoneSword,
     description: t(`${PORTAL_NAME}.instructions3`),
   },
   {
