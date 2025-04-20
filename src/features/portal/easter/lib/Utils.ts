@@ -15,7 +15,7 @@ export const getAttemptsLeft = (minigame?: Minigame) => {
 
   const history = minigame?.history ?? {};
   const purchases = minigame?.purchases ?? [];
-  const moreAttemptsDay = ["2024-12-15", "2024-12-16"];
+  const moreAttemptsDay = ["2025-04-21"];
   let dailyAttempts = DAILY_ATTEMPTS;
 
   const now = new Date();
@@ -44,7 +44,7 @@ export const getAttemptsLeft = (minigame?: Minigame) => {
 
   // More attempts
   if (moreAttemptsDay.includes(now.toISOString().substring(0, 10))) {
-    dailyAttempts = 2;
+    dailyAttempts = 3;
   }
 
   const attemptsToday = history[dateKey]?.attempts ?? 0;
