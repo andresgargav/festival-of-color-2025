@@ -353,7 +353,10 @@ export class Scene extends BaseScene {
 
     const lives = this.portalService?.state.context.lives;
 
-    if (this.isGameIntroduction) {
+    if (this.isGameReady) {
+      this.portalService?.send("START");
+      this.velocity = WALKING_SPEED;
+    } else if (this.isGameIntroduction) {
       this.velocity = 0;
     } else if (lives === 0) {
       this.gameOverAnimation();
@@ -364,9 +367,6 @@ export class Scene extends BaseScene {
       // The game has started
       this.playAnimation();
       this.specialSnake?.update();
-    } else if (this.isGameReady) {
-      this.portalService?.send("START");
-      this.velocity = WALKING_SPEED;
     }
 
     super.update();

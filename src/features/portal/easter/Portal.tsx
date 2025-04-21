@@ -131,7 +131,7 @@ export const Portal: React.FC = () => {
             mode={"failed"}
             showScore={true}
             showExitButton={true}
-            confirmButtonText={t("play.again")}
+            confirmButtonText={""}
             onConfirm={() => portalService.send("RETRY")}
           />
         </Modal>
@@ -155,7 +155,7 @@ export const Portal: React.FC = () => {
             mode={"introduction"}
             showScore={true}
             showExitButton={true}
-            confirmButtonText={t("play.again")}
+            confirmButtonText={""}
             onConfirm={() => portalService.send("RETRY")}
           />
         </Modal>

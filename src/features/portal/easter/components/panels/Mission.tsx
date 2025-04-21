@@ -133,12 +133,14 @@ export const Mission: React.FC<Props> = ({
                 {t("exit")}
               </Button>
             )}
-            <Button
-              className="whitespace-nowrap capitalize"
-              onClick={onConfirm}
-            >
-              {confirmButtonText}
-            </Button>
+            {confirmButtonText && (
+              <Button
+                className="whitespace-nowrap capitalize"
+                onClick={onConfirm}
+              >
+                {confirmButtonText}
+              </Button>
+            )}
           </div>
         </>
       )}
