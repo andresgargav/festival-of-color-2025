@@ -317,6 +317,7 @@ export class Scene extends BaseScene {
     this.initializeControls();
     this.initializeRetryEvent();
     this.initializeStartEvent();
+    this.initializeEndGameEarlyEvent();
     this.initializeFontFamily();
 
     // Game config
@@ -339,6 +340,10 @@ export class Scene extends BaseScene {
     return this.portalService?.state.matches("playing") === true;
   }
 
+  private get isGameIntroduction() {
+    return this.portalService?.state.matches("introduction") === true;
+  }
+
   public get portalService() {
     return this.registry.get("portalService") as MachineInterpreter | undefined;
   }
@@ -348,12 +353,10 @@ export class Scene extends BaseScene {
 
     const lives = this.portalService?.state.context.lives;
 
-    if (lives === 0) {
-      this.currentPlayer.death();
-      this.eggSpawnInterval.remove();
-      this.enemySpawnInterval.remove();
-      this.badEgg.destroyAllFriedEggs();
+    if (this.isGameIntroduction) {
       this.velocity = 0;
+    } else if (lives === 0) {
+      this.gameOverAnimation();
       this.time.delayedCall(1000, () => {
         this.portalService?.send({ type: "GAME_OVER" });
       });
@@ -473,6 +476,24 @@ export class Scene extends BaseScene {
       }
     };
     this.portalService?.onEvent(onRetry);
+  }
+
+  private initializeEndGameEarlyEvent() {
+    const onEndGameEarly = (event: EventObject) => {
+      if (event.type === "END_GAME_EARLY") {
+        this.gameOverAnimation();
+      }
+    };
+    this.portalService?.onEvent(onEndGameEarly);
+  }
+
+  private gameOverAnimation() {
+    if (!this.currentPlayer) return;
+    this.currentPlayer.death();
+    this.eggSpawnInterval.remove();
+    this.enemySpawnInterval.remove();
+    this.badEgg.destroyAllFriedEggs();
+    this.velocity = 0;
   }
 
   private reset() {
