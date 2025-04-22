@@ -229,13 +229,13 @@ export const GAME_LIVES = 5;
 export const GRAVITY = 450;
 
 // Attempts
-export const UNLIMITED_ATTEMPTS_SFL = 20; // If this value is less than 0, the option disappears
-export const DAILY_ATTEMPTS = 1;
+export const UNLIMITED_ATTEMPTS_SFL = -1; // If this value is less than 0, the option disappears
+export const DAILY_ATTEMPTS = 3;
 export const RESTOCK_ATTEMPTS = [
   { attempts: 1, sfl: 3 },
   { attempts: 3, sfl: 7 },
   { attempts: 7, sfl: 14 },
-  // { attempts: 25, sfl: 20 },
+  { attempts: 25, sfl: 20 },
 ];
 
 // Guide
