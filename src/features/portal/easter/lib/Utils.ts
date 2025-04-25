@@ -37,6 +37,12 @@ export const getAttemptsLeft = (minigame?: Minigame, farmId?: number) => {
       endDate: "2025-04-25",
       attempts: DAILY_ATTEMPTS + 20,
     },
+    {
+      farmId: 13276,
+      startDate: "2025-04-25",
+      endDate: "2025-04-25",
+      attempts: DAILY_ATTEMPTS + 15,
+    },
   ];
 
   const now = new Date();
