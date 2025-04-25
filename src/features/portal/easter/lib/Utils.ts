@@ -20,31 +20,24 @@ export const getAttemptsLeft = (minigame?: Minigame, farmId?: number) => {
   // Review code – I might need to change `farmId` to `id`.
   const specificAttemptsByFarmAndDate = [
     {
-      farmId: 79871,
+      farmId: 13275,
       startDate: "2025-04-25",
       endDate: "2025-04-25",
       attempts: DAILY_ATTEMPTS + 10,
     },
-    // {
-    //   farmId: 13275,
-    //   startDate: "2025-04-24",
-    //   endDate: "2025-04-24",
-    //   attempts: DAILY_ATTEMPTS + 10,
-    // },
-    // {
-    //   farmId: 30029,
-    //   startDate: "2025-04-24",
-    //   endDate: "2025-04-24",
-    //   attempts: DAILY_ATTEMPTS + 10,
-    // },
-    // {
-    //   farmId: 681,
-    //   startDate: "2025-04-24",
-    //   endDate: "2025-04-24",
-    //   attempts: DAILY_ATTEMPTS + 20,
-    // },
+    {
+      farmId: 30029,
+      startDate: "2025-04-25",
+      endDate: "2025-04-25",
+      attempts: DAILY_ATTEMPTS + 10,
+    },
+    {
+      farmId: 681,
+      startDate: "2025-04-25",
+      endDate: "2025-04-25",
+      attempts: DAILY_ATTEMPTS + 20,
+    },
   ];
-  console.log(farmId);
 
   const now = new Date();
   const startOfTodayUTC = getStartOfUTCDay(now);
@@ -86,8 +79,7 @@ export const getAttemptsLeft = (minigame?: Minigame, farmId?: number) => {
       dateToCheck >= startDate &&
       dateToCheck <= endDate
     ) {
-      console.log("ATTEMPTS:", farm.attempts);
-      // dailyAttempts = farm.attempts;
+      dailyAttempts = farm.attempts;
     }
   });
 
