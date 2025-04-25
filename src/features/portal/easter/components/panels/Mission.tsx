@@ -20,6 +20,7 @@ import { OuterPanel } from "../../../../../components/ui/Panel";
 import { Controls } from "./Controls";
 
 import key from "public/world/key.png";
+import { decodeToken } from "features/auth/actions/login";
 
 interface Props {
   mode: "introduction" | "success" | "failed";
@@ -34,6 +35,7 @@ const _isJoystickActive = (state: PortalMachineState) =>
 const _minigame = (state: PortalMachineState) =>
   state.context.state?.minigames.games[PORTAL_NAME];
 const _lastScore = (state: PortalMachineState) => state.context.lastScore;
+const _jwt = (state: PortalMachineState) => state.context.jwt;
 // const _state = (state: PortalMachineState) => state.context.state;
 
 export const Mission: React.FC<Props> = ({
@@ -49,9 +51,13 @@ export const Mission: React.FC<Props> = ({
 
   const isJoystickActive = useSelector(portalService, _isJoystickActive);
   const minigame = useSelector(portalService, _minigame);
-  const attemptsLeft = getAttemptsLeft(minigame);
   const lastScore = useSelector(portalService, _lastScore);
+  const jwt = useSelector(portalService, _jwt);
   // const state = useSelector(portalService, _state);
+
+  const { farmId } = decodeToken(jwt as string);
+
+  const attemptsLeft = getAttemptsLeft(minigame, farmId);
 
   const dateKey = new Date().toISOString().slice(0, 10);
 

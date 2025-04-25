@@ -10,13 +10,41 @@ import {
  * @param minigame The minigame.
  * @returns The number of attempts left.
  */
-export const getAttemptsLeft = (minigame?: Minigame) => {
+export const getAttemptsLeft = (minigame?: Minigame, farmId?: number) => {
   const dateKey = new Date().toISOString().slice(0, 10);
 
   const history = minigame?.history ?? {};
   const purchases = minigame?.purchases ?? [];
-  const moreAttemptsDay = ["2025-04-21"];
   let dailyAttempts = DAILY_ATTEMPTS;
+  const specificAttemptsByDay = ["2025-04-21"];
+  // Review code – I might need to change `farmId` to `id`.
+  const specificAttemptsByFarmAndDate = [
+    {
+      farmId: 79871,
+      startDate: "2025-04-24",
+      endDate: "2025-04-24",
+      attempts: DAILY_ATTEMPTS + 10,
+    },
+    // {
+    //   farmId: 13275,
+    //   startDate: "2025-04-24",
+    //   endDate: "2025-04-24",
+    //   attempts: DAILY_ATTEMPTS + 10,
+    // },
+    // {
+    //   farmId: 30029,
+    //   startDate: "2025-04-24",
+    //   endDate: "2025-04-24",
+    //   attempts: DAILY_ATTEMPTS + 10,
+    // },
+    // {
+    //   farmId: 681,
+    //   startDate: "2025-04-24",
+    //   endDate: "2025-04-24",
+    //   attempts: DAILY_ATTEMPTS + 20,
+    // },
+  ];
+  console.log(farmId);
 
   const now = new Date();
   const startOfTodayUTC = getStartOfUTCDay(now);
@@ -42,10 +70,26 @@ export const getAttemptsLeft = (minigame?: Minigame) => {
     restockAttempts += option.attempts * restockedCount;
   });
 
-  // More attempts
-  if (moreAttemptsDay.includes(now.toISOString().substring(0, 10))) {
+  // daily attempts specific to the day
+  if (specificAttemptsByDay.includes(now.toISOString().substring(0, 10))) {
     dailyAttempts = 3;
   }
+
+  // daily attempts specific to the farm and date
+  specificAttemptsByFarmAndDate.forEach((farm) => {
+    const startDate = new Date(farm.startDate);
+    const endDate = new Date(farm.endDate);
+    const dateToCheck = new Date(now.toISOString().substring(0, 10));
+
+    if (
+      farm.farmId === farmId &&
+      dateToCheck >= startDate &&
+      dateToCheck <= endDate
+    ) {
+      console.log("ATTEMPTS:", farm.attempts);
+      // dailyAttempts = farm.attempts;
+    }
+  });
 
   const attemptsToday = history[dateKey]?.attempts ?? 0;
   const attemptsLeft = dailyAttempts - attemptsToday + restockAttempts;

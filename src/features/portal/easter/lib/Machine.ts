@@ -188,7 +188,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           });
 
           const minigame = game.minigames.games[PORTAL_NAME];
-          const attemptsLeft = getAttemptsLeft(minigame);
+          const attemptsLeft = getAttemptsLeft(minigame, farmId);
 
           return { game, farmId, attemptsLeft };
         },
@@ -251,8 +251,9 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
         {
           target: "noAttempts",
           cond: (context) => {
+            const { farmId } = decodeToken(context.jwt as string);
             const minigame = context.state?.minigames.games[PORTAL_NAME];
-            const attemptsLeft = getAttemptsLeft(minigame);
+            const attemptsLeft = getAttemptsLeft(minigame, farmId);
             return attemptsLeft <= 0;
           },
         },
