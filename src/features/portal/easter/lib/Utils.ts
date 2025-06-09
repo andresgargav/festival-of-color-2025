@@ -10,7 +10,7 @@ import {
  * @param minigame The minigame.
  * @returns The number of attempts left.
  */
-export const getAttemptsLeft = (minigame?: Minigame, farmId?: number) => {
+export const getAttemptsLeft = (minigame?: Minigame, farmId = 0) => {
   const dateKey = new Date().toISOString().slice(0, 10);
 
   const history = minigame?.history ?? {};
