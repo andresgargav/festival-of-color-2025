@@ -190,34 +190,15 @@ export const ENEMY_SPAWN_INTERVAL = 10000;
 export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 3500;
 export const MINIMUM_ENEMY_SPAWN_INTERVAL = 3000;
 
+// Festival of Color 
 export const Y_AXIS = SPAWNS()[PORTAL_NAME].default.y - 6;
-export const SPECIALHAWK_Y = 184;
-export const HAWK_SCALE = 0.7;
-export const SNAKE_SCALE = 0.8;
-export const DIVE_POINT = 210;
-export const SNAKE_CONFIGURATION = {
-  snakeX_config: {
-    RtoL: { x: 464 },
-    LtoR: { x: 232 },
-  },
-  snake_jumping: {
-    fromX: SPAWNS()[PORTAL_NAME].default.x - 1,
-    toX: SPAWNS()[PORTAL_NAME].default.x + 1,
-  },
-};
-export const HAWK_CONFIGURATION = {
-  normalHawk: {
-    RtoL: { x: 464 },
-    LtoR: { x: 232 },
-  },
-  specialHawk: {
-    RtoL: { x: 0 },
-    LtoR: { x: 690 },
-  },
-};
-export const SNAKE_INITIAL_SPEED = 30;
-export const SNAKE_COLLISION_SPEED = 20;
-export const SPECIAL_SNAKE_JUMP_VELOCITY_Y = -250;
+export const SHOOTING_SPRITE_SCALE: number = 1.4;
+export const IDLE_SPRITE_SCALE: number = 1.25;
+export const SIGNAL_SPRITE_SCALE: number = 1.3;
+export const SIGNAL_DURATION = 1000;
+
+// Ball and sprites configuration
+export const BALL_CONFIGURATION = { RtoL: 445, LtoR: 260};
 
 // Player
 export const WALKING_SPEED = 60;

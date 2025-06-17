@@ -8,7 +8,6 @@ import { SPAWNS } from "features/world/lib/spawn";
 import { isTouchDevice } from "features/world/lib/device";
 import {
   PORTAL_NAME,
-  SNAKE_CONFIGURATION,
   Y_AXIS,
   WALKING_SPEED,
   GRAVITY,
@@ -17,23 +16,24 @@ import {
   EGG_SPAWN_INTERVAL,
   EGG_SPAWN_LEFT_LIMIT,
   EGG_SPAWN_RIGHT_LIMIT,
-  HAWK_CONFIGURATION,
-  SPECIALHAWK_Y,
   GAME_SECONDS,
   ENEMY_SPAWN_REDUCTION_PER_MINUTE,
   MINIMUM_ENEMY_SPAWN_INTERVAL,
   PORTAL_VOLUME,
+  BALL_CONFIGURATION,
+  IDLE_SPRITE_SCALE,
+  SIGNAL_SPRITE_SCALE,
+  SIGNAL_DURATION
 } from "./Constants";
-import { NormalSnake } from "./containers/NormalSnake";
-import { NormalHawk } from "./containers/NormalHawk";
-import { SpecialSnake } from "./containers/SpecialSnake";
-import { SpecialHawk } from "./containers/SpecialHawk";
 import { EasterEgg } from "./containers/EasterEgg";
 import { BadEgg } from "./containers/BadEgg";
 import { GoldenEgg } from "./containers/GoldenEgg";
 import { SuperEasterEgg } from "./containers/SuperEasterEgg";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { SQUARE_WIDTH } from "features/game/lib/constants";
+//Festival-of-color-2025
+import { BounceBros } from "./containers/BounceBros";
+import { BlastBros } from "./containers/BlastBros";
 
 // export const NPCS: NPCBumpkin[] = [
 //   {
@@ -60,11 +60,20 @@ export class Scene extends BaseScene {
   goldenEgg!: GoldenEgg;
   superEasterEgg!: SuperEasterEgg;
 
-  // Enemies
-  normalSnake!: NormalSnake;
-  normalHawk!: NormalHawk;
-  specialSnake!: SpecialSnake;
-  specialHawk!: SpecialHawk;
+  // Festival-of-color-2025 Enemies
+  bounceBro!: BounceBros;
+  blastBros!: BlastBros;
+  // Idle Sprite
+  blastBro1!: Phaser.GameObjects.Sprite;
+  blastBro2!: Phaser.GameObjects.Sprite;
+  blastBro1Blue!: Phaser.GameObjects.Sprite;
+  blastBro2Red!: Phaser.GameObjects.Sprite;
+  bounceBro1!: Phaser.GameObjects.Sprite;
+  bounceBro2!: Phaser.GameObjects.Sprite;
+  greenSlime1!: Phaser.GameObjects.Sprite;
+  greenSlime2!: Phaser.GameObjects.Sprite;
+
+  public randomIndex!: number;
 
   // Times
   currentEnemySpawnInterval = ENEMY_SPAWN_INTERVAL;
@@ -238,6 +247,72 @@ export class Scene extends BaseScene {
       frameHeight: 21,
     });
 
+    // Festival-of-color-2025 enemies spritesheet
+    this.load.spritesheet("bouncingball", "world/slime_grey_ball.webp", {
+      frameWidth: 10,
+      frameHeight: 10,
+    });
+
+    this.load.spritesheet("breaking_ball", "world/grey_ball_break.webp", {
+      frameWidth: 10,
+      frameHeight: 10,
+    });
+
+    this.load.spritesheet(
+      "airballoon_slime_blue",
+      "world/airballoon_slime_blue.png",
+      {
+        frameWidth: 19,
+        frameHeight: 36,
+      },
+    );
+
+    this.load.spritesheet(
+      "airballoon_slime_red",
+      "world/airballoon_slime_red.webp",
+      {
+        frameWidth: 19,
+        frameHeight: 36,
+      },
+    );
+
+    this.load.spritesheet("airballoon_slime", "world/airballoon_slime.webp", {
+      frameWidth: 19,
+      frameHeight: 36,
+    });
+
+    this.load.spritesheet(
+      "shooting_slime",
+      "world/airballoon_slime_shooting.webp",
+      {
+        frameWidth: 19,
+        frameHeight: 36,
+      },
+    );
+
+    this.load.spritesheet("ground_slime", "world/ground_slime_idle.webp", {
+      frameWidth: 19,
+      frameHeight: 20,
+    });
+
+    this.load.spritesheet(
+      "ground_slime_shooting",
+      "world/ground_slime_shooting.webp",
+      {
+        frameWidth: 19,
+        frameHeight: 20,
+      },
+    );
+
+    this.load.spritesheet(
+      "ground_slime_green",
+      "world/ground_slime_green.webp",
+      {
+        frameWidth: 19,
+        frameHeight: 20,
+      },
+    );
+
     // Mobile buttons
     this.load.image("left_button", "world/left_button.png");
     this.load.image("left_button_pressed", "world/left_button_pressed.png");
@@ -289,15 +364,6 @@ export class Scene extends BaseScene {
     this.load.audio("egg_crack", "world/sound-effects/egg_crack.mp3");
     this.load.audio("new_egg", "world/sound-effects/new_egg.mp3");
     this.load.audio("fried_egg", "world/sound-effects/fried_egg.mp3");
-    //Snake sounds
-    this.load.audio("jump_snake", "world/sound-effects/jump_snake.mp3");
-    this.load.audio("snake", "world/sound-effects/snake.mp3");
-    //Hawk sounds
-    this.load.audio("wings_flap", "world/sound-effects/wings_flap.mp3");
-    this.load.audio("dive", "world/sound-effects/dive.mp3");
-    this.load.audio("fly_away", "world/sound-effects/fly_away.mp3");
-    this.load.audio("attack", "world/sound-effects/attack.mp3");
-    this.load.audio("hawk_sound", "world/sound-effects/hawk_sound.mp3");
     //Player sounds
     this.load.audio("sword", "world/sound-effects/sword.mp3");
     this.load.audio("lose_life", "world/sound-effects/lose_life.mp3");
@@ -313,7 +379,7 @@ export class Scene extends BaseScene {
     // Basic config
     this.velocity = 0;
     this.physics.world.drawDebug = false;
-    this.addDecorations();
+    // this.addDecorations();
     this.initializeControls();
     this.initializeRetryEvent();
     this.initializeStartEvent();
@@ -328,6 +394,9 @@ export class Scene extends BaseScene {
     this.ground = this.colliders?.children.entries[0];
     this.leftWall = this.colliders?.children.entries[1];
     this.rightWall = this.colliders?.children.entries[2];
+
+    // Festival of color 2025 idle
+    this.festivalOfColorIdle();
 
     this.sound.play("ambience", { volume: PORTAL_VOLUME, loop: true });
   }
@@ -366,7 +435,6 @@ export class Scene extends BaseScene {
     } else if (this.isGamePlaying) {
       // The game has started
       this.playAnimation();
-      this.specialSnake?.update();
     }
 
     super.update();
@@ -492,7 +560,7 @@ export class Scene extends BaseScene {
     this.currentPlayer.death();
     this.eggSpawnInterval.remove();
     this.enemySpawnInterval.remove();
-    this.badEgg.destroyAllFriedEggs();
+    // this.badEgg.destroyAllFriedEggs();
     this.velocity = 0;
   }
 
@@ -592,13 +660,13 @@ export class Scene extends BaseScene {
     const randomX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
 
     if (this.eggCounter - this.superEggInitCount <= 5) {
-      this.createSuperEasterEgg(randomX);
+      // this.createSuperEasterEgg(randomX);
     } else if ((this.eggCounter - 10) % 20 === 0) {
-      this.createGoldenEgg(randomX);
+      // this.createGoldenEgg(randomX);
     } else if (this.eggCounter % 20 === 0) {
-      this.createBadEgg(randomX);
+      // this.createBadEgg(randomX);
     } else {
-      this.createEasterEgg(randomX);
+      // this.createEasterEgg(randomX);
     }
   }
 
@@ -661,73 +729,79 @@ export class Scene extends BaseScene {
     this.updateEnemySpawnInterval();
 
     const enemies = {
-      snake: () => this.createSnake(),
-      specialSnake: () => this.createSpecialSnake(),
-      hawk: () => this.createHawk(),
-      specialHawk: () => this.createSpecialHawk(),
+      blastBros: () => this.createBlastBros(),
+      bounceBros: () => this.createBounceBros(),
     };
     const enemyNames = Object.keys(enemies) as Array<keyof typeof enemies>;
     const ranNum = Math.floor(Math.random() * enemyNames.length);
     enemies[enemyNames[ranNum]]();
   }
 
-  private createSnake() {
-    const startingPoint = [
-      SNAKE_CONFIGURATION.snakeX_config.RtoL.x,
-      SNAKE_CONFIGURATION.snakeX_config.LtoR.x,
-    ];
-    const ranNum = Math.floor(Math.random() * startingPoint.length);
+  private createBounceBros() {
+    const startingPoint = [BALL_CONFIGURATION.RtoL, BALL_CONFIGURATION.LtoR];
+    this.randomIndex = Math.floor(Math.random() * startingPoint.length);
+    const randomSpawn = startingPoint[this.randomIndex];
+    const finalX = this.randomIndex == 0;
 
-    this.normalSnake = new NormalSnake({
-      x: startingPoint[ranNum],
-      y: Y_AXIS,
-      scene: this,
-      player: this.currentPlayer,
+    !finalX
+      ? this.greenSlime1.setVisible(true)
+      : this.greenSlime2.setVisible(true);
+
+    this.time.delayedCall(SIGNAL_DURATION, () => {
+      this.greenSlime1.setVisible(false);
+      this.greenSlime2.setVisible(false);
+    });
+
+    this.time.delayedCall(SIGNAL_DURATION, () => {
+      finalX
+        ? this.bounceBro2.setVisible(false)
+        : this.bounceBro1.setVisible(false);
+
+      this.bounceBro = new BounceBros({
+        x: randomSpawn,
+        y: Y_AXIS - 10,
+        scene: this,
+        player: this.currentPlayer,
+      });
+    });
+
+    this.time.delayedCall(1000 + SIGNAL_DURATION, () => {
+      this.bounceBro1.setVisible(true);
+      this.bounceBro2.setVisible(true);
     });
   }
 
-  private createSpecialSnake() {
-    const startingPoint = [
-      SNAKE_CONFIGURATION.snakeX_config.RtoL.x,
-      SNAKE_CONFIGURATION.snakeX_config.LtoR.x,
-    ];
-    const ranNum = Math.floor(Math.random() * startingPoint.length);
+  private createBlastBros() {
+    const startingPoint = [BALL_CONFIGURATION.RtoL, BALL_CONFIGURATION.LtoR];
+    this.randomIndex = Math.floor(Math.random() * startingPoint.length);
+    const randomSpawn = startingPoint[this.randomIndex];
+    const finalX = this.randomIndex == 0;
 
-    this.specialSnake = new SpecialSnake({
-      x: startingPoint[ranNum],
-      y: Y_AXIS,
-      scene: this,
-      player: this.currentPlayer,
+    !finalX
+      ? this.blastBro1Blue.setVisible(true)
+      : this.blastBro2Red.setVisible(true);
+
+    this.time.delayedCall(SIGNAL_DURATION, () => {
+      this.blastBro1Blue.setVisible(false);
+      this.blastBro2Red.setVisible(false);
     });
-  }
 
-  private createHawk() {
-    const startingPoint = [
-      HAWK_CONFIGURATION.normalHawk.RtoL.x,
-      HAWK_CONFIGURATION.normalHawk.LtoR.x,
-    ];
-    const ranNum = Math.floor(Math.random() * startingPoint.length);
-
-    this.normalHawk = new NormalHawk({
-      x: startingPoint[ranNum],
-      y: Y_AXIS,
-      scene: this,
-      player: this.currentPlayer,
+    this.time.delayedCall(SIGNAL_DURATION, () => {
+      finalX
+        ? this.blastBro2.setVisible(false)
+        : this.blastBro1.setVisible(false);
+      
+      this.blastBros = new BlastBros({
+        x: randomSpawn,
+        y: Y_AXIS - 220,
+        scene: this,
+        player: this.currentPlayer,
+      });
     });
-  }
 
-  private createSpecialHawk() {
-    const startingPoint = [
-      HAWK_CONFIGURATION.specialHawk.RtoL.x,
-      HAWK_CONFIGURATION.specialHawk.LtoR.x,
-    ];
-    const ranNum = Math.floor(Math.random() * startingPoint.length);
-
-    this.specialHawk = new SpecialHawk({
-      x: startingPoint[ranNum],
-      y: SPECIALHAWK_Y,
-      scene: this,
-      player: this.currentPlayer,
+    this.time.delayedCall(1000 + SIGNAL_DURATION, () => {
+      this.blastBro1.setVisible(true);
+      this.blastBro2.setVisible(true);
     });
   }
 
@@ -771,6 +845,37 @@ export class Scene extends BaseScene {
     this.createAnimation(eggCentralIsland, eggCentralIslandName, 0, 35);
     this.createAnimation(thematicDecoration, thematicDecorationName, 0, 8);
     this.createAnimation(bunnyShop, bunnyShopName, 0, 8);
+  }
+
+  // Festival-of-color-2025 Idle
+  private festivalOfColorIdle() {
+    const blastBrosName = "airballoon_slime";
+    const bounceBrosName = "ground_slime";
+    const airballoon_blue = "airballoon_slime_blue";
+    const airballoon_red = "airballoon_slime_red";
+    const slime_green = "ground_slime_green";
+
+    // Sprite
+    this.blastBro1 = this.add.sprite(BALL_CONFIGURATION.LtoR, Y_AXIS - 230, blastBrosName).setDepth(1000000000).setScale(IDLE_SPRITE_SCALE);
+    this.blastBro2 = this.add.sprite(BALL_CONFIGURATION.RtoL, Y_AXIS - 230, blastBrosName).setDepth(1000000000).setFlipX(true).setScale(IDLE_SPRITE_SCALE);
+    this.bounceBro1 = this.add.sprite(BALL_CONFIGURATION.LtoR, Y_AXIS + 5, bounceBrosName).setDepth(10000000).setScale(IDLE_SPRITE_SCALE);
+    this.bounceBro2 = this.add.sprite(BALL_CONFIGURATION.RtoL, Y_AXIS + 5, bounceBrosName).setDepth(10000000).setFlipX(true).setScale(IDLE_SPRITE_SCALE);
+
+    // Colored signal sprite
+    this.blastBro1Blue = this.add.sprite(BALL_CONFIGURATION.LtoR, Y_AXIS - 230, airballoon_blue).setDepth(1000000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
+    this.blastBro2Red = this.add.sprite(BALL_CONFIGURATION.RtoL, Y_AXIS - 230, airballoon_red).setDepth(1000000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
+    this.greenSlime1 = this.add.sprite(BALL_CONFIGURATION.LtoR, Y_AXIS + 5, slime_green).setDepth(10000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
+    this.greenSlime2 = this.add.sprite(BALL_CONFIGURATION.RtoL, Y_AXIS + 5, slime_green).setDepth(10000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
+
+    // Idle animation
+    this.createAnimation(this.blastBro1, blastBrosName, 0, 8);
+    this.createAnimation(this.blastBro2, blastBrosName, 0, 8);
+    this.createAnimation(this.bounceBro1, bounceBrosName, 0, 8);
+    this.createAnimation(this.bounceBro2, bounceBrosName, 0, 8);
+    this.createAnimation(this.blastBro1Blue, airballoon_blue, 0, 8);
+    this.createAnimation(this.blastBro2Red, airballoon_red, 0, 8);
+    this.createAnimation(this.greenSlime1, slime_green, 0, 8);
+    this.createAnimation(this.greenSlime2, slime_green, 0, 8);
   }
 
   private createAnimation(
