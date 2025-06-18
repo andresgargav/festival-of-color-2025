@@ -109,14 +109,14 @@ export class BlastBros extends Phaser.GameObjects.Container {
   }
 
   private StopBallmovement() {
-    if (!this.player) return;
-
+    this.ballBody.enable = false;
+    
     this.scene.tweens.add({
       targets: this,
       angle: 0,
       duration: 200,
       ease: "Linear",
-    });
+    })
 
     this.ballRotationTween?.stop();
 
@@ -144,8 +144,8 @@ export class BlastBros extends Phaser.GameObjects.Container {
         end: 7,
       }),
       repeat: 0,
-      frameRate: 10,
-    });
+      frameRate: 10
+    })
 
     this.ballSprite.once(
       Phaser.Animations.Events.ANIMATION_COMPLETE,
@@ -156,7 +156,7 @@ export class BlastBros extends Phaser.GameObjects.Container {
       },
     );
 
-    this.ballSprite.play(`${ballBreaking}_anim`, true);
+    this.ballSprite.play(`${ballBreaking}_anim`, true)
   }
 
   private createAnimation(
@@ -182,7 +182,7 @@ export class BlastBros extends Phaser.GameObjects.Container {
     this.bro1Sprite = this.scene.add
       .sprite(BALL_CONFIGURATION.LtoR, Y_AXIS - 230, this.brosName)
       .setDepth(1000000000)
-      .setScale(SIGNAL_SPRITE_SCALE);
+      .setScale(SIGNAL_SPRITE_SCALE)
     this.createAnimation(this.bro1Sprite, this.brosName, 0, 8);
     this.scene.time.delayedCall(1000, () =>
       this.bro1Sprite.setVisible(false).destroy(),
@@ -205,7 +205,7 @@ export class BlastBros extends Phaser.GameObjects.Container {
     this.scene.physics.add.collider(
       this,
       this.scene.ground as Phaser.GameObjects.GameObject,
-      () => this.StopBallmovement(),
+      () => this.StopBallmovement()
     );
   }
 

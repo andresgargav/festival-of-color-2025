@@ -378,7 +378,7 @@ export class Scene extends BaseScene {
     this.load.audio("ambience", "world/sound-effects/ambience.mp3");
 
     // Background music
-    this.load.audio("background_music", "world/Festival-of-color-sound-effects/background_music.mp3");
+    this.load.audio("background_music", "world/Festival-of-color-sound-effects/background_music_1.mp3");
   }
 
   async create() {
