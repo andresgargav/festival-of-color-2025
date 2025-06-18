@@ -199,6 +199,10 @@ export const SIGNAL_DURATION = 1000;
 
 // Ball and sprites configuration
 export const BALL_CONFIGURATION = { RtoL: 445, LtoR: 260};
+export const BOUNCING_CONFIGURATION = {
+  config_1: {duration: 4080, gravityY: 260, velocityY: -260},
+  config_2: {duration: 4500, gravityY: 300, velocityY: -300}
+}
 
 // Player
 export const WALKING_SPEED = 60;
@@ -300,3 +304,4 @@ export const PANEL_NPC_WEARABLES: Equipped = NPC_WEARABLES["hopper"];
 //Sound
 export const NEW_EGG_TIME_DELAY = 2500;
 export const PORTAL_VOLUME = 0.3;
+export const PORTAL_BACKGROUND_VOLUME = 0.2

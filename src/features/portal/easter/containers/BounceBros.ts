@@ -5,6 +5,8 @@ import {
   BALL_CONFIGURATION,
   SHOOTING_SPRITE_SCALE,
   Y_AXIS,
+  PORTAL_VOLUME,
+  BOUNCING_CONFIGURATION,
 } from "../Constants";
 
 interface Props {
@@ -56,12 +58,23 @@ export class BounceBros extends Phaser.GameObjects.Container {
   }
 
   private BouncingBall() {
+    this.scene.sound.play("ground_slime_shoot", { volume: PORTAL_VOLUME });
+
+    const bouncingConfig = [
+      BOUNCING_CONFIGURATION.config_1,
+      BOUNCING_CONFIGURATION.config_2,
+    ];
+    const ranNum = Math.floor(Math.random() * bouncingConfig.length);
+    const resConfig = bouncingConfig[ranNum];
+
+    console.log(resConfig);
+
     const containerX = !this.ranNumRes
       ? BALL_CONFIGURATION.LtoR
       : BALL_CONFIGURATION.RtoL;
 
     const targetX = containerX;
-    const duration = 4100;
+    const duration = resConfig.duration;
     const distanceX = targetX - this.x;
     const velocityX = distanceX / (duration / 1000);
 
@@ -75,8 +88,8 @@ export class BounceBros extends Phaser.GameObjects.Container {
       .setAllowGravity(true)
       .setVelocityX(velocityX)
       .setBounce(1)
-      .setGravityY(260)
-      .setVelocityY(-260);
+      .setGravityY(resConfig.gravityY)
+      .setVelocityY(resConfig.velocityY);
 
     this.overlapHandler = this.scene.physics.add.overlap(
       this.player as BumpkinContainer,
@@ -84,9 +97,10 @@ export class BounceBros extends Phaser.GameObjects.Container {
       () => this.handleOverlap(),
     );
 
-    this.scene.time.delayedCall(duration - 500, () =>
-      this.ranNumRes ? this.Bro2() : this.Bro1(),
-    );
+    this.scene.time.delayedCall(duration - 500, () => {
+      this.scene.sound.play("slime_whoosh", { volume: PORTAL_VOLUME });
+      this.ranNumRes ? this.Bro2() : this.Bro1();
+    });
     this.scene.time.delayedCall(duration, () => {
       this.dissapear();
     });
@@ -148,6 +162,7 @@ export class BounceBros extends Phaser.GameObjects.Container {
     this.scene.physics.add.collider(
       this,
       this.scene.ground as Phaser.GameObjects.GameObject,
+      () => this.scene.sound.play("ball_bounce", { volume: PORTAL_VOLUME }),
     );
   }
 

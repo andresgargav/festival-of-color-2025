@@ -1,9 +1,12 @@
 import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
 import { MachineInterpreter } from "../lib/Machine";
 import { Scene } from "../Scene";
-import { BALL_CONFIGURATION, SHOOTING_SPRITE_SCALE, Y_AXIS } from "../Constants";
-import confetti from "canvas-confetti";
-import { SQUARE_WIDTH } from "features/game/lib/constants";
+import {
+  BALL_CONFIGURATION,
+  PORTAL_VOLUME,
+  SIGNAL_SPRITE_SCALE,
+  Y_AXIS,
+} from "../Constants";
 
 interface Props {
   x: number;
@@ -25,6 +28,7 @@ export class BlastBros extends Phaser.GameObjects.Container {
   private ranNumRes: boolean;
   private target!: number;
   private ballRotationTween?: Phaser.Tweens.Tween;
+  private hasBroken = false;
 
   scene: Scene;
 
@@ -42,7 +46,7 @@ export class BlastBros extends Phaser.GameObjects.Container {
     !this.ranNumRes ? this.Bro2() : this.Bro1();
 
     this.setCollisions();
-    
+
     // Ball movement
     this.BallRotation();
     this.scene.time.delayedCall(400, () => {
@@ -61,14 +65,21 @@ export class BlastBros extends Phaser.GameObjects.Container {
   private FallingBall() {
     if (!this.player) return;
 
+    this.scene.sound.play("ground_slime_shoot", { volume: PORTAL_VOLUME });
+    this.scene.time.delayedCall(200, () =>
+      this.scene.sound.play("airballoon_slime_shoot", {
+        volume: PORTAL_VOLUME,
+      }),
+    );
+
     this.ranNumFall = Math.floor(Math.random() * (150 - 15 + 1)) + 15;
-    this.target = !this.ranNumRes ? -this.ranNumFall : this.ranNumFall
+    this.target = !this.ranNumRes ? -this.ranNumFall : this.ranNumFall;
 
     this.setDepth(10000000000000);
     this.setSize(this.ballSprite.width, this.ballSprite.height);
     this.add(this.ballSprite);
 
-    let positionX = this.player.x - 260
+    let positionX = this.player.x - 260;
     this.target = this.ranNumRes ? positionX : positionX - 170;
 
     this.scene.physics.world.enable(this);
@@ -80,11 +91,11 @@ export class BlastBros extends Phaser.GameObjects.Container {
       .setVelocityX(this.target)
       .setVelocityY(130);
 
-      this.overlapHandler = this.scene.physics.add.overlap(
-        this.player as BumpkinContainer,
-        this as Phaser.GameObjects.GameObject,
-        () => this.handleOverlap(),
-      );
+    this.overlapHandler = this.scene.physics.add.overlap(
+      this.player as BumpkinContainer,
+      this as Phaser.GameObjects.GameObject,
+      () => this.handleOverlap(),
+    );
   }
 
   private BallRotation() {
@@ -97,24 +108,34 @@ export class BlastBros extends Phaser.GameObjects.Container {
     });
   }
 
-  private BreakingBall() {
-    const ballBreaking = "breaking_ball"
+  private StopBallmovement() {
+    if (!this.player) return;
 
     this.scene.tweens.add({
       targets: this,
       angle: 0,
       duration: 200,
       ease: "Linear",
-    })
+    });
 
     this.ballRotationTween?.stop();
 
     this.ballBody
-    .setAllowGravity(true)
-    .setGravityY(0)
-    .setDragY(0)
-    .setVelocityX(0)
-    .setVelocityY(0)
+      .setAllowGravity(true)
+      .setGravityY(0)
+      .setDragY(0)
+      .setVelocityX(0)
+      .setVelocityY(0);
+
+    this.Break();
+  }
+
+  private Break() {
+    if (this.hasBroken) return;
+    this.hasBroken = true;
+
+    const ballBreaking = "breaking_ball";
+    this.scene.sound.play("stone_crack", { volume: PORTAL_VOLUME });
 
     this.scene.anims.create({
       key: `${ballBreaking}_anim`,
@@ -123,9 +144,9 @@ export class BlastBros extends Phaser.GameObjects.Container {
         end: 7,
       }),
       repeat: 0,
-      frameRate: 10
-    })  
-    
+      frameRate: 10,
+    });
+
     this.ballSprite.once(
       Phaser.Animations.Events.ANIMATION_COMPLETE,
       (anim: Phaser.Animations.Animation) => {
@@ -135,7 +156,7 @@ export class BlastBros extends Phaser.GameObjects.Container {
       },
     );
 
-    this.ballSprite.play(`${ballBreaking}_anim`, true)
+    this.ballSprite.play(`${ballBreaking}_anim`, true);
   }
 
   private createAnimation(
@@ -161,7 +182,7 @@ export class BlastBros extends Phaser.GameObjects.Container {
     this.bro1Sprite = this.scene.add
       .sprite(BALL_CONFIGURATION.LtoR, Y_AXIS - 230, this.brosName)
       .setDepth(1000000000)
-      .setScale(SHOOTING_SPRITE_SCALE)
+      .setScale(SIGNAL_SPRITE_SCALE);
     this.createAnimation(this.bro1Sprite, this.brosName, 0, 8);
     this.scene.time.delayedCall(1000, () =>
       this.bro1Sprite.setVisible(false).destroy(),
@@ -173,7 +194,7 @@ export class BlastBros extends Phaser.GameObjects.Container {
     this.bro2Sprite = this.scene.add
       .sprite(BALL_CONFIGURATION.RtoL, Y_AXIS - 230, this.brosName)
       .setDepth(1000000000)
-      .setScale(SHOOTING_SPRITE_SCALE)
+      .setScale(SIGNAL_SPRITE_SCALE);
     this.createAnimation(this.bro2Sprite, this.brosName, 0, 8);
     this.scene.time.delayedCall(1000, () =>
       this.bro2Sprite.setVisible(false).destroy(),
@@ -184,7 +205,7 @@ export class BlastBros extends Phaser.GameObjects.Container {
     this.scene.physics.add.collider(
       this,
       this.scene.ground as Phaser.GameObjects.GameObject,
-      () => this.BreakingBall()
+      () => this.StopBallmovement(),
     );
   }
 

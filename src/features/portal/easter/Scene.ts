@@ -23,7 +23,8 @@ import {
   BALL_CONFIGURATION,
   IDLE_SPRITE_SCALE,
   SIGNAL_SPRITE_SCALE,
-  SIGNAL_DURATION
+  SIGNAL_DURATION,
+  PORTAL_BACKGROUND_VOLUME
 } from "./Constants";
 import { EasterEgg } from "./containers/EasterEgg";
 import { BadEgg } from "./containers/BadEgg";
@@ -357,6 +358,13 @@ export class Scene extends BaseScene {
       frameHeight: 24,
     });
 
+    // Slime and ball sound effects
+    this.load.audio("ground_slime_shoot", "world/Festival-of-color-sound-effects/ground_slime_shoot_1.wav");
+    this.load.audio("slime_whoosh", "world/Festival-of-color-sound-effects/slime_whoosh.wav");
+    this.load.audio("airballoon_slime_shoot", "world/Festival-of-color-sound-effects/airballoon_slime_shoot.wav");
+    this.load.audio("stone_crack", "world/Festival-of-color-sound-effects/stone_crack.wav");
+    this.load.audio("ball_bounce", "world/Festival-of-color-sound-effects/ball_bounce.wav");
+
     //Egg sounds
     this.load.audio("golden_egg", "world/sound-effects/golden_egg.mp3");
     this.load.audio("normal_egg", "world/sound-effects/normal_egg.mp3");
@@ -368,6 +376,9 @@ export class Scene extends BaseScene {
     this.load.audio("sword", "world/sound-effects/sword.mp3");
     this.load.audio("lose_life", "world/sound-effects/lose_life.mp3");
     this.load.audio("ambience", "world/sound-effects/ambience.mp3");
+
+    // Background music
+    this.load.audio("background_music", "world/Festival-of-color-sound-effects/background_music.mp3");
   }
 
   async create() {
@@ -398,7 +409,7 @@ export class Scene extends BaseScene {
     // Festival of color 2025 idle
     this.festivalOfColorIdle();
 
-    this.sound.play("ambience", { volume: PORTAL_VOLUME, loop: true });
+    this.sound.play("background_music", { volume: PORTAL_BACKGROUND_VOLUME, loop: true });
   }
 
   private get isGameReady() {
