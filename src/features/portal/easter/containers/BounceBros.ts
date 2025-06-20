@@ -2,7 +2,7 @@ import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
 import { MachineInterpreter } from "../lib/Machine";
 import { Scene } from "../Scene";
 import {
-  BALL_CONFIGURATION,
+  STONE_CONFIGURATION,
   SHOOTING_SPRITE_SCALE,
   Y_AXIS,
   PORTAL_VOLUME,
@@ -35,7 +35,7 @@ export class BounceBros extends Phaser.GameObjects.Container {
     this.player = player;
 
     this.brosName = "ground_slime_shooting";
-    this.spriteName = "bouncingball";
+    this.spriteName = "stone";
     this.ballSprite = scene.add.sprite(0, 0, this.spriteName);
 
     this.ranNumRes = this.scene.randomIndex == 1;
@@ -64,14 +64,12 @@ export class BounceBros extends Phaser.GameObjects.Container {
       BOUNCING_CONFIGURATION.config_1,
       BOUNCING_CONFIGURATION.config_2,
     ];
-    const ranNum = Math.floor(Math.random() * bouncingConfig.length);
-    const resConfig = bouncingConfig[ranNum];
 
-    console.log(resConfig);
+    const resConfig = bouncingConfig[this.scene.randomIndex];
 
     const containerX = !this.ranNumRes
-      ? BALL_CONFIGURATION.LtoR
-      : BALL_CONFIGURATION.RtoL;
+      ? STONE_CONFIGURATION.LtoR
+      : STONE_CONFIGURATION.RtoL;
 
     const targetX = containerX;
     const duration = resConfig.duration;
@@ -137,7 +135,7 @@ export class BounceBros extends Phaser.GameObjects.Container {
   private Bro1() {
     if (!this.player) return;
     this.bro1Sprite = this.scene.add
-      .sprite(BALL_CONFIGURATION.LtoR, Y_AXIS + 5, this.brosName)
+      .sprite(STONE_CONFIGURATION.LtoR, Y_AXIS + 5, this.brosName)
       .setDepth(10000000000000)
       .setScale(SHOOTING_SPRITE_SCALE);
     this.createAnimation(this.bro1Sprite, this.brosName, 0, 8);
@@ -149,7 +147,7 @@ export class BounceBros extends Phaser.GameObjects.Container {
   private Bro2() {
     if (!this.player) return;
     this.bro2Sprite = this.scene.add
-      .sprite(BALL_CONFIGURATION.RtoL, Y_AXIS + 5, this.brosName)
+      .sprite(STONE_CONFIGURATION.RtoL, Y_AXIS + 5, this.brosName)
       .setDepth(100000000000000)
       .setScale(SHOOTING_SPRITE_SCALE);
     this.createAnimation(this.bro2Sprite, this.brosName, 0, 8);
@@ -162,7 +160,7 @@ export class BounceBros extends Phaser.GameObjects.Container {
     this.scene.physics.add.collider(
       this,
       this.scene.ground as Phaser.GameObjects.GameObject,
-      () => this.scene.sound.play("ball_bounce", { volume: PORTAL_VOLUME }),
+      () => this.scene.sound.play("stone_bouncing", { volume: PORTAL_VOLUME }),
     );
   }
 

@@ -6,11 +6,13 @@ import easterEgg from "public/world/easter_egg.png";
 import superEasterEgg from "public/world/super_easter_egg.png";
 import goldenEgg from "public/world/golden_egg.png";
 import badEgg from "public/world/bad_egg.png";
-import snake from "public/world/snake.gif";
-import specialSnake from "public/world/special_snake.gif";
-import hawk from "public/world/hawk.png";
-import specialHawk from "public/world/special_hawk.png";
-import stoneSword from "public/world/sword.png";
+
+// Festival of color
+import cyanBalloon from "public/world/balloon-falling-cyan.png";
+import dart from "public/world/dart.gif";
+import slime from "public/world/slime.gif";
+import airballoon_slime from "public/world/airballoon_slime_shooting.gif";
+import ground_slime from "public/world/ground_slime_shooting.gif";
 
 export const PORTAL_NAME = "easter-eggstravaganza";
 
@@ -195,13 +197,13 @@ export const Y_AXIS = SPAWNS()[PORTAL_NAME].default.y - 6;
 export const SHOOTING_SPRITE_SCALE: number = 1.4;
 export const IDLE_SPRITE_SCALE: number = 1.25;
 export const SIGNAL_SPRITE_SCALE: number = 1.3;
-export const SIGNAL_DURATION = 1000;
+export const PRE_ACTION_DELAY = 1000;
 
-// Ball and sprites configuration
-export const BALL_CONFIGURATION = { RtoL: 445, LtoR: 260};
+// Stone and sprites configuration
+export const STONE_CONFIGURATION = { RtoL: 445, LtoR: 260};
 export const BOUNCING_CONFIGURATION = {
-  config_1: {duration: 4080, gravityY: 260, velocityY: -260},
-  config_2: {duration: 4500, gravityY: 300, velocityY: -300}
+  config_1: {duration: 4080, gravityY: 260, velocityY: -260, despawnIdle: 2200, respawnIdle: 2900},
+  config_2: {duration: 4500, gravityY: 300, velocityY: -300, despawnIdle: 2400, respawnIdle: 3300}
 }
 
 // Player
@@ -230,7 +232,7 @@ export const INSTRUCTIONS: {
   width?: number;
 }[] = [
   {
-    image: easterEgg,
+    image: cyanBalloon,
     description: t(`${PORTAL_NAME}.instructions1`),
   },
   {
@@ -238,7 +240,7 @@ export const INSTRUCTIONS: {
     description: t(`${PORTAL_NAME}.instructions2`),
   },
   {
-    image: stoneSword,
+    image: dart,
     description: t(`${PORTAL_NAME}.instructions3`),
   },
   {
@@ -246,7 +248,7 @@ export const INSTRUCTIONS: {
     description: t(`${PORTAL_NAME}.instructions4`),
   },
   {
-    image: snake,
+    image: slime,
     description: t(`${PORTAL_NAME}.instructions5`),
   },
 ];
@@ -276,21 +278,12 @@ export const ENEMIES_TABLE: {
   width?: number;
 }[] = [
   {
-    image: snake,
+    image: airballoon_slime,
     description: t(`${PORTAL_NAME}.enemy1`),
   },
   {
-    image: specialSnake,
+    image: ground_slime,
     description: t(`${PORTAL_NAME}.enemy2`),
-  },
-  {
-    image: hawk,
-    description: t(`${PORTAL_NAME}.enemy3`),
-  },
-  {
-    image: specialHawk,
-    description: t(`${PORTAL_NAME}.enemy4`),
-    width: 16,
   },
   {
     image: badEgg,
@@ -304,4 +297,4 @@ export const PANEL_NPC_WEARABLES: Equipped = NPC_WEARABLES["hopper"];
 //Sound
 export const NEW_EGG_TIME_DELAY = 2500;
 export const PORTAL_VOLUME = 0.3;
-export const PORTAL_BACKGROUND_VOLUME = 0.2
+export const PORTAL_BACKGROUND_VOLUME = 0.1

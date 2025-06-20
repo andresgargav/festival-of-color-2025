@@ -20,11 +20,12 @@ import {
   ENEMY_SPAWN_REDUCTION_PER_MINUTE,
   MINIMUM_ENEMY_SPAWN_INTERVAL,
   PORTAL_VOLUME,
-  BALL_CONFIGURATION,
+  STONE_CONFIGURATION,
   IDLE_SPRITE_SCALE,
   SIGNAL_SPRITE_SCALE,
-  SIGNAL_DURATION,
-  PORTAL_BACKGROUND_VOLUME
+  PRE_ACTION_DELAY,
+  PORTAL_BACKGROUND_VOLUME,
+  BOUNCING_CONFIGURATION
 } from "./Constants";
 import { EasterEgg } from "./containers/EasterEgg";
 import { BadEgg } from "./containers/BadEgg";
@@ -249,7 +250,7 @@ export class Scene extends BaseScene {
     });
 
     // Festival-of-color-2025 enemies spritesheet
-    this.load.spritesheet("bouncingball", "world/slime_grey_ball.webp", {
+    this.load.spritesheet("stone", "world/slime_grey_ball.webp", {
       frameWidth: 10,
       frameHeight: 10,
     });
@@ -363,7 +364,7 @@ export class Scene extends BaseScene {
     this.load.audio("slime_whoosh", "world/Festival-of-color-sound-effects/slime_whoosh.wav");
     this.load.audio("airballoon_slime_shoot", "world/Festival-of-color-sound-effects/airballoon_slime_shoot.wav");
     this.load.audio("stone_crack", "world/Festival-of-color-sound-effects/stone_crack.wav");
-    this.load.audio("ball_bounce", "world/Festival-of-color-sound-effects/ball_bounce.wav");
+    this.load.audio("stone_bouncing", "world/Festival-of-color-sound-effects/ball_bounce.wav");
 
     //Egg sounds
     this.load.audio("golden_egg", "world/sound-effects/golden_egg.mp3");
@@ -749,21 +750,24 @@ export class Scene extends BaseScene {
   }
 
   private createBounceBros() {
-    const startingPoint = [BALL_CONFIGURATION.RtoL, BALL_CONFIGURATION.LtoR];
+    const startingPoint = [STONE_CONFIGURATION.RtoL, STONE_CONFIGURATION.LtoR];
+    const bounceBallConfig = [BOUNCING_CONFIGURATION.config_1, BOUNCING_CONFIGURATION.config_2];
+
     this.randomIndex = Math.floor(Math.random() * startingPoint.length);
     const randomSpawn = startingPoint[this.randomIndex];
+    const randomConfig = bounceBallConfig[this.randomIndex]
     const finalX = this.randomIndex == 0;
 
     !finalX
       ? this.greenSlime1.setVisible(true)
       : this.greenSlime2.setVisible(true);
 
-    this.time.delayedCall(SIGNAL_DURATION, () => {
+    this.time.delayedCall(PRE_ACTION_DELAY, () => {
       this.greenSlime1.setVisible(false);
       this.greenSlime2.setVisible(false);
     });
 
-    this.time.delayedCall(SIGNAL_DURATION, () => {
+    this.time.delayedCall(PRE_ACTION_DELAY, () => {
       finalX
         ? this.bounceBro2.setVisible(false)
         : this.bounceBro1.setVisible(false);
@@ -776,14 +780,25 @@ export class Scene extends BaseScene {
       });
     });
 
-    this.time.delayedCall(1000 + SIGNAL_DURATION, () => {
+    this.time.delayedCall(1000 + PRE_ACTION_DELAY, () => {
       this.bounceBro1.setVisible(true);
       this.bounceBro2.setVisible(true);
+
+      this.time.delayedCall(randomConfig.despawnIdle + PRE_ACTION_DELAY, () => {
+        finalX
+          ? this.bounceBro1.setVisible(false)
+          : this.bounceBro2.setVisible(false); 
+      })
+
+      this.time.delayedCall(randomConfig.respawnIdle + PRE_ACTION_DELAY, () => {
+        this.bounceBro1.setVisible(true);
+        this.bounceBro2.setVisible(true);  
+      })
     });
   }
 
   private createBlastBros() {
-    const startingPoint = [BALL_CONFIGURATION.RtoL, BALL_CONFIGURATION.LtoR];
+    const startingPoint = [STONE_CONFIGURATION.RtoL, STONE_CONFIGURATION.LtoR];
     this.randomIndex = Math.floor(Math.random() * startingPoint.length);
     const randomSpawn = startingPoint[this.randomIndex];
     const finalX = this.randomIndex == 0;
@@ -792,12 +807,12 @@ export class Scene extends BaseScene {
       ? this.blastBro1Blue.setVisible(true)
       : this.blastBro2Red.setVisible(true);
 
-    this.time.delayedCall(SIGNAL_DURATION, () => {
+    this.time.delayedCall(PRE_ACTION_DELAY, () => {
       this.blastBro1Blue.setVisible(false);
       this.blastBro2Red.setVisible(false);
     });
 
-    this.time.delayedCall(SIGNAL_DURATION, () => {
+    this.time.delayedCall(PRE_ACTION_DELAY, () => {
       finalX
         ? this.blastBro2.setVisible(false)
         : this.blastBro1.setVisible(false);
@@ -810,7 +825,7 @@ export class Scene extends BaseScene {
       });
     });
 
-    this.time.delayedCall(1000 + SIGNAL_DURATION, () => {
+    this.time.delayedCall(1000 + PRE_ACTION_DELAY, () => {
       this.blastBro1.setVisible(true);
       this.blastBro2.setVisible(true);
     });
@@ -867,16 +882,16 @@ export class Scene extends BaseScene {
     const slime_green = "ground_slime_green";
 
     // Sprite
-    this.blastBro1 = this.add.sprite(BALL_CONFIGURATION.LtoR, Y_AXIS - 230, blastBrosName).setDepth(1000000000).setScale(IDLE_SPRITE_SCALE);
-    this.blastBro2 = this.add.sprite(BALL_CONFIGURATION.RtoL, Y_AXIS - 230, blastBrosName).setDepth(1000000000).setFlipX(true).setScale(IDLE_SPRITE_SCALE);
-    this.bounceBro1 = this.add.sprite(BALL_CONFIGURATION.LtoR, Y_AXIS + 5, bounceBrosName).setDepth(10000000).setScale(IDLE_SPRITE_SCALE);
-    this.bounceBro2 = this.add.sprite(BALL_CONFIGURATION.RtoL, Y_AXIS + 5, bounceBrosName).setDepth(10000000).setFlipX(true).setScale(IDLE_SPRITE_SCALE);
+    this.blastBro1 = this.add.sprite(STONE_CONFIGURATION.LtoR, Y_AXIS - 230, blastBrosName).setDepth(1000000000).setScale(IDLE_SPRITE_SCALE);
+    this.blastBro2 = this.add.sprite(STONE_CONFIGURATION.RtoL, Y_AXIS - 230, blastBrosName).setDepth(1000000000).setFlipX(true).setScale(IDLE_SPRITE_SCALE);
+    this.bounceBro1 = this.add.sprite(STONE_CONFIGURATION.LtoR, Y_AXIS + 5, bounceBrosName).setDepth(10000000).setScale(IDLE_SPRITE_SCALE);
+    this.bounceBro2 = this.add.sprite(STONE_CONFIGURATION.RtoL, Y_AXIS + 5, bounceBrosName).setDepth(10000000).setFlipX(true).setScale(IDLE_SPRITE_SCALE);
 
     // Colored signal sprite
-    this.blastBro1Blue = this.add.sprite(BALL_CONFIGURATION.LtoR, Y_AXIS - 230, airballoon_blue).setDepth(1000000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
-    this.blastBro2Red = this.add.sprite(BALL_CONFIGURATION.RtoL, Y_AXIS - 230, airballoon_red).setDepth(1000000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
-    this.greenSlime1 = this.add.sprite(BALL_CONFIGURATION.LtoR, Y_AXIS + 5, slime_green).setDepth(10000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
-    this.greenSlime2 = this.add.sprite(BALL_CONFIGURATION.RtoL, Y_AXIS + 5, slime_green).setDepth(10000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
+    this.blastBro1Blue = this.add.sprite(STONE_CONFIGURATION.LtoR, Y_AXIS - 230, airballoon_blue).setDepth(1000000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
+    this.blastBro2Red = this.add.sprite(STONE_CONFIGURATION.RtoL, Y_AXIS - 230, airballoon_red).setDepth(1000000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
+    this.greenSlime1 = this.add.sprite(STONE_CONFIGURATION.LtoR, Y_AXIS + 5, slime_green).setDepth(10000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
+    this.greenSlime2 = this.add.sprite(STONE_CONFIGURATION.RtoL, Y_AXIS + 5, slime_green).setDepth(10000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
 
     // Idle animation
     this.createAnimation(this.blastBro1, blastBrosName, 0, 8);

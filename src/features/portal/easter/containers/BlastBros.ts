@@ -2,7 +2,7 @@ import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
 import { MachineInterpreter } from "../lib/Machine";
 import { Scene } from "../Scene";
 import {
-  BALL_CONFIGURATION,
+  STONE_CONFIGURATION,
   PORTAL_VOLUME,
   SIGNAL_SPRITE_SCALE,
   Y_AXIS,
@@ -38,7 +38,7 @@ export class BlastBros extends Phaser.GameObjects.Container {
     this.player = player;
 
     this.brosName = "shooting_slime";
-    this.spriteName = "bouncingball";
+    this.spriteName = "stone";
     this.ballSprite = scene.add.sprite(0, 0, this.spriteName);
 
     this.ranNumRes = this.scene.randomIndex == 1;
@@ -180,7 +180,7 @@ export class BlastBros extends Phaser.GameObjects.Container {
   private Bro1() {
     if (!this.player) return;
     this.bro1Sprite = this.scene.add
-      .sprite(BALL_CONFIGURATION.LtoR, Y_AXIS - 230, this.brosName)
+      .sprite(STONE_CONFIGURATION.LtoR, Y_AXIS - 230, this.brosName)
       .setDepth(1000000000)
       .setScale(SIGNAL_SPRITE_SCALE)
     this.createAnimation(this.bro1Sprite, this.brosName, 0, 8);
@@ -192,7 +192,7 @@ export class BlastBros extends Phaser.GameObjects.Container {
   private Bro2() {
     if (!this.player) return;
     this.bro2Sprite = this.scene.add
-      .sprite(BALL_CONFIGURATION.RtoL, Y_AXIS - 230, this.brosName)
+      .sprite(STONE_CONFIGURATION.RtoL, Y_AXIS - 230, this.brosName)
       .setDepth(1000000000)
       .setScale(SIGNAL_SPRITE_SCALE);
     this.createAnimation(this.bro2Sprite, this.brosName, 0, 8);
