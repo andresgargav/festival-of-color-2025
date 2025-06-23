@@ -605,6 +605,12 @@ export class Scene extends BaseScene {
       y: -1,
       scene: this,
       spriteName: "balloon_red",
+      onPop: () => {
+        this.portalService?.send("GAIN_POINTS", {
+          points: -1,
+        });
+        this.currentPlayer?.addLabel(-1);
+      },
       onDebuff: () => {
         this.velocity = WALKING_SPEED * PLAYER_PERCENTAGE_DEBUFF_VELOCITY;
         this.time.delayedCall(TIME_DEBUFF_VELOCITY, () => {
