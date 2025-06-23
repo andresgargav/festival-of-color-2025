@@ -18,6 +18,7 @@ import { ITEM_DETAILS } from "features/game/types/images";
 // import { AchievementsList } from "./AchievementsList";
 import { OuterPanel } from "../../../../../components/ui/Panel";
 import { Controls } from "./Controls";
+import { isTouchDevice } from "features/world/lib/device";
 
 import key from "public/world/key.png";
 
@@ -73,29 +74,16 @@ export const Mission: React.FC<Props> = ({
           <div>
             <div className="w-full relative flex justify-between gap-1 items-center pt-1 px-1">
               <Attempts attemptsLeft={attemptsLeft} />
-              <div className="flex gap-1">
+              <div className="gap-1">
                 <Button
-                  className="whitespace-nowrap capitalize w-24 p-0"
-                  onClick={() => setPage("guide")}
+                  className="whitespace-nowrap capitalize w-32 p-0"
+                  onClick={() => setPage("controls")}
                 >
-                  <div className="flex flex-row gap-1">
-                    <SquareIcon icon={ITEM_DETAILS["Carrot"].image} width={7} />
-                    {t("guide")}
+                  <div className="flex flex-row gap-1 justify-center items-center">
+                    <img src={key} className="h-5 mt-1" />
+                    {t(`${PORTAL_NAME}.controls`)}
                   </div>
                 </Button>
-                {window.innerWidth >= 500 && (
-                  <>
-                    <Button
-                      className="whitespace-nowrap capitalize w-32 p-0"
-                      onClick={() => setPage("controls")}
-                    >
-                      <div className="flex flex-row gap-1 justify-center items-center">
-                        <img src={key} className="h-5 mt-1" />
-                        {t(`${PORTAL_NAME}.controls`)}
-                      </div>
-                    </Button>
-                  </>
-                )}
               </div>
             </div>
 

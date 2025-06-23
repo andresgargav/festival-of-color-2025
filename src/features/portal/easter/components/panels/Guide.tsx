@@ -14,7 +14,7 @@ import { PIXEL_SCALE } from "features/game/lib/constants";
 import { useSound } from "lib/utils/hooks/useSound";
 
 type Props = {
-  onBack: () => void;
+  onBack?: () => void;
 };
 
 export const Guide: React.FC<Props> = ({ onBack }) => {
@@ -27,7 +27,7 @@ export const Guide: React.FC<Props> = ({ onBack }) => {
       {/* title */}
       <div className="flex flex-col gap-1">
         <div className="flex text-center">
-          <div
+          {/* <div
             className="flex-none"
             style={{
               width: `${PIXEL_SCALE * 11}px`,
@@ -39,22 +39,22 @@ export const Guide: React.FC<Props> = ({ onBack }) => {
               className="cursor-pointer"
               onClick={() => {
                 button.play();
-                onBack();
+                onBack?.();
               }}
               style={{
                 width: `${PIXEL_SCALE * 11}px`,
               }}
             />
-          </div>
+          </div> */}
           <div className="grow mb-3 text-lg">{t(`${PORTAL_NAME}.guide`)}</div>
-          <div className="flex-none">
+          {/* <div className="flex-none">
             <div
               style={{
                 width: `${PIXEL_SCALE * 11}px`,
                 marginRight: `${PIXEL_SCALE * 2}px`,
               }}
             />
-          </div>
+          </div> */}
         </div>
       </div>
 

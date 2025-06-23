@@ -4,7 +4,10 @@ import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { CloseButtonPanel } from "features/game/components/CloseablePanel";
 import { Mission } from "./Mission";
 import { PANEL_NPC_WEARABLES, PORTAL_NAME } from "../../Constants";
-import easterEgg from "public/world/easter_egg.png";
+
+import cyanBalloon from "public/world/balloon-falling-cyan.png";
+import page from "public/world/page.png";
+import { Guide } from "./Guide";
 
 interface Props {
   mode: "introduction" | "success" | "failed";
@@ -31,8 +34,12 @@ export const RulesPanel: React.FC<Props> = ({
       setCurrentTab={setTab}
       tabs={[
         {
-          icon: easterEgg,
+          icon: cyanBalloon,
           name: t(`${PORTAL_NAME}.portal.title`),
+        },
+        {
+          icon: page,
+          name: t("guide"),
         },
       ]}
     >
@@ -46,6 +53,8 @@ export const RulesPanel: React.FC<Props> = ({
             onConfirm={onConfirm}
           />
         )}
+
+        {tab === 1 && <Guide />}
       </>
     </CloseButtonPanel>
   );

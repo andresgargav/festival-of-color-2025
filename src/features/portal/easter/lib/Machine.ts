@@ -32,6 +32,7 @@ export interface Context {
   id: number;
   jwt: string | null;
   isJoystickActive: boolean;
+  isJoystickEnabled?: boolean;
   state: GameState | undefined;
   score: number;
   lastScore: number;
@@ -50,6 +51,11 @@ type SetJoystickActiveEvent = {
   isJoystickActive: boolean;
 };
 
+type SetJoystickEnabledEvent = {
+  type: "SET_JOYSTICK_ENABLED";
+  isJoystickEnabled: boolean;
+};
+
 type PurchaseRestockEvent = {
   type: "PURCHASED_RESTOCK";
   sfl: number;
@@ -64,8 +70,13 @@ type LoseLifeEvent = {
   type: "LOSE_LIFE";
 };
 
+type GainLifeEvent = {
+  type: "GAIN_LIFE";
+};
+
 export type PortalEvent =
   | SetJoystickActiveEvent
+  | SetJoystickEnabledEvent
   | { type: "START" }
   | { type: "CLAIM" }
   | { type: "CANCEL_PURCHASE" }
@@ -77,6 +88,7 @@ export type PortalEvent =
   | { type: "GAME_OVER" }
   | GainPointsEvent
   | LoseLifeEvent
+  | GainLifeEvent
   | UnlockAchievementsEvent;
 
 export type PortalState = {
@@ -125,6 +137,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
     jwt: getJWT(),
 
     isJoystickActive: false,
+    isJoystickEnabled: true,
 
     state: CONFIG.API_URL ? undefined : OFFLINE_FARM,
 
@@ -139,6 +152,13 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
       actions: assign<Context, any>({
         isJoystickActive: (_: Context, event: SetJoystickActiveEvent) => {
           return event.isJoystickActive;
+        },
+      }),
+    },
+    SET_JOYSTICK_ENABLED: {
+      actions: assign<Context, any>({
+        isJoystickEnabled: (_: Context, event: SetJoystickEnabledEvent) => {
+          return event.isJoystickEnabled;
         },
       }),
     },
@@ -301,6 +321,13 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
             score: (context: Context, event: GainPointsEvent) => {
               const { points = 1 } = event;
               return context.score + points;
+            },
+          }),
+        },
+        GAIN_LIFE: {
+          actions: assign<Context, any>({
+            lives: (context: Context) => {
+              return context.lives + 1;
             },
           }),
         },

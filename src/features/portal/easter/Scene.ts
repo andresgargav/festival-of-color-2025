@@ -1,21 +1,21 @@
-import mapJson from "assets/map/easter.json";
-import tilesetconfig from "assets/map/easter_tileset.json";
+import mapJson from "assets/map/festival_of_colors.json";
+import tilesetconfig from "assets/map/festival_of_colors_tileset.json";
 import { SceneId } from "features/world/mmoMachine";
 import { BaseScene } from "features/world/scenes/BaseScene";
 import { MachineInterpreter } from "./lib/Machine";
 import { EventObject } from "xstate";
 import { SPAWNS } from "features/world/lib/spawn";
 import { isTouchDevice } from "features/world/lib/device";
+import VirtualJoystick from "phaser3-rex-plugins/plugins/virtualjoystick.js";
 import {
   PORTAL_NAME,
   Y_AXIS,
   WALKING_SPEED,
   GRAVITY,
-  PLAYER_JUMP_VELOCITY_Y,
   ENEMY_SPAWN_INTERVAL,
-  EGG_SPAWN_INTERVAL,
-  EGG_SPAWN_LEFT_LIMIT,
-  EGG_SPAWN_RIGHT_LIMIT,
+  BALLOON_SPAWN_INTERVAL,
+  BALLOON_SPAWN_LEFT_LIMIT,
+  BALLOON_SPAWN_RIGHT_LIMIT,
   GAME_SECONDS,
   ENEMY_SPAWN_REDUCTION_PER_MINUTE,
   MINIMUM_ENEMY_SPAWN_INTERVAL,
@@ -25,17 +25,18 @@ import {
   SIGNAL_SPRITE_SCALE,
   PRE_ACTION_DELAY,
   PORTAL_BACKGROUND_VOLUME,
-  BOUNCING_CONFIGURATION
+  BOUNCING_CONFIGURATION,
+  TIME_DEBUFF_VELOCITY,
+  PLAYER_PERCENTAGE_DEBUFF_VELOCITY,
+  AMOUNT_CYAN_BALLOONS,
 } from "./Constants";
-import { EasterEgg } from "./containers/EasterEgg";
-import { BadEgg } from "./containers/BadEgg";
-import { GoldenEgg } from "./containers/GoldenEgg";
-import { SuperEasterEgg } from "./containers/SuperEasterEgg";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { SQUARE_WIDTH } from "features/game/lib/constants";
 //Festival-of-color-2025
+import { Balloon } from "./containers/Balloon";
 import { BounceBros } from "./containers/BounceBros";
 import { BlastBros } from "./containers/BlastBros";
+import { Dart } from "./containers/Dart";
 
 // export const NPCS: NPCBumpkin[] = [
 //   {
@@ -48,19 +49,20 @@ import { BlastBros } from "./containers/BlastBros";
 
 export class Scene extends BaseScene {
   private enemySpawnInterval!: Phaser.Time.TimerEvent;
-  private eggSpawnInterval!: Phaser.Time.TimerEvent;
-  private eggCounter = 0;
-  private superEggInitCount = -1000;
+  private balloonSpawnInterval!: Phaser.Time.TimerEvent;
+  private balloonCounter = 0;
+  private cyanBalloonInitCount = -1000;
+  private isJoystickEnabled = false;
+  private leftButton!: Phaser.GameObjects.Image;
+  private rightButton!: Phaser.GameObjects.Image;
 
   ground!: Phaser.GameObjects.GameObject | undefined;
   leftWall!: Phaser.GameObjects.GameObject | undefined;
   rightWall!: Phaser.GameObjects.GameObject | undefined;
+  deflator!: Phaser.GameObjects.GameObject | undefined;
 
-  // Eggs
-  easterEgg!: EasterEgg;
-  badEgg!: BadEgg;
-  goldenEgg!: GoldenEgg;
-  superEasterEgg!: SuperEasterEgg;
+  // Darts
+  darts!: Phaser.GameObjects.Group;
 
   // Festival-of-color-2025 Enemies
   bounceBro!: BounceBros;
@@ -87,7 +89,7 @@ export class Scene extends BaseScene {
       name: PORTAL_NAME,
       map: {
         json: mapJson,
-        imageKey: "easter-tileset",
+        imageKey: "festival-of-colors-tileset",
         defaultTilesetConfig: tilesetconfig,
       },
       audio: { fx: { walk_key: "dirt_footstep" } },
@@ -97,159 +99,52 @@ export class Scene extends BaseScene {
   preload() {
     super.preload();
 
-    // Eggs
-    this.load.image("easter_egg", "world/easter_egg.png");
-    this.load.spritesheet(
-      "easter_egg_disappear",
-      "world/easter_egg_disappear.png",
-      {
-        frameWidth: 16,
-        frameHeight: 16,
-      },
-    );
-    this.load.spritesheet("easter_egg_break", "world/easter_egg_break.png", {
-      frameWidth: 16,
-      frameHeight: 16,
+    // Balloons
+    const balloons = ["blue", "green", "yellow", "red", "cyan"];
+    balloons.forEach((color) => {
+      this.load.spritesheet(
+        `flying_balloon_${color}`,
+        `world/flying-balloon-${color}.png`,
+        {
+          frameWidth: 14,
+          frameHeight: 25,
+        },
+      );
+      this.load.spritesheet(
+        `deflating_balloon_${color}`,
+        `world/deflating-balloon-${color}.png`,
+        {
+          frameWidth: 14,
+          frameHeight: 24,
+        },
+      );
+      this.load.spritesheet(
+        `explosive_balloon_${color}`,
+        `world/explosive-balloon-${color}.png`,
+        {
+          frameWidth: 27,
+          frameHeight: 25,
+        },
+      );
     });
 
-    this.load.image("super_easter_egg", "world/super_easter_egg.png");
-    this.load.spritesheet(
-      "super_easter_egg_disappear",
-      "world/super_easter_egg_disappear.png",
-      {
-        frameWidth: 16,
-        frameHeight: 16,
-      },
-    );
-    this.load.spritesheet(
-      "super_easter_egg_break",
-      "world/super_easter_egg_break.png",
-      {
-        frameWidth: 16,
-        frameHeight: 16,
-      },
-    );
+    // Dart
+    this.load.image("dart", "world/dart.png");
 
-    this.load.image("golden_egg", "world/golden_egg.png");
-    this.load.spritesheet(
-      "golden_egg_disappear",
-      "world/golden_egg_disappear.png",
-      {
-        frameWidth: 20,
-        frameHeight: 16,
-      },
-    );
-    this.load.spritesheet("golden_egg_break", "world/golden_egg_break.png", {
-      frameWidth: 20,
-      frameHeight: 16,
+    // Launcher
+    this.load.spritesheet("launcher_idle", "world/launcher-idle.png", {
+      frameWidth: 21,
+      frameHeight: 29,
     });
-
-    this.load.image("bad_egg", "world/bad_egg.png");
-    this.load.spritesheet("bad_egg_disappear", "world/bad_egg_disappear.png", {
-      frameWidth: 16,
-      frameHeight: 16,
+    this.load.spritesheet("launcher_shoot", "world/launcher-shoot.png", {
+      frameWidth: 21,
+      frameHeight: 29,
     });
-    this.load.spritesheet("bad_egg_break", "world/bad_egg_break.png", {
-      frameWidth: 16,
-      frameHeight: 16,
-    });
-
-    this.load.image("fried_egg_1", "world/fried_egg_1.png");
-    this.load.spritesheet(
-      "fried_egg_1_disappear",
-      "world/fried_egg_1_disappear.png",
-      {
-        frameWidth: 16,
-        frameHeight: 16,
-      },
-    );
-
-    this.load.image("fried_egg_2", "world/fried_egg_2.png");
-    this.load.spritesheet(
-      "fried_egg_2_disappear",
-      "world/fried_egg_2_disappear.png",
-      {
-        frameWidth: 16,
-        frameHeight: 16,
-      },
-    );
-
-    this.load.image("fried_egg_3", "world/fried_egg_3.png");
-    this.load.spritesheet(
-      "fried_egg_3_disappear",
-      "world/fried_egg_3_disappear.png",
-      {
-        frameWidth: 16,
-        frameHeight: 16,
-      },
-    );
 
     // Heart
     this.load.image("heart", SUNNYSIDE.icons.heart);
 
     // Enemies
-    this.load.spritesheet("snake_normal", "world/snake_normal.webp", {
-      frameWidth: 20,
-      frameHeight: 19,
-    });
-
-    this.load.spritesheet(
-      "snake_normal_collision",
-      "world/snake_normal_collision.webp",
-      {
-        frameWidth: 20,
-        frameHeight: 19,
-      },
-    );
-
-    this.load.spritesheet("hawk_flying", "world/hawk_flying.png", {
-      frameWidth: 48,
-      frameHeight: 19,
-    });
-
-    this.load.spritesheet("hawk_collision", "world/hawk_collision.png", {
-      frameWidth: 48,
-      frameHeight: 19,
-    });
-    this.load.spritesheet("snake_special", "world/snake_special.png", {
-      frameWidth: 20,
-      frameHeight: 19,
-    });
-
-    this.load.spritesheet(
-      "snake_special_col",
-      "world/snake_special_collision.webp",
-      {
-        frameWidth: 20,
-        frameHeight: 19,
-      },
-    );
-
-    this.load.spritesheet(
-      "snake_special_jump",
-      "world/snake_special_jump.webp",
-      {
-        frameWidth: 20,
-        frameHeight: 19,
-      },
-    );
-
-    this.load.spritesheet("hawk_readydive", "world/hawk_readydive.png", {
-      frameWidth: 48,
-      frameHeight: 22,
-    });
-
-    this.load.spritesheet("hawk_dive", "world/hawk_dive.png", {
-      frameWidth: 48,
-      frameHeight: 35,
-    });
-
-    this.load.spritesheet("hawk_attack", "world/hawk_attack.png", {
-      frameWidth: 48,
-      frameHeight: 21,
-    });
-
-    // Festival-of-color-2025 enemies spritesheet
     this.load.spritesheet("stone", "world/slime_grey_ball.webp", {
       frameWidth: 10,
       frameHeight: 10,
@@ -318,68 +213,44 @@ export class Scene extends BaseScene {
     // Mobile buttons
     this.load.image("left_button", "world/left_button.png");
     this.load.image("left_button_pressed", "world/left_button_pressed.png");
-    this.load.image("up_button", "world/up_button.png");
-    this.load.image("up_button_pressed", "world/up_button_pressed.png");
+    this.load.image("red_button", "world/red_button.png");
+    this.load.image("red_button_pressed", "world/red_button_pressed.png");
 
     // Decorations
-    this.load.spritesheet("goblin_farting", "world/goblin_farting.png", {
-      frameWidth: 29,
-      frameHeight: 22,
-    });
-    this.load.spritesheet("goblin_snorkling", "world/goblin_snorkling.png", {
-      frameWidth: 24,
-      frameHeight: 24,
-    });
-    this.load.spritesheet("dragonfly", "world/dragonfly.png", {
-      frameWidth: 13,
-      frameHeight: 4,
-    });
-    this.load.spritesheet("snake_jump", "world/snake_jump.png", {
-      frameWidth: 20,
-      frameHeight: 19,
-    });
-    this.load.spritesheet(
-      "egg_central_island",
-      "world/egg_central_island.png",
-      {
-        frameWidth: 52,
-        frameHeight: 64,
-      },
-    );
-    this.load.spritesheet(
-      "thematic_decoration",
-      "world/thematic_decoration.png",
-      {
-        frameWidth: 16,
-        frameHeight: 32,
-      },
-    );
-    this.load.spritesheet("bunny_shop", "world/bunny_shop.png", {
-      frameWidth: 20,
-      frameHeight: 24,
-    });
+    this.load.image("river", "world/river.png");
 
     // Slime and ball sound effects
-    this.load.audio("ground_slime_shoot", "world/Festival-of-color-sound-effects/ground_slime_shoot_1.wav");
-    this.load.audio("slime_whoosh", "world/Festival-of-color-sound-effects/slime_whoosh.wav");
-    this.load.audio("airballoon_slime_shoot", "world/Festival-of-color-sound-effects/airballoon_slime_shoot.wav");
-    this.load.audio("stone_crack", "world/Festival-of-color-sound-effects/stone_crack.wav");
-    this.load.audio("stone_bouncing", "world/Festival-of-color-sound-effects/ball_bounce.wav");
+    this.load.audio(
+      "ground_slime_shoot",
+      "world/Festival-of-color-sound-effects/ground_slime_shoot_1.wav",
+    );
+    this.load.audio(
+      "slime_whoosh",
+      "world/Festival-of-color-sound-effects/slime_whoosh.wav",
+    );
+    this.load.audio(
+      "airballoon_slime_shoot",
+      "world/Festival-of-color-sound-effects/airballoon_slime_shoot.wav",
+    );
+    this.load.audio(
+      "stone_crack",
+      "world/Festival-of-color-sound-effects/stone_crack.wav",
+    );
+    this.load.audio(
+      "stone_bouncing",
+      "world/Festival-of-color-sound-effects/ball_bounce.wav",
+    );
 
-    //Egg sounds
-    this.load.audio("golden_egg", "world/sound-effects/golden_egg.mp3");
-    this.load.audio("normal_egg", "world/sound-effects/normal_egg.mp3");
-    this.load.audio("egg_break", "world/sound-effects/egg_break.mp3");
-    this.load.audio("egg_crack", "world/sound-effects/egg_crack.mp3");
-    this.load.audio("new_egg", "world/sound-effects/new_egg.mp3");
-    this.load.audio("fried_egg", "world/sound-effects/fried_egg.mp3");
     //Player sounds
     this.load.audio("sword", "world/sound-effects/sword.mp3");
     this.load.audio("lose_life", "world/sound-effects/lose_life.mp3");
     this.load.audio("ambience", "world/sound-effects/ambience.mp3");
 
     // Background music
-    this.load.audio("background_music", "world/Festival-of-color-sound-effects/background_music_1.mp3");
+    this.load.audio(
+      "background_music",
+      "world/Festival-of-color-sound-effects/background_music_1.mp3",
+    );
   }
 
   async create() {
@@ -390,8 +261,8 @@ export class Scene extends BaseScene {
 
     // Basic config
     this.velocity = 0;
+    this.darts = this.add.group();
     this.physics.world.drawDebug = false;
-    // this.addDecorations();
     this.initializeControls();
     this.initializeRetryEvent();
     this.initializeStartEvent();
@@ -399,18 +270,21 @@ export class Scene extends BaseScene {
     this.initializeFontFamily();
 
     // Game config
-    this.currentPlayer?.createBasket();
-    this.currentPlayer?.createSword();
+    this.currentPlayer?.createLauncher();
     this.input.addPointer(3);
     this.physics.world.gravity.y = GRAVITY;
     this.ground = this.colliders?.children.entries[0];
     this.leftWall = this.colliders?.children.entries[1];
     this.rightWall = this.colliders?.children.entries[2];
+    this.deflator = this.colliders?.children.entries[3];
 
     // Festival of color 2025 idle
     this.festivalOfColorIdle();
 
-    this.sound.play("background_music", { volume: PORTAL_BACKGROUND_VOLUME, loop: true });
+    this.sound.play("background_music", {
+      volume: PORTAL_BACKGROUND_VOLUME,
+      loop: true,
+    });
   }
 
   private get isGameReady() {
@@ -449,6 +323,9 @@ export class Scene extends BaseScene {
       this.playAnimation();
     }
 
+    // Controls
+    this.setControls();
+
     super.update();
   }
 
@@ -458,64 +335,65 @@ export class Scene extends BaseScene {
       const leftButtonX =
         (this.map.width * SQUARE_WIDTH) / 2 -
         window.innerWidth / (2 * this.zoom) +
-        6 +
+        15 +
         SQUARE_WIDTH;
 
-      const leftButton = this.add
+      this.leftButton = this.add
         .image(leftButtonX, buttonY, "left_button")
         .setAlpha(0.8)
         .setInteractive()
         .setDepth(1000)
+        .setVisible(false)
         .on("pointerdown", () => {
           this.mobileKeys.left = true;
-          leftButton.setTexture("left_button_pressed");
+          this.leftButton.setTexture("left_button_pressed");
         })
         .on("pointerup", () => {
           this.mobileKeys.left = false;
-          leftButton.setTexture("left_button");
+          this.leftButton.setTexture("left_button");
         })
         .on("pointerout", () => {
           this.mobileKeys.left = false;
-          leftButton.setTexture("left_button");
+          this.leftButton.setTexture("left_button");
         });
 
-      const rightButton = this.add
-        .image(leftButtonX + leftButton.width + 5, buttonY, "left_button")
+      this.rightButton = this.add
+        .image(leftButtonX + this.leftButton.width + 5, buttonY, "left_button")
         .setAlpha(0.8)
         .setInteractive()
         .setDepth(1000)
+        .setVisible(false)
         .on("pointerdown", () => {
           this.mobileKeys.right = true;
-          rightButton.setTexture("left_button_pressed");
+          this.rightButton.setTexture("left_button_pressed");
         })
         .on("pointerup", () => {
           this.mobileKeys.right = false;
-          rightButton.setTexture("left_button");
+          this.rightButton.setTexture("left_button");
         })
         .on("pointerout", () => {
           this.mobileKeys.right = false;
-          rightButton.setTexture("left_button");
+          this.rightButton.setTexture("left_button");
         });
 
-      rightButton.flipX = true;
+      this.rightButton.flipX = true;
 
       // Jump
       const jumpButton = this.add
-        .image(leftButtonX, buttonY, "up_button")
-        .setAlpha(0.8)
+        .image(leftButtonX, buttonY, "red_button")
         .setInteractive()
         .setDepth(1000)
         .on("pointerdown", () => {
-          this.mobileKeys.jump = true;
-          jumpButton.setTexture("up_button_pressed");
+          this.mobileKeys.space = true;
+          jumpButton.setTexture("red_button_pressed");
         })
         .on("pointerup", () => {
-          this.mobileKeys.jump = false;
-          jumpButton.setTexture("up_button");
+          this.mobileKeys.space = false;
+          jumpButton.setTexture("red_button");
         })
         .on("pointerout", () => {
-          this.mobileKeys.jump = false;
-          jumpButton.setTexture("up_button");
+          this.mobileKeys.space = false;
+          jumpButton.setTexture("red_button");
         });
 
       jumpButton.setPosition(
@@ -527,8 +405,22 @@ export class Scene extends BaseScene {
         buttonY,
       );
 
-      leftButton.setDepth(1000000000000);
-      rightButton.setDepth(1000000000000);
+      // Joystick
+      this.joystick = new VirtualJoystick(this, {
+        x:
+          (this.map.width * this.zoom * SQUARE_WIDTH) / 2 -
+          window.innerWidth / (2 * this.zoom) +
+          +15 +
+          2.5 * SQUARE_WIDTH,
+        y: (this.map.height * this.zoom * SQUARE_WIDTH) / 2 + 175,
+        radius: 15,
+        base: this.add.circle(0, 0, 20, 0x000000, 0.7).setDepth(1000000000),
+        thumb: this.add.circle(0, 0, 10, 0xffffff, 0.7).setDepth(1000000000),
+        forceMin: 2,
+      }).setVisible(false);
+
+      this.leftButton.setDepth(1000000000000);
+      this.rightButton.setDepth(1000000000000);
       jumpButton.setDepth(1000000000000);
 
       this.portalService?.send("SET_JOYSTICK_ACTIVE", {
@@ -570,10 +462,22 @@ export class Scene extends BaseScene {
   private gameOverAnimation() {
     if (!this.currentPlayer) return;
     this.currentPlayer.death();
-    this.eggSpawnInterval.remove();
+    this.balloonSpawnInterval.remove();
     this.enemySpawnInterval.remove();
-    // this.badEgg.destroyAllFriedEggs();
     this.velocity = 0;
+  }
+
+  private setControls() {
+    const joystickEnabled = this.portalService?.state.context.isJoystickEnabled;
+    if (joystickEnabled) {
+      this.joystick?.setVisible(true);
+      this.leftButton?.setVisible(false);
+      this.rightButton?.setVisible(false);
+    } else {
+      this.joystick?.setVisible(false);
+      this.leftButton?.setVisible(true);
+      this.rightButton?.setVisible(true);
+    }
   }
 
   private reset() {
@@ -582,9 +486,10 @@ export class Scene extends BaseScene {
       SPAWNS()[this.sceneId].default.y,
     );
     this.enemySpawnInterval.remove();
-    this.eggSpawnInterval.remove();
-    this.eggCounter = 0;
-    this.superEggInitCount = -1000;
+    this.balloonSpawnInterval.remove();
+    this.balloonCounter = 0;
+    this.cyanBalloonInitCount = -1000;
+    this.currentPlayer?.setIsShooting(false);
     this.currentPlayer?.setIsHurt(false);
     this.currentEnemySpawnInterval = ENEMY_SPAWN_INTERVAL;
   }
@@ -592,9 +497,9 @@ export class Scene extends BaseScene {
   private initializeStartEvent() {
     const onStart = (event: EventObject) => {
       if (event.type === "START") {
-        this.eggSpawnInterval = this.time.addEvent({
-          delay: EGG_SPAWN_INTERVAL,
-          callback: () => this.createEgg(),
+        this.balloonSpawnInterval = this.time.addEvent({
+          delay: BALLOON_SPAWN_INTERVAL,
+          callback: () => this.createBalloon(),
           callbackScope: this,
           repeat: -1,
         });
@@ -622,100 +527,138 @@ export class Scene extends BaseScene {
   private playAnimation() {
     if (!this.currentPlayer) return;
     if (this.currentPlayer.isHurt) return;
-    const swordBody = this.currentPlayer.sword
-      ?.body as Phaser.Physics.Arcade.Body;
 
-    if (
-      this.currentPlayer.y >= SPAWNS()[this.sceneId].default.y &&
-      !this.currentPlayer.isHurt
-    ) {
-      this.currentPlayer.enableBasket(true);
-      this.currentPlayer.enableSword(false);
-      if (this.isMoving) {
-        this.currentPlayer.carry();
-      } else {
-        this.currentPlayer.carryIdle();
-      }
+    // Move
+    if (this.isMoving) {
+      this.currentPlayer.carry();
+    } else {
+      this.currentPlayer.carryIdle();
     }
 
+    // Throw dart
     if (
-      (this.cursorKeys?.space.isDown || this.mobileKeys.jump) &&
-      this.currentPlayer.y >= SPAWNS()[this.sceneId].default.y &&
-      !this.currentPlayer.isHurt
+      (this.cursorKeys?.space.isDown || this.mobileKeys.space) &&
+      !this.currentPlayer.isShooting
     ) {
-      this.currentPlayer.enableBasket(false);
-      this.currentPlayer.enableSword(true);
-      this.currentPlayer.attack();
-      const currentPlayerBody = this.currentPlayer
-        .body as Phaser.Physics.Arcade.Body;
-      currentPlayerBody.setVelocityY(PLAYER_JUMP_VELOCITY_Y);
-    }
-
-    if (swordBody.enable && this.currentPlayer.directionFacing === "right") {
-      this.currentPlayer.sword?.setPosition(-12, -17);
-    } else if (
-      swordBody.enable &&
-      this.currentPlayer.directionFacing === "left"
-    ) {
-      this.currentPlayer.sword?.setPosition(-22, -17);
+      this.shootDart();
     }
   }
 
-  private setSuperEggInitCount() {
-    this.superEggInitCount = this.eggCounter;
+  private shootDart() {
+    if (!this.currentPlayer) return;
+
+    this.currentPlayer.shootLauncher();
+    const offset = 0.8;
+    const offsetX =
+      this.currentPlayer.directionFacing === "right" ? offset : -offset;
+
+    const dart = new Dart({
+      x: this.currentPlayer.x + offsetX,
+      y: this.currentPlayer.y - 10,
+      scene: this,
+    });
+
+    this.darts.add(dart);
   }
 
-  private createEgg() {
-    this.eggCounter += 1;
-    const minX = EGG_SPAWN_LEFT_LIMIT;
-    const maxX = EGG_SPAWN_RIGHT_LIMIT;
+  private createBalloon() {
+    this.balloonCounter += 1;
+    const minX = BALLOON_SPAWN_LEFT_LIMIT;
+    const maxX = BALLOON_SPAWN_RIGHT_LIMIT;
     const randomX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
 
-    if (this.eggCounter - this.superEggInitCount <= 5) {
-      // this.createSuperEasterEgg(randomX);
-    } else if ((this.eggCounter - 10) % 20 === 0) {
-      // this.createGoldenEgg(randomX);
-    } else if (this.eggCounter % 20 === 0) {
-      // this.createBadEgg(randomX);
+    if (
+      this.balloonCounter - this.cyanBalloonInitCount <=
+      AMOUNT_CYAN_BALLOONS
+    ) {
+      this.createCyanBalloon(randomX);
+    } else if (this.balloonCounter >= 25 && this.balloonCounter % 20 === 5) {
+      this.createGreenBalloon(randomX);
+    } else if ((this.balloonCounter - 10) % 20 === 0) {
+      this.createYellowBalloon(randomX);
+    } else if (this.balloonCounter % 20 === 0) {
+      this.createRedBalloon(randomX);
     } else {
-      // this.createEasterEgg(randomX);
+      this.createBlueBalloon(randomX);
     }
   }
 
-  private createEasterEgg(x: number) {
-    this.easterEgg = new EasterEgg({
+  private createBlueBalloon(x: number) {
+    new Balloon({
       x: x,
       y: -1,
       scene: this,
-      player: this.currentPlayer,
+      spriteName: "balloon_blue",
+      onPop: () => {
+        this.portalService?.send("GAIN_POINTS", {
+          points: 1,
+        });
+        this.currentPlayer?.addLabel(1);
+        // this.sound.play("earn_point", { volume: PORTAL_VOLUME });
+      },
     });
   }
 
-  private createSuperEasterEgg(x: number) {
-    this.superEasterEgg = new SuperEasterEgg({
+  private createRedBalloon(x: number) {
+    new Balloon({
       x: x,
       y: -1,
       scene: this,
-      player: this.currentPlayer,
+      spriteName: "balloon_red",
+      onDebuff: () => {
+        this.velocity = WALKING_SPEED * PLAYER_PERCENTAGE_DEBUFF_VELOCITY;
+        this.time.delayedCall(TIME_DEBUFF_VELOCITY, () => {
+          this.velocity = WALKING_SPEED;
+        });
+        // this.sound.play("debuff_velocity", { volume: PORTAL_VOLUME });
+      },
     });
   }
 
-  private createBadEgg(x: number) {
-    this.badEgg = new BadEgg({
+  private createYellowBalloon(x: number) {
+    new Balloon({
       x: x,
       y: -1,
       scene: this,
-      player: this.currentPlayer,
+      spriteName: "balloon_yellow",
+      onPop: () => {
+        this.portalService?.send("GAIN_POINTS", {
+          points: 3,
+        });
+        this.currentPlayer?.addLabel(3, "#DCD42F");
+        this.cyanBalloonInitCount = this.balloonCounter;
+        // this.sound.play("enable_special_balloons", { volume: PORTAL_VOLUME });
+      },
     });
   }
 
-  private createGoldenEgg(x: number) {
-    this.goldenEgg = new GoldenEgg({
+  private createGreenBalloon(x: number) {
+    new Balloon({
       x: x,
       y: -1,
       scene: this,
-      player: this.currentPlayer,
-      action: () => this.setSuperEggInitCount(),
+      spriteName: "balloon_green",
+      onPop: () => {
+        this.portalService?.send("GAIN_LIFE");
+        this.currentPlayer?.addLabel(1, "", "heart");
+        // this.sound.play("earn_life", { volume: PORTAL_VOLUME });
+      },
+    });
+  }
+
+  private createCyanBalloon(x: number) {
+    new Balloon({
+      x: x,
+      y: -1,
+      scene: this,
+      spriteName: "balloon_cyan",
+      onPop: () => {
+        this.portalService?.send("GAIN_POINTS", {
+          points: 2,
+        });
+        this.currentPlayer?.addLabel(2, "#ADFFFF");
+        // this.sound.play("earn_super_point", { volume: PORTAL_VOLUME });
+      },
     });
   }
 
@@ -751,11 +694,14 @@ export class Scene extends BaseScene {
 
   private createBounceBros() {
     const startingPoint = [STONE_CONFIGURATION.RtoL, STONE_CONFIGURATION.LtoR];
-    const bounceBallConfig = [BOUNCING_CONFIGURATION.config_1, BOUNCING_CONFIGURATION.config_2];
+    const bounceBallConfig = [
+      BOUNCING_CONFIGURATION.config_1,
+      BOUNCING_CONFIGURATION.config_2,
+    ];
 
     this.randomIndex = Math.floor(Math.random() * startingPoint.length);
     const randomSpawn = startingPoint[this.randomIndex];
-    const randomConfig = bounceBallConfig[this.randomIndex]
+    const randomConfig = bounceBallConfig[this.randomIndex];
     const finalX = this.randomIndex == 0;
 
     !finalX
@@ -787,13 +733,13 @@ export class Scene extends BaseScene {
       this.time.delayedCall(randomConfig.despawnIdle + PRE_ACTION_DELAY, () => {
         finalX
           ? this.bounceBro1.setVisible(false)
-          : this.bounceBro2.setVisible(false); 
-      })
+          : this.bounceBro2.setVisible(false);
+      });
 
       this.time.delayedCall(randomConfig.respawnIdle + PRE_ACTION_DELAY, () => {
         this.bounceBro1.setVisible(true);
-        this.bounceBro2.setVisible(true);  
-      })
+        this.bounceBro2.setVisible(true);
+      });
     });
   }
 
@@ -816,7 +762,7 @@ export class Scene extends BaseScene {
       finalX
         ? this.blastBro2.setVisible(false)
         : this.blastBro1.setVisible(false);
-      
+
       this.blastBros = new BlastBros({
         x: randomSpawn,
         y: Y_AXIS - 220,
@@ -843,38 +789,9 @@ export class Scene extends BaseScene {
     return GAME_SECONDS - this.secondsLeft;
   }
 
-  private addDecorations() {
-    const goblinFartingName = "goblin_farting";
-    const goblinSnorklingName = "goblin_snorkling";
-    const dragonflyName = "dragonfly";
-    const snakeJumpName = "snake_jump";
-    const eggCentralIslandName = "egg_central_island";
-    const thematicDecorationName = "thematic_decoration";
-    const bunnyShopName = "bunny_shop";
-
-    const goblinFarting = this.add.sprite(378, 34, goblinFartingName);
-    const goblinSnorkling = this.add.sprite(278, 17, goblinSnorklingName);
-    const dragonfly = this.add.sprite(374, 146, dragonflyName);
-    const snakeJump = this.add.sprite(228, 157, snakeJumpName);
-    const eggCentralIsland = this.add.sprite(340, 141, eggCentralIslandName);
-    const thematicDecoration = this.add.sprite(
-      408,
-      100,
-      thematicDecorationName,
-    );
-    const bunnyShop = this.add.sprite(344, 249, thematicDecorationName);
-
-    this.createAnimation(goblinFarting, goblinFartingName, 0, 62);
-    this.createAnimation(goblinSnorkling, goblinSnorklingName, 0, 45);
-    this.createAnimation(dragonfly, dragonflyName, 0, 1);
-    this.createAnimation(snakeJump, snakeJumpName, 0, 8);
-    this.createAnimation(eggCentralIsland, eggCentralIslandName, 0, 35);
-    this.createAnimation(thematicDecoration, thematicDecorationName, 0, 8);
-    this.createAnimation(bunnyShop, bunnyShopName, 0, 8);
-  }
-
   // Festival-of-color-2025 Idle
   private festivalOfColorIdle() {
+    const riverName = "river";
     const blastBrosName = "airballoon_slime";
     const bounceBrosName = "ground_slime";
     const airballoon_blue = "airballoon_slime_blue";
@@ -882,16 +799,47 @@ export class Scene extends BaseScene {
     const slime_green = "ground_slime_green";
 
     // Sprite
-    this.blastBro1 = this.add.sprite(STONE_CONFIGURATION.LtoR, Y_AXIS - 230, blastBrosName).setDepth(1000000000).setScale(IDLE_SPRITE_SCALE);
-    this.blastBro2 = this.add.sprite(STONE_CONFIGURATION.RtoL, Y_AXIS - 230, blastBrosName).setDepth(1000000000).setFlipX(true).setScale(IDLE_SPRITE_SCALE);
-    this.bounceBro1 = this.add.sprite(STONE_CONFIGURATION.LtoR, Y_AXIS + 5, bounceBrosName).setDepth(10000000).setScale(IDLE_SPRITE_SCALE);
-    this.bounceBro2 = this.add.sprite(STONE_CONFIGURATION.RtoL, Y_AXIS + 5, bounceBrosName).setDepth(10000000).setFlipX(true).setScale(IDLE_SPRITE_SCALE);
+    this.add.sprite(1, 1, riverName).setOrigin(0).setDepth(1000);
+    this.blastBro1 = this.add
+      .sprite(STONE_CONFIGURATION.LtoR, Y_AXIS - 230, blastBrosName)
+      .setDepth(1000000000)
+      .setScale(IDLE_SPRITE_SCALE);
+    this.blastBro2 = this.add
+      .sprite(STONE_CONFIGURATION.RtoL, Y_AXIS - 230, blastBrosName)
+      .setDepth(1000000000)
+      .setFlipX(true)
+      .setScale(IDLE_SPRITE_SCALE);
+    this.bounceBro1 = this.add
+      .sprite(STONE_CONFIGURATION.LtoR, Y_AXIS + 5, bounceBrosName)
+      .setDepth(10000000)
+      .setScale(IDLE_SPRITE_SCALE);
+    this.bounceBro2 = this.add
+      .sprite(STONE_CONFIGURATION.RtoL, Y_AXIS + 5, bounceBrosName)
+      .setDepth(10000000)
+      .setFlipX(true)
+      .setScale(IDLE_SPRITE_SCALE);
 
     // Colored signal sprite
-    this.blastBro1Blue = this.add.sprite(STONE_CONFIGURATION.LtoR, Y_AXIS - 230, airballoon_blue).setDepth(1000000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
-    this.blastBro2Red = this.add.sprite(STONE_CONFIGURATION.RtoL, Y_AXIS - 230, airballoon_red).setDepth(1000000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
-    this.greenSlime1 = this.add.sprite(STONE_CONFIGURATION.LtoR, Y_AXIS + 5, slime_green).setDepth(10000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
-    this.greenSlime2 = this.add.sprite(STONE_CONFIGURATION.RtoL, Y_AXIS + 5, slime_green).setDepth(10000000).setScale(SIGNAL_SPRITE_SCALE).setVisible(false);
+    this.blastBro1Blue = this.add
+      .sprite(STONE_CONFIGURATION.LtoR, Y_AXIS - 230, airballoon_blue)
+      .setDepth(1000000000)
+      .setScale(SIGNAL_SPRITE_SCALE)
+      .setVisible(false);
+    this.blastBro2Red = this.add
+      .sprite(STONE_CONFIGURATION.RtoL, Y_AXIS - 230, airballoon_red)
+      .setDepth(1000000000)
+      .setScale(SIGNAL_SPRITE_SCALE)
+      .setVisible(false);
+    this.greenSlime1 = this.add
+      .sprite(STONE_CONFIGURATION.LtoR, Y_AXIS + 5, slime_green)
+      .setDepth(10000000)
+      .setScale(SIGNAL_SPRITE_SCALE)
+      .setVisible(false);
+    this.greenSlime2 = this.add
+      .sprite(STONE_CONFIGURATION.RtoL, Y_AXIS + 5, slime_green)
+      .setDepth(10000000)
+      .setScale(SIGNAL_SPRITE_SCALE)
+      .setVisible(false);
 
     // Idle animation
     this.createAnimation(this.blastBro1, blastBrosName, 0, 8);

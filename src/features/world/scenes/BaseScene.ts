@@ -122,10 +122,10 @@ export abstract class BaseScene extends Phaser.Scene {
   soundEffects: AudioController[] = [];
   walkAudioController?: WalkAudioController;
 
-  mobileKeys: { left: boolean; right: boolean; jump: boolean } = {
+  mobileKeys: { left: boolean; right: boolean; space: boolean } = {
     left: false,
     right: false,
-    jump: false,
+    space: false,
   };
 
   cursorKeys:
@@ -148,7 +148,7 @@ export abstract class BaseScene extends Phaser.Scene {
 
   currentTick = 0;
 
-  zoom = window.innerWidth < 500 ? 2 : 3;
+  zoom = window.innerWidth < 400 ? 1.75 : window.innerWidth < 500 ? 2 : 3;
 
   velocity = WALKING_SPEED;
   isMoving = false;
@@ -334,7 +334,6 @@ export abstract class BaseScene extends Phaser.Scene {
         // gameService
         clothing: {
           ...(this.gameState.bumpkin?.equipped as BumpkinParts),
-          onesie: "Bunny Onesie",
           updatedAt: 0,
         },
         experience: 0,
@@ -506,14 +505,14 @@ export abstract class BaseScene extends Phaser.Scene {
       (window.innerWidth - this.map.width * this.zoom * SQUARE_WIDTH) / 2;
     let offsetY =
       window.innerHeight - this.map.height * this.zoom * SQUARE_WIDTH;
-    if (window.innerWidth >= 500) {
-      offsetY = offsetY + SQUARE_WIDTH * 4 * this.zoom;
+    if (!isTouchDevice()) {
+      offsetY = offsetY + SQUARE_WIDTH * 3 * this.zoom;
     }
-    if (window.innerWidth < 500) {
+    if (isTouchDevice()) {
       offsetX = offsetX + 20;
-      offsetY = offsetY + SQUARE_WIDTH * 1 * this.zoom;
+      offsetY = offsetY + SQUARE_WIDTH * 0 * this.zoom;
     }
-    camera.setPosition(offsetX, offsetY);
+    camera.setPosition(offsetX - 17, offsetY);
     camera.setSize(
       this.map.width * this.zoom * SQUARE_WIDTH,
       this.map.height * this.zoom * SQUARE_WIDTH,
@@ -606,7 +605,6 @@ export abstract class BaseScene extends Phaser.Scene {
   public initialiseControls() {
     if (isTouchDevice()) {
       // Initialise joystick
-      // const { centerX, centerY, height, width } = this.cameras.main;
       // this.joystick = new VirtualJoystick(this, {
       //   x: (this.map.width * this.zoom * SQUARE_WIDTH) / 2,
       //   y: this.map.height * this.zoom * SQUARE_WIDTH - 275,
@@ -614,7 +612,7 @@ export abstract class BaseScene extends Phaser.Scene {
       //   base: this.add.circle(0, 0, 15, 0x000000, 0.2).setDepth(1000000000),
       //   thumb: this.add.circle(0, 0, 7, 0xffffff, 0.2).setDepth(1000000000),
       //   forceMin: 2,
-      // });
+      // }).setVisible(false);
     }
 
     // Initialise Keyboard

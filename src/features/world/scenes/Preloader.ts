@@ -42,6 +42,11 @@ export abstract class Preloader extends Phaser.Scene {
         `${CONFIG.PROTECTED_IMAGE_URL}/world/map-extruded.png`,
       );
 
+      this.load.image(
+        "festival-of-colors-tileset",
+        "world/festival_of_colors_map.png",
+      );
+
       this.load.image("easter-tileset", "world/easter_map.png");
 
       this.load.image(

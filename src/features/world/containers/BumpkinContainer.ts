@@ -16,7 +16,10 @@ import { KNOWN_IDS } from "features/game/types";
 import { getTradeableDisplay } from "features/marketplace/lib/tradeables";
 import { Heart } from "features/portal/easter/containers/Heart";
 import { BaseScene } from "../scenes/BaseScene";
-import { PORTAL_VOLUME } from "features/portal/easter/Constants";
+import {
+  DART_SHOOTING_DELAY,
+  PORTAL_VOLUME,
+} from "features/portal/easter/Constants";
 
 const NAME_ALIASES: Partial<Record<NPCName, string>> = {
   "pumpkin' pete": "pete",
@@ -63,16 +66,21 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
   private backAuraAnimationKey: string | undefined;
   private direction: "left" | "right" = "right";
 
-  // Easter
-  private jumpAnimationKey: string | undefined;
+  // Festival of color
   private hurtAnimationKey: string | undefined;
-  private attackAnimationKey: string | undefined;
   private carryAnimationKey: string | undefined;
   private carryIdleAnimationKey: string | undefined;
   private deathAnimationKey: string | undefined;
+  private launcherIdleAnimationKey: string | undefined;
+  private launcherAnimationKey: string | undefined;
+  private shootLauncherAnimationKey: string | undefined;
+
+  private launcher: Phaser.GameObjects.Sprite | undefined;
+  private labelText: Phaser.GameObjects.Text | undefined;
+  private iconLabelText: Phaser.GameObjects.Sprite | undefined;
+
+  isShooting = false;
   isHurt = false;
-  basket: Phaser.GameObjects.Zone | undefined;
-  sword: Phaser.GameObjects.Zone | undefined;
 
   constructor({
     scene,
@@ -171,9 +179,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     this.walkingAnimationKey = `${this.spriteKey}-bumpkin-walking`;
     this.digAnimationKey = `${this.spriteKey}-bumpkin-dig`;
     this.drillAnimationKey = `${this.spriteKey}-bumpkin-drilling`;
-    this.jumpAnimationKey = `${this.spriteKey}-bumpkin-jump`;
     this.hurtAnimationKey = `${this.spriteKey}-bumpkin-hurt`;
-    this.attackAnimationKey = `${this.spriteKey}-bumpkin-attack`;
     this.carryAnimationKey = `${this.spriteKey}-bumpkin-carry`;
     this.carryIdleAnimationKey = `${this.spriteKey}-bumpkin-carry-idle`;
     this.deathAnimationKey = `${this.spriteKey}-bumpkin-death`;
@@ -210,12 +216,6 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         "walking",
         "dig",
         "drilling",
-        // "hurt",
-        // "attack",
-        // "carry",
-        // "carry-idle",
-        // "death",
-        // "jump",
       ]);
       const idleLoader = scene.load.spritesheet(this.spriteKey, url, {
         frameWidth: 96,
@@ -247,12 +247,6 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
         this.createWalkingAnimation(9, 16);
         this.createDigAnimation(17, 29);
         this.createDrillAnimation(30, 38);
-        // this.createJumpAnimation(0, 8);
-        // this.createHurtAnimation(0, 8);
-        // this.createAttackAnimation(0, 8);
-        // this.createCarryAnimation(0, 8);
-        // this.createCarryIdleAnimation(0, 8);
-        // this.createDeathAnimation(0, 8);
         this.sprite.play(this.idleAnimationKey as string, true);
 
         this.ready = true;
@@ -262,21 +256,17 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
       });
 
       const animations = [
-        "jump",
         "hurt",
-        "attack",
-        "carry",
-        "carry-idle",
+        "carry-none",
+        "carry-none-idle",
         "death",
       ] as const;
 
       const createAnimations: Record<(typeof animations)[number], () => void> =
         {
-          jump: () => this.createJumpAnimation(0, 7),
           hurt: () => this.createHurtAnimation(1, 5),
-          attack: () => this.createAttackAnimation(0, 9),
-          carry: () => this.createCarryAnimation(0, 7),
-          "carry-idle": () => this.createCarryIdleAnimation(0, 8),
+          "carry-none": () => this.createCarryAnimation(0, 7),
+          "carry-none-idle": () => this.createCarryIdleAnimation(0, 8),
           death: () => this.createDeathAnimation(0, 12),
         };
 
@@ -300,20 +290,6 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     scene.load.start();
   }
 
-  private createJumpAnimation(start: number, end: number) {
-    if (!this.scene || !this.scene.anims) return;
-
-    this.scene.anims.create({
-      key: this.jumpAnimationKey,
-      frames: this.scene.anims.generateFrameNumbers("jump-animations", {
-        start,
-        end,
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-  }
-
   private createHurtAnimation(start: number, end: number) {
     if (!this.scene || !this.scene.anims) return;
 
@@ -328,26 +304,12 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     });
   }
 
-  private createAttackAnimation(start: number, end: number) {
-    if (!this.scene || !this.scene.anims) return;
-
-    this.scene.anims.create({
-      key: this.attackAnimationKey,
-      frames: this.scene.anims.generateFrameNumbers("attack-animations", {
-        start,
-        end,
-      }),
-      frameRate: 17,
-      repeat: 0,
-    });
-  }
-
   private createCarryAnimation(start: number, end: number) {
     if (!this.scene || !this.scene.anims) return;
 
     this.scene.anims.create({
       key: this.carryAnimationKey,
-      frames: this.scene.anims.generateFrameNumbers("carry-animations", {
+      frames: this.scene.anims.generateFrameNumbers("carry-none-animations", {
         start,
         end,
       }),
@@ -361,10 +323,13 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
 
     this.scene.anims.create({
       key: this.carryIdleAnimationKey,
-      frames: this.scene.anims.generateFrameNumbers("carry-idle-animations", {
-        start,
-        end,
-      }),
+      frames: this.scene.anims.generateFrameNumbers(
+        "carry-none-idle-animations",
+        {
+          start,
+          end,
+        },
+      ),
       frameRate: 10,
       repeat: -1,
     });
@@ -902,21 +867,6 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     }
   }
 
-  public jump() {
-    if (
-      this.sprite?.anims &&
-      this.scene?.anims.exists(this.jumpAnimationKey as string) &&
-      this.sprite?.anims.getName() !== this.jumpAnimationKey
-    ) {
-      try {
-        this.sprite.anims.play(this.jumpAnimationKey as string, true);
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.log("Bumpkin Container: Error playing jump animation: ", e);
-      }
-    }
-  }
-
   public hurt() {
     if (
       this.sprite?.anims &&
@@ -925,8 +875,6 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     ) {
       try {
         this.isHurt = true;
-        this.enableBasket(false);
-        this.enableSword(false);
         this.sprite.anims.play(this.hurtAnimationKey as string, true);
         this.animateRemovalHeart();
         this.sprite.once(
@@ -944,28 +892,16 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     }
   }
 
-  public attack() {
-    if (
-      this.sprite?.anims &&
-      this.scene?.anims.exists(this.attackAnimationKey as string) &&
-      this.sprite?.anims.getName() !== this.attackAnimationKey
-    ) {
-      try {
-        this.sprite.anims.play(this.attackAnimationKey as string, true);
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.log("Bumpkin Container: Error playing attack animation: ", e);
-      }
-    }
-  }
-
   public carry() {
+    this.playLauncherAnimation(this.launcherAnimationKey);
     if (
       this.sprite?.anims &&
       this.scene?.anims.exists(this.carryAnimationKey as string) &&
       this.sprite?.anims.getName() !== this.carryAnimationKey
     ) {
       try {
+        this.launcher?.anims.restart();
+        this.sprite.anims.restart();
         this.sprite.anims.play(this.carryAnimationKey as string, true);
       } catch (e) {
         // eslint-disable-next-line no-console
@@ -975,12 +911,15 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
   }
 
   public carryIdle() {
+    this.playLauncherAnimation(this.launcherIdleAnimationKey);
     if (
       this.sprite?.anims &&
       this.scene?.anims.exists(this.carryIdleAnimationKey as string) &&
       this.sprite?.anims.getName() !== this.carryIdleAnimationKey
     ) {
       try {
+        this.launcher?.anims.restart();
+        this.sprite.anims.restart();
         this.sprite.anims.play(this.carryIdleAnimationKey as string, true);
       } catch (e) {
         // eslint-disable-next-line no-console
@@ -1143,39 +1082,78 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     );
   }
 
-  public createBasket() {
-    this.basket = this.scene.add.zone(0, -8, 14, 10);
-    this.scene.physics.world.enable(this.basket);
-    const basketBody = this.basket.body as Phaser.Physics.Arcade.Body;
-    basketBody.setAllowGravity(false);
-    basketBody.enable = false;
-    this.add(this.basket);
+  // Festival of color
+  public createLauncher() {
+    const spriteNameLauncher = "launcher_idle";
+    const spriteNameShootLauncher = "launcher_shoot";
+    this.launcherIdleAnimationKey = `${spriteNameLauncher}_animation`;
+    this.launcherAnimationKey = "launcher_animation";
+    this.shootLauncherAnimationKey = "launcher_shoot_animation";
+    this.launcher = this.scene.add.sprite(0, -7, spriteNameLauncher);
+    this.launcher.setVisible(false).setScale(0.95, 0.85);
+    this.add(this.launcher);
+
+    this.launcher.on(
+      Phaser.Animations.Events.ANIMATION_COMPLETE,
+      (animation: Phaser.Animations.Animation) => {
+        if (animation.key === this.shootLauncherAnimationKey) {
+          this.launcher?.anims.play(
+            this.launcherIdleAnimationKey as string,
+            true,
+          );
+          this.sprite?.anims.restart();
+          this.scene.time.delayedCall(DART_SHOOTING_DELAY, () => {
+            this.isShooting = false;
+          });
+        }
+      },
+    );
+
+    this.scene.anims.create({
+      key: this.launcherIdleAnimationKey,
+      frames: this.scene.anims.generateFrameNumbers(spriteNameLauncher, {
+        frames: [0, 1, 6, 7],
+      }),
+      repeat: -1,
+      frameRate: 4 / 0.9,
+    });
+
+    this.scene.anims.create({
+      key: this.launcherAnimationKey,
+      frames: this.scene.anims.generateFrameNumbers(spriteNameLauncher, {
+        frames: [0, 1, 6, 7],
+      }),
+      repeat: -1,
+      frameRate: 4 / 0.7,
+    });
+
+    this.scene.anims.create({
+      key: this.shootLauncherAnimationKey,
+      frames: this.scene.anims.generateFrameNumbers(spriteNameShootLauncher, {
+        start: 1,
+        end: 3,
+      }),
+      repeat: 0,
+      frameRate: 10,
+    });
   }
 
-  public createSword() {
-    this.sword = this.scene.add.zone(-12, -17, 35, 15).setOrigin(0);
-    this.scene.physics.world.enable(this.sword);
-    const swordBody = this.sword.body as Phaser.Physics.Arcade.Body;
-    swordBody.setAllowGravity(false);
-    swordBody.enable = false;
-    this.add(this.sword);
-  }
-
-  public enableBasket(state: boolean) {
-    const basketBody = this.basket?.body as Phaser.Physics.Arcade.Body;
-    basketBody.enable = state;
-  }
-
-  public enableSword(state: boolean) {
-    const swordBody = this.sword?.body as Phaser.Physics.Arcade.Body;
-    swordBody.enable = state;
-    if (state && this.direction === "right") {
-      this.sword?.setPosition(-12, -17);
-      this.scene.sound.play("sword", { volume: PORTAL_VOLUME });
-    } else if (state && this.direction === "left") {
-      this.sword?.setPosition(-22, -17);
-      this.scene.sound.play("sword", { volume: PORTAL_VOLUME });
+  private playLauncherAnimation(name?: string) {
+    if (this.launcher?.anims.getName() !== this.shootLauncherAnimationKey) {
+      this.launcher?.anims.play(name as string, true);
     }
+    this.launcher?.setVisible(true);
+    const offset = 0.8;
+    if (this.direction === "right") {
+      this.launcher?.setX(offset);
+    } else {
+      this.launcher?.setX(-1 * offset);
+    }
+  }
+
+  public shootLauncher() {
+    this.isShooting = true;
+    this.launcher?.anims.play(this.shootLauncherAnimationKey as string, false);
   }
 
   private animateRemovalHeart() {
@@ -1192,24 +1170,42 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     this.isHurt = value;
   }
 
-  public addLabel(value: number | string) {
+  public setIsShooting(value: boolean) {
+    this.isShooting = value;
+  }
+
+  public addLabel(value: number | string, color?: string, iconName?: string) {
+    this.labelText?.destroy();
+    this.iconLabelText?.destroy();
     if (typeof value === "number") {
       value = `${value > 0 ? "+" : "-"}${Math.abs(value)}`;
     }
 
-    const label = this.scene.add
+    this.labelText = this.scene.add
       .text(1, -23, value, {
         fontSize: "5px",
         fontFamily: "Teeny",
-        color: "#FFFFFF",
+        color: color || "#FFFFFF",
         resolution: 10,
         padding: { x: 2, y: 2 },
       })
       .setOrigin(0.5);
 
-    label.setShadow(4, 4, "#161424", 0, true, true);
-    this.add(label);
+    this.labelText.setShadow(4, 4, "#161424", 0, true, true);
+    this.add(this.labelText);
 
-    this.scene.time.delayedCall(1000, () => label.destroy());
+    if (iconName) {
+      this.labelText.setX(-5);
+      this.iconLabelText = this.scene.add
+        .sprite(5, -24, iconName)
+        .setScale(0.9)
+        .setOrigin(0.5);
+      this.add(this.iconLabelText);
+    }
+
+    this.scene.time.delayedCall(1000, () => {
+      this.labelText?.destroy();
+      this.iconLabelText?.destroy();
+    });
   }
 }
