@@ -1,4 +1,4 @@
-import { DART_VELOCITY } from "../Constants";
+import { DART_VELOCITY, PORTAL_VOLUME } from "../Constants";
 import { Scene } from "../Scene";
 
 interface Props {
@@ -36,5 +36,7 @@ export class Dart extends Phaser.GameObjects.Container {
     scene.add.existing(this);
   }
 
-  private playSound() {}
+  private playSound() {
+    this.scene.sound.play("shoot", { volume: PORTAL_VOLUME });
+  }
 }
