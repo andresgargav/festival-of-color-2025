@@ -3,7 +3,7 @@ import tilesetconfig from "assets/map/festival_of_colors_tileset.json";
 import { SceneId } from "features/world/mmoMachine";
 import { BaseScene } from "features/world/scenes/BaseScene";
 import { MachineInterpreter } from "./lib/Machine";
-import { EventObject } from "xstate";
+import { EventObject, Machine } from "xstate";
 import { SPAWNS } from "features/world/lib/spawn";
 import { isTouchDevice } from "features/world/lib/device";
 import VirtualJoystick from "phaser3-rex-plugins/plugins/virtualjoystick.js";
@@ -29,6 +29,8 @@ import {
   TIME_DEBUFF_VELOCITY,
   PLAYER_PERCENTAGE_DEBUFF_VELOCITY,
   AMOUNT_CYAN_BALLOONS,
+  MACHINE_DECO_CONFIG,
+  BALLOON_DECO_CONFIG,
 } from "./Constants";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { SQUARE_WIDTH } from "features/game/lib/constants";
@@ -218,8 +220,26 @@ export class Scene extends BaseScene {
 
     // Decorations
     this.load.image("river", "world/river.png");
+    this.load.spritesheet("balloon_machine", "world/balloonMachine.png", 
+      {
+        frameWidth: 52,
+        frameHeight: 55,
+      }
+    );
 
-    // Slime and ball sound effects
+    const machineBalloons = ["red", "blue", "green", "yellow"];
+    machineBalloons.forEach((colors) => {
+      this.load.spritesheet(
+        `machine_balloon_${colors}`,
+        `world/machine_balloon_${colors}.png`,
+        {
+          frameWidth: 16,
+          frameHeight: 25,
+        }
+      )
+    })
+    
+    // Slime and sotne sound effects
     this.load.audio(
       "ground_slime_shoot",
       "world/Festival-of-color-sound-effects/ground_slime_shoot_1.wav",
@@ -238,13 +258,25 @@ export class Scene extends BaseScene {
     );
     this.load.audio(
       "stone_bouncing",
-      "world/Festival-of-color-sound-effects/ball_bounce.wav",
+      "world/Festival-of-color-sound-effects/stone_bounce.wav",
     );
 
-    //Player sounds
+    // Player sounds
     this.load.audio("sword", "world/sound-effects/sword.mp3");
     this.load.audio("lose_life", "world/sound-effects/lose_life.mp3");
     this.load.audio("ambience", "world/sound-effects/ambience.mp3");
+    this.load.audio("shoot", "world/Festival-of-color-sound-effects/shoot.wav",);
+
+    // Balloons sound effects
+    this.load.audio("new_balloon", "world/Festival-of-color-sound-effects/new_balloon.wav",);
+    this.load.audio("burst_balloon", "world/Festival-of-color-sound-effects/burst_balloon.wav",);
+    this.load.audio("deflating_balloon", "world/Festival-of-color-sound-effects/deflating_balloon.mp3",);
+    this.load.audio("debuff_velocity", "world/Festival-of-color-sound-effects/debuff.wav",);
+    this.load.audio("earn_life", "world/Festival-of-color-sound-effects/earn_life.mp3",);
+    this.load.audio("enable_special_balloons", "world/Festival-of-color-sound-effects/plus3.wav",);
+    this.load.audio("earn_point", "world/Festival-of-color-sound-effects/plus1.wav",);
+    this.load.audio("earn_super_point", "world/Festival-of-color-sound-effects/plus2.wav",);
+    this.load.audio("minus_point", "world/Festival-of-color-sound-effects/minus1.wav",);
 
     // Background music
     this.load.audio(
@@ -594,7 +626,7 @@ export class Scene extends BaseScene {
           points: 1,
         });
         this.currentPlayer?.addLabel(1);
-        // this.sound.play("earn_point", { volume: PORTAL_VOLUME });
+        this.sound.play("earn_point", { volume: PORTAL_VOLUME });
       },
     });
   }
@@ -606,6 +638,7 @@ export class Scene extends BaseScene {
       scene: this,
       spriteName: "balloon_red",
       onPop: () => {
+        this.sound.play("minus_point", { volume: PORTAL_VOLUME });
         this.portalService?.send("GAIN_POINTS", {
           points: -1,
         });
@@ -616,7 +649,7 @@ export class Scene extends BaseScene {
         this.time.delayedCall(TIME_DEBUFF_VELOCITY, () => {
           this.velocity = WALKING_SPEED;
         });
-        // this.sound.play("debuff_velocity", { volume: PORTAL_VOLUME });
+        this.sound.play("debuff_velocity", { volume: PORTAL_VOLUME });
       },
     });
   }
@@ -633,7 +666,7 @@ export class Scene extends BaseScene {
         });
         this.currentPlayer?.addLabel(3, "#DCD42F");
         this.cyanBalloonInitCount = this.balloonCounter;
-        // this.sound.play("enable_special_balloons", { volume: PORTAL_VOLUME });
+        this.sound.play("enable_special_balloons", { volume: PORTAL_VOLUME });
       },
     });
   }
@@ -647,7 +680,7 @@ export class Scene extends BaseScene {
       onPop: () => {
         this.portalService?.send("GAIN_LIFE");
         this.currentPlayer?.addLabel(1, "", "heart");
-        // this.sound.play("earn_life", { volume: PORTAL_VOLUME });
+        this.sound.play("earn_life", { volume: PORTAL_VOLUME });
       },
     });
   }
@@ -663,7 +696,7 @@ export class Scene extends BaseScene {
           points: 2,
         });
         this.currentPlayer?.addLabel(2, "#ADFFFF");
-        // this.sound.play("earn_super_point", { volume: PORTAL_VOLUME });
+        this.sound.play("earn_super_point", { volume: PORTAL_VOLUME });
       },
     });
   }
@@ -803,8 +836,59 @@ export class Scene extends BaseScene {
     const airballoon_blue = "airballoon_slime_blue";
     const airballoon_red = "airballoon_slime_red";
     const slime_green = "ground_slime_green";
+    const balloonNames = {
+      red: "machine_balloon_red",
+      blue: "machine_balloon_blue",
+      green: "machine_balloon_green",
+      yellow: "machine_balloon_yellow"
+    };
 
-    // Sprite
+    type MachineConfigKey = keyof typeof MACHINE_DECO_CONFIG;
+    // Define keys used
+    const configKeys: MachineConfigKey[] = ["config1", "config2", "config3", "config4"];
+
+    // Map each machine config to a specific balloon color
+    const machineBalloonColors: Record<MachineConfigKey, "red" | "blue" | "green" | "yellow"> = {
+      config1: "red",
+      config2: "blue",
+      config3: "green",
+      config4: "yellow"
+    };
+    
+    configKeys.forEach((key) => {
+      const machineConfig = MACHINE_DECO_CONFIG[key];
+    
+      // Add the base machine sprite
+      const balloon_machine_name = "balloon_machine";
+      const balloon_machine = this.add.sprite(
+        machineConfig.x,
+        machineConfig.y,
+        balloon_machine_name
+      ).setOrigin(0).setDepth(100000000);
+    
+      this.createAnimation(balloon_machine, balloon_machine_name, 0, 8);
+    
+      // Get the balloon color for this machine
+      const balloonColor = machineBalloonColors[key];
+      const balloonName = balloonNames[balloonColor];
+    
+      const balloonConfig = {
+        x: machineConfig.x + BALLOON_DECO_CONFIG.x,
+        y: machineConfig.y + BALLOON_DECO_CONFIG.y
+      };
+    
+      const balloonSprite = this.add.sprite(
+        balloonConfig.x,
+        balloonConfig.y,
+        balloonName
+      ).setOrigin(0).setDepth(1000000000).setScale(0.8);
+
+      console.log(balloonName, balloonNames)
+    
+      this.createAnimation(balloonSprite, balloonName, 0, 17);
+    });    
+
+    // Sprite    
     this.add.sprite(1, 1, riverName).setOrigin(0).setDepth(1000);
     this.blastBro1 = this.add
       .sprite(STONE_CONFIGURATION.LtoR, Y_AXIS - 230, blastBrosName)
