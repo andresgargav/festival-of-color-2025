@@ -220,12 +220,10 @@ export class Scene extends BaseScene {
 
     // Decorations
     this.load.image("river", "world/river.png");
-    this.load.spritesheet("balloon_machine", "world/balloonMachine.png", 
-      {
-        frameWidth: 52,
-        frameHeight: 55,
-      }
-    );
+    this.load.spritesheet("balloon_machine", "world/balloonMachine.png", {
+      frameWidth: 52,
+      frameHeight: 55,
+    });
 
     const machineBalloons = ["red", "blue", "green", "yellow"];
     machineBalloons.forEach((colors) => {
@@ -235,10 +233,10 @@ export class Scene extends BaseScene {
         {
           frameWidth: 16,
           frameHeight: 25,
-        }
-      )
-    })
-    
+        },
+      );
+    });
+
     // Slime and sotne sound effects
     this.load.audio(
       "ground_slime_shoot",
@@ -265,18 +263,45 @@ export class Scene extends BaseScene {
     this.load.audio("sword", "world/sound-effects/sword.mp3");
     this.load.audio("lose_life", "world/sound-effects/lose_life.mp3");
     this.load.audio("ambience", "world/sound-effects/ambience.mp3");
-    this.load.audio("shoot", "world/Festival-of-color-sound-effects/shoot.wav",);
+    this.load.audio("shoot", "world/Festival-of-color-sound-effects/shoot.wav");
 
     // Balloons sound effects
-    this.load.audio("new_balloon", "world/Festival-of-color-sound-effects/new_balloon.wav",);
-    this.load.audio("burst_balloon", "world/Festival-of-color-sound-effects/burst_balloon.wav",);
-    this.load.audio("deflating_balloon", "world/Festival-of-color-sound-effects/deflating_balloon.mp3",);
-    this.load.audio("debuff_velocity", "world/Festival-of-color-sound-effects/debuff.wav",);
-    this.load.audio("earn_life", "world/Festival-of-color-sound-effects/earn_life.mp3",);
-    this.load.audio("enable_special_balloons", "world/Festival-of-color-sound-effects/plus3.wav",);
-    this.load.audio("earn_point", "world/Festival-of-color-sound-effects/plus1.wav",);
-    this.load.audio("earn_super_point", "world/Festival-of-color-sound-effects/plus2.wav",);
-    this.load.audio("minus_point", "world/Festival-of-color-sound-effects/minus1.wav",);
+    this.load.audio(
+      "new_balloon",
+      "world/Festival-of-color-sound-effects/new_balloon.wav",
+    );
+    this.load.audio(
+      "burst_balloon",
+      "world/Festival-of-color-sound-effects/burst_balloon.wav",
+    );
+    this.load.audio(
+      "deflating_balloon",
+      "world/Festival-of-color-sound-effects/deflating_balloon.mp3",
+    );
+    this.load.audio(
+      "debuff_velocity",
+      "world/Festival-of-color-sound-effects/debuff.wav",
+    );
+    this.load.audio(
+      "earn_life",
+      "world/Festival-of-color-sound-effects/earn_life.mp3",
+    );
+    this.load.audio(
+      "enable_special_balloons",
+      "world/Festival-of-color-sound-effects/plus3.wav",
+    );
+    this.load.audio(
+      "earn_point",
+      "world/Festival-of-color-sound-effects/plus1.wav",
+    );
+    this.load.audio(
+      "earn_super_point",
+      "world/Festival-of-color-sound-effects/plus2.wav",
+    );
+    this.load.audio(
+      "minus_point",
+      "world/Festival-of-color-sound-effects/minus1.wav",
+    );
 
     // Background music
     this.load.audio(
@@ -840,55 +865,62 @@ export class Scene extends BaseScene {
       red: "machine_balloon_red",
       blue: "machine_balloon_blue",
       green: "machine_balloon_green",
-      yellow: "machine_balloon_yellow"
+      yellow: "machine_balloon_yellow",
     };
 
     type MachineConfigKey = keyof typeof MACHINE_DECO_CONFIG;
     // Define keys used
-    const configKeys: MachineConfigKey[] = ["config1", "config2", "config3", "config4"];
+    const configKeys: MachineConfigKey[] = [
+      "config1",
+      "config2",
+      "config3",
+      "config4",
+    ];
 
     // Map each machine config to a specific balloon color
-    const machineBalloonColors: Record<MachineConfigKey, "red" | "blue" | "green" | "yellow"> = {
+    const machineBalloonColors: Record<
+      MachineConfigKey,
+      "red" | "blue" | "green" | "yellow"
+    > = {
       config1: "red",
       config2: "blue",
       config3: "green",
-      config4: "yellow"
+      config4: "yellow",
     };
-    
+
     configKeys.forEach((key) => {
       const machineConfig = MACHINE_DECO_CONFIG[key];
-    
+
       // Add the base machine sprite
       const balloon_machine_name = "balloon_machine";
-      const balloon_machine = this.add.sprite(
-        machineConfig.x,
-        machineConfig.y,
-        balloon_machine_name
-      ).setOrigin(0).setDepth(100000000);
-    
+      const balloon_machine = this.add
+        .sprite(machineConfig.x, machineConfig.y, balloon_machine_name)
+        .setOrigin(0)
+        .setDepth(100000000);
+
       this.createAnimation(balloon_machine, balloon_machine_name, 0, 8);
-    
+
       // Get the balloon color for this machine
       const balloonColor = machineBalloonColors[key];
       const balloonName = balloonNames[balloonColor];
-    
+
       const balloonConfig = {
         x: machineConfig.x + BALLOON_DECO_CONFIG.x,
-        y: machineConfig.y + BALLOON_DECO_CONFIG.y
+        y: machineConfig.y + BALLOON_DECO_CONFIG.y,
       };
-    
-      const balloonSprite = this.add.sprite(
-        balloonConfig.x,
-        balloonConfig.y,
-        balloonName
-      ).setOrigin(0).setDepth(1000000000).setScale(0.8);
 
-      console.log(balloonName, balloonNames)
-    
+      const balloonSprite = this.add
+        .sprite(balloonConfig.x, balloonConfig.y, balloonName)
+        .setOrigin(0)
+        .setDepth(1000000000)
+        .setScale(0.8);
+
+      console.log(balloonName, balloonNames);
+
       this.createAnimation(balloonSprite, balloonName, 0, 17);
-    });    
+    });
 
-    // Sprite    
+    // Sprite
     this.add.sprite(1, 1, riverName).setOrigin(0).setDepth(1000);
     this.blastBro1 = this.add
       .sprite(STONE_CONFIGURATION.LtoR, Y_AXIS - 230, blastBrosName)
