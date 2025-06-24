@@ -9,7 +9,6 @@ on:
 jobs:
   deploy:
     concurrency: portal-deploy
-    environment: develop
     runs-on: ubuntu-latest
     steps:
       - name: Get current date
