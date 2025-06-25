@@ -861,7 +861,7 @@
   "festival-of-colors.mission": "Mission",
   "festival-of-colors.achievementUnlocked": "achievementUnlocked",
   "festival-of-colors.sflRequired": "FLOWER required",
-  "festival-of-colors.youHaveRunOutOfAttempts": "You have run out of attempts for today.",
+  "festival-of-colors.youHaveRunOutOfAttempts": "You have run out of attempts.",
   "festival-of-colors.wouldYouLikeToUnlock": "Would you like to buy more attempts?",
   "festival-of-colors.buyAttempts": "Buy {{attempts}} attempts ({{sfl}} FLOWER)",
   "festival-of-colors.unlockAttempts": "Unlock unlimited attempts ({{sfl}} FLOWER)",

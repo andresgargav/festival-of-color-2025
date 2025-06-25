@@ -99,7 +99,7 @@ export class Balloon extends Phaser.GameObjects.Container {
 
   private playSound() {
     this.scene.time.delayedCall(NEW_BALLOON_TIME_DELAY, () => {
-      this.scene.sound.play("new_balloon", { volume: PORTAL_VOLUME });
+      this.scene?.sound.play("new_balloon", { volume: PORTAL_VOLUME });
     });
   }
 
@@ -146,7 +146,10 @@ export class Balloon extends Phaser.GameObjects.Container {
   }
 
   private deflate() {
-    this.scene.sound.play("deflating_balloon", { volume: PORTAL_VOLUME, rate: 2});
+    this.scene.sound.play("deflating_balloon", {
+      volume: PORTAL_VOLUME,
+      rate: 2,
+    });
     this.sprite.anims.play(`deflating_${this.spriteName}`, true);
     this.sprite.once(
       Phaser.Animations.Events.ANIMATION_COMPLETE,

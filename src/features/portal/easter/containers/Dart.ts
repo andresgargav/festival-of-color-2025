@@ -21,6 +21,9 @@ export class Dart extends Phaser.GameObjects.Container {
     this.spriteName = "dart";
     this.sprite = scene.add.sprite(0, 0, this.spriteName);
 
+    // Collisions
+    this.collideWithTopWall();
+
     // Sound
     this.playSound();
 
@@ -38,5 +41,11 @@ export class Dart extends Phaser.GameObjects.Container {
 
   private playSound() {
     this.scene.sound.play("shoot", { volume: PORTAL_VOLUME });
+  }
+
+  private collideWithTopWall() {
+    this.scene.physics.add.overlap(this, this.scene.topWall, () => {
+      this.destroy();
+    });
   }
 }

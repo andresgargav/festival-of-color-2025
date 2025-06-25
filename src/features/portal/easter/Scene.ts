@@ -62,6 +62,7 @@ export class Scene extends BaseScene {
   leftWall!: Phaser.GameObjects.GameObject | undefined;
   rightWall!: Phaser.GameObjects.GameObject | undefined;
   deflator!: Phaser.GameObjects.GameObject | undefined;
+  topWall!: Phaser.GameObjects.Zone;
 
   // Darts
   darts!: Phaser.GameObjects.Group;
@@ -330,10 +331,7 @@ export class Scene extends BaseScene {
     this.currentPlayer?.createLauncher();
     this.input.addPointer(3);
     this.physics.world.gravity.y = GRAVITY;
-    this.ground = this.colliders?.children.entries[0];
-    this.leftWall = this.colliders?.children.entries[1];
-    this.rightWall = this.colliders?.children.entries[2];
-    this.deflator = this.colliders?.children.entries[3];
+    this.createInvisibleWalls();
 
     // Festival of color 2025 idle
     this.festivalOfColorIdle();
@@ -579,6 +577,26 @@ export class Scene extends BaseScene {
         color: "#000000",
       })
       .setAlpha(0);
+  }
+
+  private createInvisibleWalls() {
+    this.ground = this.colliders?.children.entries[0];
+    this.leftWall = this.colliders?.children.entries[1];
+    this.rightWall = this.colliders?.children.entries[2];
+    this.deflator = this.colliders?.children.entries[3];
+    const graphics = this.add.graphics();
+    graphics.fillStyle(0xff0000, 1);
+    const spriteDeflator = this.deflator?.body as Phaser.Physics.Arcade.Body;
+    graphics.fillRect(
+      spriteDeflator.x,
+      spriteDeflator.y,
+      spriteDeflator.width,
+      spriteDeflator.height,
+    );
+    graphics.setDepth(1000000000000);
+    this.topWall = this.add.zone(0, 0, this.map.widthInPixels * 2, 30);
+    this.physics.world.enable(this.topWall);
+    (this.topWall.body as Phaser.Physics.Arcade.Body)?.setAllowGravity(false);
   }
 
   private playAnimation() {
