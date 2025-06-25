@@ -22,7 +22,7 @@ export const DART_SHOOTING_DELAY = 300;
 export const DART_VELOCITY = 100;
 
 // Balloons
-export const BALLOON_SPAWN_INTERVAL = 2000;
+export const BALLOON_SPAWN_INTERVAL = 1500;
 export const BALLOON_SPAWN_LEFT_LIMIT = 293;
 export const BALLOON_SPAWN_RIGHT_LIMIT = 426;
 export const AMOUNT_CYAN_BALLOONS = 3;
@@ -73,7 +73,7 @@ export const PLAYER_PERCENTAGE_DEBUFF_VELOCITY = 0.5;
 export const TIME_DEBUFF_VELOCITY = 5000;
 
 // Game config
-export const GAME_SECONDS = 180;
+export const GAME_SECONDS = 120;
 export const GAME_LIVES = 3;
 export const GRAVITY = 450;
 
@@ -166,5 +166,5 @@ export const ENEMIES_TABLE: {
 ];
 
 export const BETA_TESTERS = [
-  29, 9609, 49035, 155026, 1181, 151471, 49035, 86, 79871, 0,
+  29, 9609, 49035, 155026, 1181, 151471, 49035, 86, 79871,
 ];

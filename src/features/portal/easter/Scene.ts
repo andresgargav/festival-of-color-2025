@@ -653,6 +653,10 @@ export class Scene extends BaseScene {
         this.currentPlayer?.addLabel(1);
         this.sound.play("earn_point", { volume: PORTAL_VOLUME });
       },
+      onDebuff: () => {
+        this.portalService?.send("LOSE_LIFE");
+        this.currentPlayer?.hurt();
+      },
     });
   }
 
@@ -693,6 +697,10 @@ export class Scene extends BaseScene {
         this.cyanBalloonInitCount = this.balloonCounter;
         this.sound.play("enable_special_balloons", { volume: PORTAL_VOLUME });
       },
+      onDebuff: () => {
+        this.portalService?.send("LOSE_LIFE");
+        this.currentPlayer?.hurt();
+      },
     });
   }
 
@@ -706,6 +714,10 @@ export class Scene extends BaseScene {
         this.portalService?.send("GAIN_LIFE");
         this.currentPlayer?.addLabel(1, "", "heart");
         this.sound.play("earn_life", { volume: PORTAL_VOLUME });
+      },
+      onDebuff: () => {
+        this.portalService?.send("LOSE_LIFE");
+        this.currentPlayer?.hurt();
       },
     });
   }
@@ -722,6 +734,10 @@ export class Scene extends BaseScene {
         });
         this.currentPlayer?.addLabel(2, "#ADFFFF");
         this.sound.play("earn_super_point", { volume: PORTAL_VOLUME });
+      },
+      onDebuff: () => {
+        this.portalService?.send("LOSE_LIFE");
+        this.currentPlayer?.hurt();
       },
     });
   }
