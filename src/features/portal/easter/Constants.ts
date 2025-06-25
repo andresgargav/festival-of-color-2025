@@ -18,18 +18,18 @@ import cyan_balloon from "public/world/balloon-falling-cyan.png";
 export const PORTAL_NAME = "festival-of-colors";
 
 // Dart
-export const DART_SHOOTING_DELAY = 300;
-export const DART_VELOCITY = 100;
+export const DART_SHOOTING_DELAY = 200;
+export const DART_VELOCITY = 120;
 
 // Balloons
-export const BALLOON_SPAWN_INTERVAL = 1500;
+export const BALLOON_SPAWN_INTERVAL = 1000;
 export const BALLOON_SPAWN_LEFT_LIMIT = 293;
 export const BALLOON_SPAWN_RIGHT_LIMIT = 426;
 export const AMOUNT_CYAN_BALLOONS = 3;
 
 // Enemies
-export const ENEMY_SPAWN_INTERVAL = 10000;
-export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 3500;
+export const ENEMY_SPAWN_INTERVAL = 8000;
+export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 5000;
 export const MINIMUM_ENEMY_SPAWN_INTERVAL = 3000;
 
 // Festival of Color
@@ -67,14 +67,14 @@ export const BOUNCING_CONFIGURATION = {
 };
 
 // Player
-export const WALKING_SPEED = 60;
+export const WALKING_SPEED = 75;
 export const PLAYER_JUMP_VELOCITY_Y = -165;
 export const PLAYER_PERCENTAGE_DEBUFF_VELOCITY = 0.5;
 export const TIME_DEBUFF_VELOCITY = 5000;
 
 // Game config
 export const GAME_SECONDS = 120;
-export const GAME_LIVES = 3;
+export const GAME_LIVES = 5;
 export const GRAVITY = 450;
 
 // Attempts
@@ -88,7 +88,7 @@ export const RESTOCK_ATTEMPTS = [
 ];
 
 // Panel
-export const PANEL_NPC_WEARABLES: Equipped = NPC_WEARABLES["hopper"];
+export const PANEL_NPC_WEARABLES: Equipped = NPC_WEARABLES["jester"];
 
 //Sound
 export const NEW_BALLOON_TIME_DELAY = 2500;
