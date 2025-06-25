@@ -29,7 +29,7 @@ export const AMOUNT_CYAN_BALLOONS = 3;
 
 // Enemies
 export const ENEMY_SPAWN_INTERVAL = 8000;
-export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 5000;
+export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 4000;
 export const MINIMUM_ENEMY_SPAWN_INTERVAL = 3000;
 
 // Festival of Color
@@ -79,7 +79,7 @@ export const GRAVITY = 450;
 
 // Attempts
 export const UNLIMITED_ATTEMPTS_SFL = 150; // If this value is less than 0, the option disappears
-export const DAILY_ATTEMPTS = 1;
+export const DAILY_ATTEMPTS = 2;
 export const RESTOCK_ATTEMPTS = [
   { attempts: 1, sfl: 3 },
   { attempts: 3, sfl: 7 },
@@ -91,7 +91,7 @@ export const RESTOCK_ATTEMPTS = [
 export const PANEL_NPC_WEARABLES: Equipped = NPC_WEARABLES["jester"];
 
 //Sound
-export const NEW_BALLOON_TIME_DELAY = 1200;
+export const NEW_BALLOON_TIME_DELAY = 2000;
 export const PORTAL_VOLUME = 0.5;
 export const PORTAL_BACKGROUND_VOLUME = 0.2;
 
