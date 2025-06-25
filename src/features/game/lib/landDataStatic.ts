@@ -16,7 +16,7 @@ import { EXPIRY_COOLDOWNS } from "./collectibleBuilt";
 export const STATIC_OFFLINE_FARM: GameState = {
   username: "Local Hero",
   coins: 10000,
-  balance: new Decimal(0),
+  balance: new Decimal(10000),
   previousBalance: new Decimal(0),
   vip: {
     bundles: [{ name: "1_MONTH", boughtAt: Date.now() }],
@@ -225,7 +225,74 @@ export const STATIC_OFFLINE_FARM: GameState = {
   rewards: INITIAL_REWARDS,
 
   minigames: {
-    games: {},
+    games: {
+      "festival-of-colors": {
+        history: {
+          "2024-06-25": {
+            attempts: 5,
+            highscore: 6,
+            prizeClaimedAt: 1719276680695,
+          },
+          "2024-06-26": {
+            attempts: 5,
+            highscore: 6,
+            prizeClaimedAt: 1719370863632,
+          },
+          "2024-06-27": {
+            attempts: 6,
+            highscore: 6,
+            prizeClaimedAt: 1719452780913,
+          },
+          "2024-06-28": {
+            attempts: 5,
+            highscore: 6,
+            prizeClaimedAt: 1719534579364,
+          },
+          "2024-06-29": {
+            attempts: 5,
+            highscore: 6,
+            prizeClaimedAt: 1719698339321,
+          },
+          // "2025-06-24": {
+          //   attempts: 1,
+          //   highscore: 87,
+          // },
+        },
+        purchases: [
+          {
+            purchasedAt: 1719276551870,
+            sfl: 3,
+            items: { Sunflower: 25 },
+          },
+          {
+            purchasedAt: 1719370727395,
+            sfl: 7,
+            items: { Potato: 50 },
+          },
+          {
+            purchasedAt: 1719452646101,
+            sfl: 14,
+            items: { Soybean: 10 },
+          },
+          {
+            purchasedAt: 1719534511716,
+            sfl: 30,
+            items: { Cabbage: 25 },
+          },
+          {
+            purchasedAt: 1719698262261,
+            sfl: 30,
+            items: { Radish: 50 },
+          },
+          // {
+          //   purchasedAt: 1750723200000,
+          //   sfl: 30,
+          //   items: {},
+          // },
+        ],
+        highscore: 87,
+      },
+    },
     prizes: {},
   },
 

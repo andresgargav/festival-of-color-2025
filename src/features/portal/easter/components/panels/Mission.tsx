@@ -10,15 +10,12 @@ import { getAttemptsLeft } from "../../lib/Utils";
 import { goHome } from "features/portal/lib/portalUtil";
 import { PortalMachineState } from "../../lib/Machine";
 import { Guide } from "./Guide";
-import { SquareIcon } from "components/ui/SquareIcon";
 import { PORTAL_NAME } from "../../Constants";
-import { ITEM_DETAILS } from "features/game/types/images";
 // import { hasFeatureAccess } from "lib/flags";
 // import { Prize } from "./Prize";
 // import { AchievementsList } from "./AchievementsList";
 import { OuterPanel } from "../../../../../components/ui/Panel";
 import { Controls } from "./Controls";
-import { isTouchDevice } from "features/world/lib/device";
 
 import key from "public/world/key.png";
 
@@ -62,6 +59,20 @@ export const Mission: React.FC<Props> = ({
   const [page, setPage] = React.useState<
     "main" | "achievements" | "guide" | "controls"
   >("main");
+
+  const isWithinSurroundingMonths = (dateString: string) => {
+    const now = new Date();
+    const date = new Date(dateString);
+
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const monthDiff =
+      (date.getFullYear() - currentYear) * 12 +
+      (date.getMonth() - currentMonth);
+
+    return monthDiff >= -1 && monthDiff <= 1;
+  };
 
   // const hasBetaAccess = state
   //   ? hasFeatureAccess(state, "")
@@ -109,8 +120,11 @@ export const Mission: React.FC<Props> = ({
               <OuterPanel className="w-full flex flex-col items-center">
                 <Label type="default">{t(`${PORTAL_NAME}.bestAllTime`)}</Label>
                 <div>
-                  {Object.values(minigame?.history ?? {}).reduce(
-                    (acc, { highscore }) => Math.max(acc, highscore),
+                  {Object.entries(minigame?.history ?? {}).reduce(
+                    (acc, [date, entry]) => {
+                      if (!isWithinSurroundingMonths(date)) return acc;
+                      return Math.max(acc, entry.highscore);
+                    },
                     0,
                   )}
                 </div>

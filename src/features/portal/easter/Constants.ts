@@ -9,13 +9,13 @@ import dart from "public/world/dart.gif";
 import slime from "public/world/slime.gif";
 import airballoon_slime from "public/world/airballoon_slime_shooting.gif";
 import ground_slime from "public/world/ground_slime_shooting.gif";
-import red_balloon from "public/world/balloon-falling-red.png"
-import blue_balloon from "public/world/balloon-falling-blue.png"
-import green_balloon from "public/world/balloon-falling-green.png"
-import yellow_balloon from "public/world/balloon-falling-yellow.png"
-import cyan_balloon from "public/world/balloon-falling-cyan.png"
+import red_balloon from "public/world/balloon-falling-red.png";
+import blue_balloon from "public/world/balloon-falling-blue.png";
+import green_balloon from "public/world/balloon-falling-green.png";
+import yellow_balloon from "public/world/balloon-falling-yellow.png";
+import cyan_balloon from "public/world/balloon-falling-cyan.png";
 
-export const PORTAL_NAME = "festival-of-colors-2025";
+export const PORTAL_NAME = "festival-of-colors";
 
 // Dart
 export const DART_SHOOTING_DELAY = 300;
@@ -40,12 +40,12 @@ export const SIGNAL_SPRITE_SCALE = 1.3;
 export const PRE_ACTION_DELAY = 1000;
 
 export const MACHINE_DECO_CONFIG = {
-  config1: {x: 240, y: 290},
-  config2: {x: 140, y: 180},
-  config3: {x: 550, y: 120},
-  config4: {x: 480, y: 230}
+  config1: { x: 240, y: 290 },
+  config2: { x: 140, y: 180 },
+  config3: { x: 550, y: 120 },
+  config4: { x: 480, y: 230 },
 };
-export const BALLOON_DECO_CONFIG = {x: 32.5, y: 5}
+export const BALLOON_DECO_CONFIG = { x: 32.5, y: 5 };
 
 // Stone and sprites configuration
 export const STONE_CONFIGURATION = { RtoL: 457, LtoR: 260 };
@@ -163,4 +163,8 @@ export const ENEMIES_TABLE: {
     image: red_balloon,
     description: t(`${PORTAL_NAME}.enemy3`),
   },
+];
+
+export const BETA_TESTERS = [
+  29, 9609, 49035, 155026, 1181, 151471, 49035, 86, 79871, 0,
 ];

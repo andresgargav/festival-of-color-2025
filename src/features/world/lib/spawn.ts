@@ -10,7 +10,7 @@ const randomXOffset = Math.random() * 60;
 const randomYOffset = Math.random() * 20;
 
 export const SPAWNS: () => SpawnLocation = () => ({
-  "festival-of-colors-2025": {
+  "festival-of-colors": {
     default: {
       x: 358,
       y: 372,
