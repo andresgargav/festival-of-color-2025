@@ -22,7 +22,7 @@ export const DART_SHOOTING_DELAY = 200;
 export const DART_VELOCITY = 120;
 
 // Balloons
-export const BALLOON_SPAWN_INTERVAL = 1000;
+export const BALLOON_SPAWN_INTERVAL = 1200;
 export const BALLOON_SPAWN_LEFT_LIMIT = 293;
 export const BALLOON_SPAWN_RIGHT_LIMIT = 426;
 export const AMOUNT_CYAN_BALLOONS = 3;
@@ -91,7 +91,7 @@ export const RESTOCK_ATTEMPTS = [
 export const PANEL_NPC_WEARABLES: Equipped = NPC_WEARABLES["jester"];
 
 //Sound
-export const NEW_BALLOON_TIME_DELAY = 2500;
+export const NEW_BALLOON_TIME_DELAY = 1200;
 export const PORTAL_VOLUME = 0.5;
 export const PORTAL_BACKGROUND_VOLUME = 0.2;
 
