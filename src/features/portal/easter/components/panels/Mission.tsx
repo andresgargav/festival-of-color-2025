@@ -18,6 +18,7 @@ import { OuterPanel } from "../../../../../components/ui/Panel";
 import { Controls } from "./Controls";
 
 import key from "public/world/key.png";
+import { decodeToken } from "features/auth/actions/login";
 
 interface Props {
   mode: "introduction" | "success" | "failed";
@@ -52,7 +53,8 @@ export const Mission: React.FC<Props> = ({
   const jwt = useSelector(portalService, _jwt);
   // const state = useSelector(portalService, _state);
 
-  const attemptsLeft = getAttemptsLeft(minigame);
+  const { farmId } = decodeToken(jwt as string);
+  const attemptsLeft = getAttemptsLeft(minigame, farmId);
 
   const dateKey = new Date().toISOString().slice(0, 10);
 
