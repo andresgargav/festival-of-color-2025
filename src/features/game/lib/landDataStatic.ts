@@ -293,7 +293,19 @@ export const STATIC_OFFLINE_FARM: GameState = {
         highscore: 87,
       },
     },
-    prizes: {},
+    prizes: {
+      "festival-of-colors-2025": {
+        coins: 0,
+        items: {
+          Mark: 0,
+          "Colors Token 2025": 50,
+        },
+        wearables: {},
+        score: 90,
+        startAt: 1750809600000,
+        endAt: 1750896000000,
+      },
+    },
   },
 
   megastore: {

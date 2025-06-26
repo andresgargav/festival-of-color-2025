@@ -229,6 +229,8 @@ export type Coupons =
   | "Prize Ticket"
   | "Mark"
   | "Trade Point"
+  | "Colors Token 2025"
+  | "Colors Ticket 2025"
   | Keys
   | SeasonalTicket
   | FactionEmblem;
@@ -346,6 +348,12 @@ export const COUPONS: Record<Coupons, { description: string }> = {
   },
   Timeshard: {
     description: "",
+  },
+  "Colors Token 2025": {
+    description: translate("description.colorToken2025"),
+  },
+  "Colors Ticket 2025": {
+    description: translate("description.colorTicket2025"),
   },
 };
 
