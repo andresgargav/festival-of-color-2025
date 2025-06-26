@@ -401,8 +401,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
         {
           target: "winner",
           cond: (context) => {
-            const prize =
-              context.state?.minigames.prizes[`${PORTAL_NAME}-2025`];
+            const prize = context.state?.minigames.prizes[PORTAL_NAME];
             if (!prize) {
               return false;
             }
