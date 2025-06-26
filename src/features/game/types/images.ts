@@ -826,6 +826,8 @@ import ancientClock from "assets/icons/ancient_clock.png";
 import windsOfChangeBanner from "assets/decorations/banners/winds-of-change_banner_loop.gif";
 import pesticide from "assets/sfts/pesticide.webp";
 import jin from "assets/sfts/jin_ronin.webp";
+import colorToken2025 from "assets/icons/colors_token_2025.png";
+import colorTicket2025 from "assets/icons/colors_ticket_2025.png";
 
 import { COUPONS, EASTER_EGG, FERTILISERS, InventoryItemName } from "./game";
 
