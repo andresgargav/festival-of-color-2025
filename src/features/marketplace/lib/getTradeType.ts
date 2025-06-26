@@ -341,6 +341,8 @@ export const ITEM_TRADE_TYPES: {
     "Sushi Roll": "instant",
     "The Lot": "instant",
     "Tofu Scramble": "instant",
+    "Colors Token 2025": "onchain",
+    "Colors Ticket 2025": "onchain",
     Antipasto: "instant",
     Caponata: "instant",
     "Glazed Carrots": "instant",

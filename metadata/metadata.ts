@@ -4608,6 +4608,29 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
       { trait_type: "Tradable", value: "Yes" },
     ],
   },
+  "Colors Token 2025": {
+    description: "Use this in the easter event shop before the event ends!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Coupon" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/757.webp",
+    name: "Colors Token 2025",
+  },
+  "Colors Ticket 2025": {
+    description:
+      "Hold this for a chance to win $FLOWER after the easter event ends!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Coupon" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2273.webp",
+    name: "Colors Ticket 2025",
+  },
   "Iron Idol": {
     description: "The Idol adds 1 iron every time you mine iron.",
     decimals: 0,

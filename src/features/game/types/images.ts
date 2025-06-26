@@ -2655,6 +2655,14 @@ export const ITEM_DETAILS: Items = {
     image: giantCarrot,
     description: translate("description.giant.carrot"),
   },
+  "Colors Token 2025": {
+    image: colorToken2025,
+    description: translate("description.colorToken2025"),
+  },
+  "Colors Ticket 2025": {
+    image: colorTicket2025,
+    description: translate("description.colorTicket2025"),
+  },
   "Iron Idol": {
     image: ironIdol,
     description: translate("description.iron.idol"),
