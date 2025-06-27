@@ -18,8 +18,8 @@ import cyan_balloon from "public/world/balloon-falling-cyan.png";
 export const PORTAL_NAME = "festival-of-colors";
 
 // Dart
-export const DART_SHOOTING_DELAY = 600;
-export const DART_VELOCITY = 120;
+export const DART_SHOOTING_DELAY = 800;
+export const DART_VELOCITY = 150;
 
 // Balloons
 export const BALLOON_SPAWN_INTERVAL = 1200;
@@ -29,7 +29,7 @@ export const AMOUNT_CYAN_BALLOONS = 3;
 
 // Enemies
 export const ENEMY_SPAWN_INTERVAL = 8000;
-export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 4000;
+export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 5000;
 export const MINIMUM_ENEMY_SPAWN_INTERVAL = 3000;
 
 // Festival of Color
@@ -67,7 +67,7 @@ export const BOUNCING_CONFIGURATION = {
 };
 
 // Player
-export const WALKING_SPEED = 75;
+export const WALKING_SPEED = 70;
 export const PLAYER_JUMP_VELOCITY_Y = -165;
 export const PLAYER_PERCENTAGE_DEBUFF_VELOCITY = 0.5;
 export const TIME_DEBUFF_VELOCITY = 5000;
