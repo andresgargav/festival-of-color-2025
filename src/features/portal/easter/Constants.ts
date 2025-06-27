@@ -28,7 +28,7 @@ export const BALLOON_SPAWN_RIGHT_LIMIT = 426;
 export const AMOUNT_CYAN_BALLOONS = 3;
 
 // Enemies
-export const ENEMY_SPAWN_INTERVAL = 7500;
+export const ENEMY_SPAWN_INTERVAL = 8000;
 export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 5500;
 export const MINIMUM_ENEMY_SPAWN_INTERVAL = 2500;
 
@@ -67,14 +67,14 @@ export const BOUNCING_CONFIGURATION = {
 };
 
 // Player
-export const WALKING_SPEED = 70;
+export const WALKING_SPEED = 75;
 export const PLAYER_JUMP_VELOCITY_Y = -165;
 export const PLAYER_PERCENTAGE_DEBUFF_VELOCITY = 0.5;
 export const TIME_DEBUFF_VELOCITY = 5000;
 
 // Game config
 export const GAME_SECONDS = 120;
-export const GAME_LIVES = 3;
+export const GAME_LIVES = 4;
 export const GRAVITY = 450;
 
 // Attempts
