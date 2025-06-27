@@ -22,6 +22,7 @@ import { getUrl, loadPortal } from "features/portal/actions/loadPortal";
 import { getAttemptsLeft } from "./Utils";
 import { unlockMinigameAchievements } from "features/game/events/minigames/unlockMinigameAchievements";
 import { AchievementsName } from "../Achievements";
+import { JOYSTICK_LOCAL_STORAGE_KEY } from "../components/panels/Controls";
 
 const getJWT = () => {
   const code = new URLSearchParams(window.location.search).get("jwt");
@@ -129,6 +130,11 @@ const resetGameTransition = {
   },
 };
 
+const getJoystickEnabled = () => {
+  const cached = localStorage.getItem(JOYSTICK_LOCAL_STORAGE_KEY);
+  return cached ? JSON.parse(cached) : false;
+};
+
 export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
   id: "portalMachine",
   initial: "initialising",
@@ -137,7 +143,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
     jwt: getJWT(),
 
     isJoystickActive: false,
-    isJoystickEnabled: true,
+    isJoystickEnabled: getJoystickEnabled(),
 
     state: CONFIG.API_URL ? undefined : OFFLINE_FARM,
 

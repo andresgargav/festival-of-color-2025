@@ -307,7 +307,7 @@ export class Scene extends BaseScene {
     // Background music
     this.load.audio(
       "background_music",
-      "world/Festival-of-color-sound-effects/background_music_1.mp3",
+      "world/Festival-of-color-sound-effects/country_fair.mp3",
     );
   }
 
@@ -433,7 +433,7 @@ export class Scene extends BaseScene {
 
       this.rightButton.flipX = true;
 
-      // Jump
+      // Shoot
       const jumpButton = this.add
         .image(leftButtonX, buttonY, "red_button")
         .setInteractive()
@@ -467,10 +467,10 @@ export class Scene extends BaseScene {
           window.innerWidth / (2 * this.zoom) +
           +15 +
           2.5 * SQUARE_WIDTH,
-        y: (this.map.height * this.zoom * SQUARE_WIDTH) / 2 + 175,
+        y: (this.map.height * this.zoom * SQUARE_WIDTH) / 2 + 180,
         radius: 15,
-        base: this.add.circle(0, 0, 20, 0x000000, 0.7).setDepth(1000000000),
-        thumb: this.add.circle(0, 0, 10, 0xffffff, 0.7).setDepth(1000000000),
+        base: this.add.circle(0, 0, 27, 0x000000, 0.5).setDepth(1000000000),
+        thumb: this.add.circle(0, 0, 12, 0xffffff, 0.5).setDepth(1000000000),
         forceMin: 2,
       }).setVisible(false);
 

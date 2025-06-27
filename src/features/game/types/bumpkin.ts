@@ -18,7 +18,8 @@ export type BumpkinBackground =
   | "Desert Camel Background"
   | "Pumpkin Plaza Background"
   | "Goblin Retreat Background"
-  | "Kingdom Background";
+  | "Kingdom Background"
+  | "Sky Island Background";
 
 export type BumpkinBody =
   | "Beige Farmer Potion"
@@ -60,7 +61,8 @@ export type BumpkinHair =
   | "Ash Ponytail"
   | "Pink Ponytail"
   | "Silver Streaks"
-  | "Brown Rancher Hair";
+  | "Brown Rancher Hair"
+  | "Paint Splattered Hair";
 
 export type BumpkinShirt =
   | "Pixel Perfect Hoodie"
@@ -131,7 +133,9 @@ export type BumpkinShirt =
   | "Merino Jumper"
   | "Fossil Armor"
   | "Rice Shirt"
-  | "Sakura Shirt";
+  | "Sakura Shirt"
+  | "Love Charm Shirt"
+  | "Paint Splattered Shirt";
 
 export type BumpkinCoat =
   | "Chef Apron"
@@ -139,7 +143,9 @@ export type BumpkinCoat =
   | "Pirate General Coat"
   | "Royal Robe"
   | "Milk Apron"
-  | "Tomato Apron";
+  | "Tomato Apron"
+  | "Easter Apron"
+  | "Medic Apron";
 
 export type BumpkinTool =
   | "Farmer Pitchfork"
@@ -190,7 +196,12 @@ export type BumpkinTool =
   | "Shepherd Staff"
   | "Sickle"
   | "Adventurer's Torch"
-  | "Flower Bouquet";
+  | "Flower Bouquet"
+  | "Carrot Pitchfork"
+  | "Handheld Bunny"
+  | "Frost Sword"
+  | "Paint Spray Can";
+
 export type BumpkinShoe =
   | "Black Farmer Boots"
   | "Brown Boots"
@@ -229,7 +240,8 @@ export type BumpkinNecklace =
   | "Nightshade Medallion"
   | "Sunflorian Medallion"
   | "Dream Scarf"
-  | "Cowbell Necklace";
+  | "Cowbell Necklace"
+  | "Obsidian Necklace";
 
 export type BumpkinHat =
   | "Painter's Cap"
@@ -262,6 +274,7 @@ export type BumpkinHat =
   | "Birthday Hat"
   | "Double Harvest Cap"
   | "Streamer Helmet"
+  | "Streamer Hat"
   | "Pumpkin Hat"
   | "Victorian Hat"
   | "Boater Hat"
@@ -319,7 +332,14 @@ export type BumpkinHat =
   | "Pumpkin Head"
   | "Acorn Hat"
   | "Crab Hat"
-  | "Weather Hat";
+  | "Weather Hat"
+  | "Flower Mask"
+  | "Luvvy Head"
+  | "Grumpy Cat"
+  | "Bunny Mask"
+  | "Broccoli Hat"
+  | "Coin Head"
+  | "Slime Hat";
 
 export type BumpkinPant =
   | "Farmer Overalls"
@@ -357,7 +377,9 @@ export type BumpkinPant =
   | "Grape Pants"
   | "Cowboy Trouser"
   | "Cowgirl Skirt"
-  | "Fossil Pants";
+  | "Fossil Pants"
+  | "Bunny Pants"
+  | "Paint Splattered Overalls";
 
 export type BumpkinDress =
   | "Royal Dress"
@@ -422,7 +444,9 @@ export type BumpkinOnesie =
   | "Locust Onesie"
   | "Locust King Onesie"
   | "Love Heart Onesie"
-  | "Love Bear Onesie";
+  | "Love Bear Onesie"
+  | "Dino Onesie"
+  | "Red Pepper Onesie";
 
 // Goes over clothes
 export type BumpkinSuit =
@@ -437,7 +461,11 @@ export type BumpkinSuit =
   | "Beekeeper Suit"
   | "Lucky Red Suit"
   | "Chicken Suit"
-  | "Ladybug Suit";
+  | "Ladybug Suit"
+  | "Bloomwarden Suit"
+  | "Embersteel Suit"
+  | "Amberfall Suit"
+  | "Glacierguard Suit";
 
 export type BumpkinWings =
   | "Angel Wings"
@@ -455,11 +483,14 @@ export type BumpkinWings =
   | "Nightshade Quiver"
   | "Sunflorian Quiver"
   | "Sol & Luna"
-  | "Glacial Plume";
+  | "Glacial Plume"
+  | "Golden Wings"
+  | "Oracle Syringe"
+  | "Slime Wings";
 
 export type BumpkinBeard = "Wise Beard" | "Hoary Chin" | "Santa Beard";
 
-export type BumpkinAura = "Coin Aura";
+export type BumpkinAura = "Coin Aura" | "Love Puff Aura" | "Slime Aura";
 
 export type BumpkinItem =
   | BumpkinBody
@@ -926,6 +957,46 @@ export const ITEM_IDS: Record<BumpkinItem, number> = {
   "Love Heart Onesie": 435,
   "Love Bear Onesie": 436,
   "Flower Bouquet": 437,
+  "Streamer Hat": 438,
+
+  //Love Charm Wearables
+  "Dino Onesie": 439,
+  "Golden Wings": 440,
+  "Flower Mask": 441,
+  "Luvvy Head": 442,
+  "Grumpy Cat": 443,
+  "Love Puff Aura": 444,
+
+  //Easter 2025 Event Wearables
+  "Carrot Pitchfork": 445,
+  "Handheld Bunny": 446,
+  "Bunny Pants": 447,
+  "Bunny Mask": 448,
+  "Easter Apron": 449,
+
+  //Love Chapter Wearables
+  "Bloomwarden Suit": 450,
+  "Embersteel Suit": 451,
+  "Amberfall Suit": 452,
+  "Glacierguard Suit": 453,
+  "Broccoli Hat": 454,
+  "Frost Sword": 455,
+  "Medic Apron": 456,
+  "Obsidian Necklace": 457,
+  "Red Pepper Onesie": 458,
+  "Love Charm Shirt": 459,
+  "Sky Island Background": 460,
+  "Oracle Syringe": 461,
+  "Coin Head": 462,
+
+  //Festival of Colors Event Wearables
+  "Paint Splattered Hair": 463,
+  "Paint Splattered Shirt": 464,
+  "Paint Splattered Overalls": 465,
+  "Paint Spray Can": 466,
+  "Slime Hat": 467,
+  "Slime Wings": 468,
+  "Slime Aura": 469,
 };
 
 // The reverse of above
@@ -1164,6 +1235,7 @@ export const BUMPKIN_ITEM_PART: Record<BumpkinItem, keyof Wallet> = {
   "Birthday Hat": "hat",
   "Double Harvest Cap": "hat",
   "Streamer Helmet": "hat",
+  "Streamer Hat": "hat",
   "Corn Onesie": "onesie",
   "Crow Wings": "wings",
   "Witches' Eve Tee": "shirt",
@@ -1424,6 +1496,37 @@ export const BUMPKIN_ITEM_PART: Record<BumpkinItem, keyof Wallet> = {
   "Love Heart Onesie": "onesie",
   "Love Bear Onesie": "onesie",
   "Flower Bouquet": "tool",
+  "Dino Onesie": "onesie",
+  "Golden Wings": "wings",
+  "Flower Mask": "hat",
+  "Luvvy Head": "hat",
+  "Grumpy Cat": "hat",
+  "Love Puff Aura": "aura",
+  "Bunny Mask": "hat",
+  "Bunny Pants": "pants",
+  "Easter Apron": "coat",
+  "Carrot Pitchfork": "tool",
+  "Handheld Bunny": "tool",
+  "Bloomwarden Suit": "suit",
+  "Embersteel Suit": "suit",
+  "Amberfall Suit": "suit",
+  "Glacierguard Suit": "suit",
+  "Broccoli Hat": "hat",
+  "Frost Sword": "tool",
+  "Medic Apron": "coat",
+  "Obsidian Necklace": "necklace",
+  "Red Pepper Onesie": "onesie",
+  "Love Charm Shirt": "shirt",
+  "Sky Island Background": "background",
+  "Oracle Syringe": "wings",
+  "Coin Head": "hat",
+  "Paint Splattered Hair": "hair",
+  "Paint Splattered Shirt": "shirt",
+  "Paint Splattered Overalls": "pants",
+  "Paint Spray Can": "tool",
+  "Slime Hat": "hat",
+  "Slime Wings": "wings",
+  "Slime Aura": "aura",
 };
 
 /**Copied from BE just for hoarding checks */

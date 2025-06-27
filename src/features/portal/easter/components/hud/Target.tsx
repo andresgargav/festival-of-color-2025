@@ -7,7 +7,7 @@ import { useAppTranslation } from "lib/i18n/useAppTranslations";
 import { PortalMachineState } from "../../lib/Machine";
 import { PORTAL_NAME } from "../../Constants";
 
-import easterEgg from "public/world/easter_egg.png";
+import blue_balloon from "public/world/balloon-falling-blue.png";
 
 const _target = (state: PortalMachineState) =>
   state.context.state?.minigames.prizes[`${PORTAL_NAME}-2025`]?.score ?? 0;
@@ -24,7 +24,7 @@ export const Target: React.FC = () => {
 
   return (
     <Label
-      icon={easterEgg}
+      icon={blue_balloon}
       secondaryIcon={isTargetReached ? SUNNYSIDE.icons.confirm : undefined}
       type={isTargetReached ? "success" : "vibrant"}
     >

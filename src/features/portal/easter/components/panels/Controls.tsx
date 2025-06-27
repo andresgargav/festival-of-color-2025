@@ -18,7 +18,7 @@ import shootButton from "public/world/red_button.png";
 import leftButton from "public/world/left_button.png";
 import joystick from "public/world/joystick.png";
 
-const JOYSTICK_LOCAL_STORAGE_KEY = "settings.controls.joystickEnabled";
+export const JOYSTICK_LOCAL_STORAGE_KEY = "settings.controls.joystickEnabled";
 
 export function cacheControlModeSetting(value: boolean) {
   localStorage.setItem(JOYSTICK_LOCAL_STORAGE_KEY, JSON.stringify(value));
@@ -26,7 +26,7 @@ export function cacheControlModeSetting(value: boolean) {
 
 export function getControlModeSetting(): boolean {
   const cached = localStorage.getItem(JOYSTICK_LOCAL_STORAGE_KEY);
-  return cached ? JSON.parse(cached) : true;
+  return cached ? JSON.parse(cached) : false;
 }
 
 type Props = {
