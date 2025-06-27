@@ -28,9 +28,9 @@ export const BALLOON_SPAWN_RIGHT_LIMIT = 426;
 export const AMOUNT_CYAN_BALLOONS = 3;
 
 // Enemies
-export const ENEMY_SPAWN_INTERVAL = 8000;
+export const ENEMY_SPAWN_INTERVAL = 7000;
 export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 5000;
-export const MINIMUM_ENEMY_SPAWN_INTERVAL = 3000;
+export const MINIMUM_ENEMY_SPAWN_INTERVAL = 2000;
 
 // Festival of Color
 export const Y_AXIS = SPAWNS()[PORTAL_NAME].default.y - 6;
@@ -74,7 +74,7 @@ export const TIME_DEBUFF_VELOCITY = 5000;
 
 // Game config
 export const GAME_SECONDS = 120;
-export const GAME_LIVES = 5;
+export const GAME_LIVES = 3;
 export const GRAVITY = 450;
 
 // Attempts
