@@ -18,7 +18,7 @@ import cyan_balloon from "public/world/balloon-falling-cyan.png";
 export const PORTAL_NAME = "festival-of-colors";
 
 // Dart
-export const DART_SHOOTING_DELAY = 800;
+export const DART_SHOOTING_DELAY = 700;
 export const DART_VELOCITY = 150;
 
 // Balloons
