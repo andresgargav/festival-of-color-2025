@@ -1,9 +1,11 @@
 import { Minigame } from "features/game/types/game";
 import {
   UNLIMITED_ATTEMPTS_SFL,
-  DAILY_ATTEMPTS,
+  FREE_DAILY_ATTEMPTS,
   RESTOCK_ATTEMPTS,
   BETA_TESTERS,
+  INITIAL_DATE,
+  ATTEMPTS_BETA_TESTERS,
 } from "../Constants";
 
 /**
@@ -12,72 +14,35 @@ import {
  * @returns The number of attempts left.
  */
 export const getAttemptsLeft = (minigame?: Minigame, farmId = 0) => {
-  // const dateKey = new Date().toISOString().slice(0, 10);
+  const dateKey = new Date().toISOString().slice(0, 10);
 
   const history = minigame?.history ?? {};
   const purchases = minigame?.purchases ?? [];
-  let dailyAttempts = DAILY_ATTEMPTS;
-  const specificAttemptsByDay = ["2025-04-21"];
-  const initialDate = "2025-06-30"; // The date when the minigame started
-  const freeAttemptsPerDay = 1; // The number of free attempts per day
-  const attemptsBeta = 100;
-  // Review code – I might need to change `farmId` to `id`.
-  // const specificAttemptsByFarmAndDate = [
-  //   {
-  //     farmId: 13275,
-  //     startDate: "2025-04-25",
-  //     endDate: "2025-04-25",
-  //     attempts: DAILY_ATTEMPTS + 10,
-  //   },
-  // ];
 
-  const now = new Date();
+  // const now = new Date();
   // const startOfTodayUTC = getStartOfUTCDay(now);
   // const endOfTodayUTC = startOfTodayUTC + 24 * 60 * 60 * 1000; // 24 hours later
 
+  // Unlimited attempts
   const hasUnlimitedAttempts = hasRecentUnlimitedAttempts(purchases);
   if (hasUnlimitedAttempts) return Infinity;
 
-  let restockAttempts = 0;
-  RESTOCK_ATTEMPTS.forEach((option) => {
-    const restockedCount = purchases.filter(
-      (purchase) =>
-        purchase.sfl === option.sfl && isWithinRange(purchase.purchasedAt),
-    ).length;
+  // Restock attempts
+  const restockAttempts = hasRecentRestockAttempts(purchases);
 
-    restockAttempts += option.attempts * restockedCount;
-  });
-
-  // daily attempts specific to the day
-  if (specificAttemptsByDay.includes(now.toISOString().substring(0, 10))) {
-    dailyAttempts = 3;
-  }
-
-  // daily attempts specific to the farm and date
-  // specificAttemptsByFarmAndDate.forEach((farm) => {
-  //   const startDate = new Date(farm.startDate);
-  //   const endDate = new Date(farm.endDate);
-  //   const dateToCheck = new Date(now.toISOString().substring(0, 10));
-
-  //   if (
-  //     farm.farmId === farmId &&
-  //     dateToCheck >= startDate &&
-  //     dateToCheck <= endDate
-  //   ) {
-  //     dailyAttempts = farm.attempts;
-  //   }
-  // });
-
-  // const attemptsToday = history[dateKey]?.attempts ?? 0;
+  // Total attempts used
   const totalAttemptsUsed = getTotalAttemptsInSurroundingMonths(history);
 
+  // Free daily attempts
   const freeTotalAttempts =
-    getDaysPassedSince(initialDate) * freeAttemptsPerDay;
+    getDaysPassedSince(INITIAL_DATE) * FREE_DAILY_ATTEMPTS;
 
+  // Total attempts
   let attemptsLeft = freeTotalAttempts - totalAttemptsUsed + restockAttempts;
 
-  if (BETA_TESTERS.includes(farmId)) {
-    attemptsLeft += attemptsBeta;
+  // +Beta attemtps
+  if (BETA_TESTERS.includes(farmId) && dateKey < INITIAL_DATE) {
+    attemptsLeft += ATTEMPTS_BETA_TESTERS;
   }
 
   return attemptsLeft;
@@ -98,6 +63,26 @@ const hasRecentUnlimitedAttempts = (
 };
 
 /**
+ * Calculates the number of restock attempts made recently.
+ * @param purchases The list of purchases made in the minigame.
+ * @returns The total number of restock attempts made.
+ */
+const hasRecentRestockAttempts = (
+  purchases: { purchasedAt: number; sfl: number }[],
+): number => {
+  let restockAttempts = 0;
+  RESTOCK_ATTEMPTS.forEach((option) => {
+    const restockedCount = purchases.filter(
+      (purchase) =>
+        purchase.sfl === option.sfl && isWithinRange(purchase.purchasedAt),
+    ).length;
+
+    restockAttempts += option.attempts * restockedCount;
+  });
+  return restockAttempts;
+};
+
+/**
  * Calculates the total number of attempts used in the current month, previous month, and next month.
  * @param history The history of attempts, where keys are date strings and values are objects with an `attempts` property.
  * @returns The total number of attempts used in the surrounding months.
@@ -115,15 +100,23 @@ const getTotalAttemptsInSurroundingMonths = (
  * @param date The date to check, can be a string or a number (timestamp).
  * @returns True if the date is within the range, false otherwise.
  */
-const isWithinRange = (date: string | number) => {
+export const isWithinRange = (date: string | number) => {
   const now = new Date();
-  const currentMonth = now.getMonth(); // 0-indexed
-  const currentYear = now.getFullYear();
   const entryDate = new Date(date);
-  const year = entryDate.getFullYear();
-  const month = entryDate.getMonth();
-  const monthDiff = (year - currentYear) * 12 + (month - currentMonth);
-  return monthDiff >= -1 && monthDiff <= 1;
+  const dateKey = now.toISOString().slice(0, 10);
+  let lowerLimit;
+
+  if (dateKey >= INITIAL_DATE) {
+    lowerLimit = new Date(INITIAL_DATE);
+  } else {
+    lowerLimit = new Date(now);
+    lowerLimit.setMonth(lowerLimit.getMonth() - 1);
+  }
+
+  const upperLimit = new Date(now);
+  upperLimit.setMonth(upperLimit.getMonth() + 1);
+
+  return entryDate >= lowerLimit && entryDate <= upperLimit;
 };
 
 /**

@@ -77,8 +77,10 @@ export const GAME_LIVES = 4;
 export const GRAVITY = 450;
 
 // Attempts
+export const INITIAL_DATE = "2025-06-30";
+export const ATTEMPTS_BETA_TESTERS = 100;
 export const UNLIMITED_ATTEMPTS_SFL = 150; // If this value is less than 0, the option disappears
-export const DAILY_ATTEMPTS = 2;
+export const FREE_DAILY_ATTEMPTS = 1;
 export const RESTOCK_ATTEMPTS = [
   { attempts: 1, sfl: 3 },
   { attempts: 3, sfl: 7 },

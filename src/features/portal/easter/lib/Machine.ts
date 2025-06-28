@@ -4,10 +4,10 @@ import { CONFIG } from "lib/config";
 import { decodeToken } from "features/auth/actions/login";
 import {
   UNLIMITED_ATTEMPTS_SFL,
-  DAILY_ATTEMPTS,
   GAME_SECONDS,
   GAME_LIVES,
   PORTAL_NAME,
+  FREE_DAILY_ATTEMPTS,
 } from "../Constants";
 import { GameState } from "features/game/types/game";
 import { purchaseMinigameItem } from "features/game/events/minigames/purchaseMinigameItem";
@@ -202,7 +202,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
       invoke: {
         src: async (context) => {
           if (!getUrl()) {
-            return { game: OFFLINE_FARM, attemptsLeft: DAILY_ATTEMPTS };
+            return { game: OFFLINE_FARM, attemptsLeft: FREE_DAILY_ATTEMPTS };
           }
 
           const { farmId } = decodeToken(context.jwt as string);

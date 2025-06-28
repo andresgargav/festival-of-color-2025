@@ -6,7 +6,7 @@ import { useSelector } from "@xstate/react";
 import { PortalContext } from "../../lib/PortalProvider";
 import { Label } from "components/ui/Label";
 import { Attempts } from "./Attempts";
-import { getAttemptsLeft } from "../../lib/Utils";
+import { getAttemptsLeft, isWithinRange } from "../../lib/Utils";
 import { goHome } from "features/portal/lib/portalUtil";
 import { PortalMachineState } from "../../lib/Machine";
 import { Guide } from "./Guide";
@@ -63,20 +63,6 @@ export const Mission: React.FC<Props> = ({
     "main" | "achievements" | "guide" | "controls"
   >("main");
 
-  const isWithinSurroundingMonths = (dateString: string) => {
-    const now = new Date();
-    const date = new Date(dateString);
-
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-
-    const monthDiff =
-      (date.getFullYear() - currentYear) * 12 +
-      (date.getMonth() - currentMonth);
-
-    return monthDiff >= -1 && monthDiff <= 1;
-  };
-
   // const hasBetaAccess = state
   //   ? hasFeatureAccess(state, "")
   //   : false;
@@ -125,7 +111,7 @@ export const Mission: React.FC<Props> = ({
                 <div>
                   {Object.entries(minigame?.history ?? {}).reduce(
                     (acc, [date, entry]) => {
-                      if (!isWithinSurroundingMonths(date)) return acc;
+                      if (!isWithinRange(date)) return acc;
                       return Math.max(acc, entry.highscore);
                     },
                     0,
