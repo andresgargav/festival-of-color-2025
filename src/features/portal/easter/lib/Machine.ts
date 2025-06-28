@@ -395,12 +395,13 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           // they have already completed the mission before
           target: "complete",
           cond: (context) => {
-            const dateKey = new Date().toISOString().slice(0, 10);
+            // const dateKey = new Date().toISOString().slice(0, 10);
 
-            const minigame = context.state?.minigames.games[PORTAL_NAME];
-            const history = minigame?.history ?? {};
+            // const minigame = context.state?.minigames.games[PORTAL_NAME];
+            // const history = minigame?.history ?? {};
 
-            return !!history[dateKey]?.prizeClaimedAt;
+            // return !!history[dateKey]?.prizeClaimedAt;
+            return false;
           },
         },
 
