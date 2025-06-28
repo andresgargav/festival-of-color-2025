@@ -226,7 +226,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
 
   minigames: {
     games: {
-      "festival-of-colors": {
+      "festival-of-colors-2025": {
         history: {
           "2024-06-25": {
             attempts: 5,

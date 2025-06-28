@@ -11,17 +11,19 @@ interface Props {
   y: number;
   scene: Scene;
   spriteName: string;
-  onPop?: () => void;
+  onPop?: (object1?: Balloon) => void;
   onDebuff?: () => void;
 }
 
 export class Balloon extends Phaser.GameObjects.Container {
   private sprite: Phaser.GameObjects.Sprite;
   private spriteName: string;
-  private onPop?: () => void;
+  private onPop?: (object1?: Balloon) => void;
   private onDebuff?: () => void;
   private isDeflated = false;
   private colliders: Phaser.Physics.Arcade.Collider[] = [];
+  private labelText: Phaser.GameObjects.Text | undefined;
+  private iconLabelText: Phaser.GameObjects.Sprite | undefined;
 
   scene: Scene;
 
@@ -127,10 +129,10 @@ export class Balloon extends Phaser.GameObjects.Container {
 
   private collideWithDart() {
     const dartCollider = this.scene.physics.add.collider(
-      this,
+      this as Phaser.GameObjects.Container,
       this.scene.darts,
       (_, dart) => {
-        this.onPop?.();
+        this.onPop?.(this);
         dart.destroy();
         this.pop();
 
@@ -186,5 +188,40 @@ export class Balloon extends Phaser.GameObjects.Container {
         }
       },
     );
+  }
+
+  public addLabel(value: number | string, color?: string, iconName?: string) {
+    this.labelText?.destroy();
+    this.iconLabelText?.destroy();
+    if (typeof value === "number") {
+      value = `${value > 0 ? "+" : "-"}${Math.abs(value)}`;
+    }
+
+    this.labelText = this.scene.add
+      .text(-1, 0, value, {
+        fontSize: "5px",
+        fontFamily: "Teeny",
+        color: color || "#FFFFFF",
+        resolution: 10,
+        padding: { x: 2, y: 2 },
+      })
+      .setOrigin(0.5);
+
+    this.labelText.setShadow(4, 4, "#161424", 0, true, true);
+    this.add(this.labelText);
+
+    if (iconName) {
+      this.labelText.setX(-5);
+      this.iconLabelText = this.scene.add
+        .sprite(3, -1, iconName)
+        .setScale(0.9)
+        .setOrigin(0.5);
+      this.add(this.iconLabelText);
+    }
+
+    this.scene.time.delayedCall(1000, () => {
+      this.labelText?.destroy();
+      this.iconLabelText?.destroy();
+    });
   }
 }

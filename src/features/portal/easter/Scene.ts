@@ -590,16 +590,6 @@ export class Scene extends BaseScene {
     this.leftWall = this.colliders?.children.entries[1];
     this.rightWall = this.colliders?.children.entries[2];
     this.deflator = this.colliders?.children.entries[3];
-    const graphics = this.add.graphics();
-    graphics.fillStyle(0xff0000, 1);
-    const spriteDeflator = this.deflator?.body as Phaser.Physics.Arcade.Body;
-    graphics.fillRect(
-      spriteDeflator.x,
-      spriteDeflator.y,
-      spriteDeflator.width,
-      spriteDeflator.height,
-    );
-    graphics.setDepth(1000000000000);
     this.topWall = this.add.zone(0, 0, this.map.widthInPixels * 2, 30);
     this.physics.world.enable(this.topWall);
     (this.topWall.body as Phaser.Physics.Arcade.Body)?.setAllowGravity(false);
@@ -670,11 +660,11 @@ export class Scene extends BaseScene {
       y: -1,
       scene: this,
       spriteName: "balloon_blue",
-      onPop: () => {
+      onPop: (balloon?: Balloon) => {
         this.portalService?.send("GAIN_POINTS", {
           points: 1,
         });
-        this.currentPlayer?.addLabel(1);
+        balloon?.addLabel(1);
         this.sound.play("earn_point", { volume: PORTAL_VOLUME });
       },
       onDebuff: () => {
@@ -690,12 +680,12 @@ export class Scene extends BaseScene {
       y: -1,
       scene: this,
       spriteName: "balloon_red",
-      onPop: () => {
+      onPop: (balloon?: Balloon) => {
         this.sound.play("minus_point", { volume: PORTAL_VOLUME });
         this.portalService?.send("GAIN_POINTS", {
           points: -1,
         });
-        this.currentPlayer?.addLabel(-1);
+        balloon?.addLabel(-1, "#F5B7BA");
       },
       onDebuff: () => {
         this.velocity = WALKING_SPEED * PLAYER_PERCENTAGE_DEBUFF_VELOCITY;
@@ -713,11 +703,11 @@ export class Scene extends BaseScene {
       y: -1,
       scene: this,
       spriteName: "balloon_yellow",
-      onPop: () => {
+      onPop: (balloon?: Balloon) => {
         this.portalService?.send("GAIN_POINTS", {
           points: 3,
         });
-        this.currentPlayer?.addLabel(3, "#DCD42F");
+        balloon?.addLabel(3, "#FDF787");
         this.cyanBalloonInitCount = this.balloonCounter;
         this.sound.play("enable_special_balloons", { volume: PORTAL_VOLUME });
       },
@@ -734,9 +724,9 @@ export class Scene extends BaseScene {
       y: -1,
       scene: this,
       spriteName: "balloon_green",
-      onPop: () => {
+      onPop: (balloon?: Balloon) => {
         this.portalService?.send("GAIN_LIFE");
-        this.currentPlayer?.addLabel(1, "", "heart");
+        balloon?.addLabel(1, "", "heart");
         this.sound.play("earn_life", { volume: PORTAL_VOLUME });
       },
       onDebuff: () => {
@@ -752,11 +742,11 @@ export class Scene extends BaseScene {
       y: -1,
       scene: this,
       spriteName: "balloon_cyan",
-      onPop: () => {
+      onPop: (balloon?: Balloon) => {
         this.portalService?.send("GAIN_POINTS", {
           points: 2,
         });
-        this.currentPlayer?.addLabel(2, "#ADFFFF");
+        balloon?.addLabel(2, "#ADFFFF");
         this.sound.play("earn_super_point", { volume: PORTAL_VOLUME });
       },
       onDebuff: () => {
