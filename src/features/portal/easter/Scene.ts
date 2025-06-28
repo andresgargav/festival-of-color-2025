@@ -3,7 +3,7 @@ import tilesetconfig from "assets/map/festival_of_colors_tileset.json";
 import { SceneId } from "features/world/mmoMachine";
 import { BaseScene } from "features/world/scenes/BaseScene";
 import { MachineInterpreter } from "./lib/Machine";
-import { EventObject, Machine } from "xstate";
+import { EventObject } from "xstate";
 import { SPAWNS } from "features/world/lib/spawn";
 import { isTouchDevice } from "features/world/lib/device";
 import VirtualJoystick from "phaser3-rex-plugins/plugins/virtualjoystick.js";
@@ -302,6 +302,12 @@ export class Scene extends BaseScene {
     this.load.audio(
       "minus_point",
       "world/Festival-of-color-sound-effects/minus1.wav",
+    );
+
+    // Target reached sound
+    this.load.audio(
+      "target_reached",
+      "world/Festival-of-color-sound-effects/target_reached.mp3",
     );
 
     // Background music
@@ -948,8 +954,6 @@ export class Scene extends BaseScene {
         .setOrigin(0)
         .setDepth(1000000000)
         .setScale(0.8);
-
-      console.log(balloonName, balloonNames);
 
       this.createAnimation(balloonSprite, balloonName, 0, 17);
     });

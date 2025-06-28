@@ -10,7 +10,7 @@ import { PORTAL_NAME } from "../../Constants";
 import blue_balloon from "public/world/balloon-falling-blue.png";
 
 const _target = (state: PortalMachineState) =>
-  state.context.state?.minigames.prizes[`${PORTAL_NAME}-2025`]?.score ?? 0;
+  state.context.state?.minigames.prizes[PORTAL_NAME]?.score ?? 0;
 const _score = (state: PortalMachineState) => state.context.score;
 
 export const Target: React.FC = () => {

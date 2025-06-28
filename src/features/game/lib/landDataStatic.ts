@@ -301,7 +301,7 @@ export const STATIC_OFFLINE_FARM: GameState = {
           "Colors Token 2025": 50,
         },
         wearables: {},
-        score: 90,
+        score: 30,
         startAt: 1750809600000,
         endAt: 1750896000000,
       },

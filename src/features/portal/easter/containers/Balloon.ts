@@ -1,5 +1,10 @@
 import { Scene } from "../Scene";
-import { NEW_BALLOON_TIME_DELAY, PORTAL_VOLUME } from "../Constants";
+import {
+  NEW_BALLOON_TIME_DELAY,
+  PORTAL_NAME,
+  PORTAL_VOLUME,
+} from "../Constants";
+import { MachineInterpreter } from "../lib/Machine";
 
 interface Props {
   x: number;
@@ -97,6 +102,23 @@ export class Balloon extends Phaser.GameObjects.Container {
     });
   }
 
+  get portalService() {
+    return this.scene.registry.get("portalService") as
+      | MachineInterpreter
+      | undefined;
+  }
+
+  get target() {
+    return (
+      this.portalService?.state.context.state?.minigames.prizes[PORTAL_NAME]
+        ?.score ?? 0
+    );
+  }
+
+  get score() {
+    return this.portalService?.state.context.score ?? 0;
+  }
+
   private playSound() {
     this.scene.time.delayedCall(NEW_BALLOON_TIME_DELAY, () => {
       this.scene?.sound.play("new_balloon", { volume: PORTAL_VOLUME });
@@ -111,6 +133,11 @@ export class Balloon extends Phaser.GameObjects.Container {
         this.onPop?.();
         dart.destroy();
         this.pop();
+
+        // play target reached sound if target is reached
+        if (this.target >= 0 && this.score === this.target) {
+          this.scene?.sound.play("target_reached", { volume: 1 });
+        }
       },
     );
     this.colliders.push(dartCollider);

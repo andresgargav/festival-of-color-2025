@@ -1,6 +1,5 @@
 import { Equipped } from "features/game/types/bumpkin";
 import { translate as t } from "lib/i18n/translate";
-import { NPC_WEARABLES } from "lib/npcs";
 import { SPAWNS } from "features/world/lib/spawn";
 
 // Festival of color
@@ -15,7 +14,7 @@ import green_balloon from "public/world/balloon-falling-green.png";
 import yellow_balloon from "public/world/balloon-falling-yellow.png";
 import cyan_balloon from "public/world/balloon-falling-cyan.png";
 
-export const PORTAL_NAME = "festival-of-colors";
+export const PORTAL_NAME = "festival-of-colors-2025";
 
 // Dart
 export const DART_SHOOTING_DELAY = 600;
@@ -88,7 +87,17 @@ export const RESTOCK_ATTEMPTS = [
 ];
 
 // Panel
-export const PANEL_NPC_WEARABLES: Equipped = NPC_WEARABLES["jester"];
+export const PANEL_NPC_WEARABLES: Equipped = {
+  background: "Farm Background",
+  body: "Beige Farmer Potion",
+  hair: "Paint Splattered Hair",
+  shoes: "Black Farmer Boots",
+  pants: "Paint Splattered Overalls",
+  tool: "Paint Spray Can",
+  shirt: "Paint Splattered Shirt",
+  hat: "Slime Hat",
+  wings: "Slime Wings",
+};
 
 //Sound
 export const NEW_BALLOON_TIME_DELAY = 2000;

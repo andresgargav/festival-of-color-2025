@@ -30,7 +30,7 @@ export type Scenes = {
   bumpkin_house: Room<PlazaRoomState> | undefined;
   portal_example: Room<PlazaRoomState> | undefined;
   infernos: Room<PlazaRoomState> | undefined;
-  "festival-of-colors": Room<PlazaRoomState> | undefined;
+  "festival-of-colors-2025": Room<PlazaRoomState> | undefined;
 };
 
 export type SceneId = keyof Scenes;
