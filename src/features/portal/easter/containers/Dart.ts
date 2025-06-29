@@ -28,10 +28,10 @@ export class Dart extends Phaser.GameObjects.Container {
     this.playSound();
 
     this.setDepth(1000000000000);
-    this.setSize(this.sprite.width, this.sprite.height);
+    this.setSize(this.sprite?.width, this.sprite?.height);
     this.add(this.sprite);
 
-    this.scene.physics.world.enable(this);
+    this.scene?.physics.world.enable(this);
     (this.body as Phaser.Physics.Arcade.Body)
       .setAllowGravity(false)
       .setVelocityY(-DART_VELOCITY);
@@ -40,11 +40,11 @@ export class Dart extends Phaser.GameObjects.Container {
   }
 
   private playSound() {
-    this.scene.sound.play("shoot", { volume: PORTAL_VOLUME });
+    this.scene?.sound.play("shoot", { volume: PORTAL_VOLUME });
   }
 
   private collideWithTopWall() {
-    this.scene.physics.add.overlap(this, this.scene.topWall, () => {
+    this.scene?.physics.add.overlap(this, this.scene?.topWall, () => {
       this.destroy();
     });
   }

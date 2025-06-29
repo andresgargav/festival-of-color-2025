@@ -38,6 +38,7 @@ export interface Context {
   score: number;
   lastScore: number;
   endAt: number;
+  isTraining: boolean;
   attemptsLeft: number;
   lives: number;
 }
@@ -85,6 +86,7 @@ export type PortalEvent =
   | { type: "PURCHASED_UNLIMITED" }
   | { type: "RETRY" }
   | { type: "CONTINUE" }
+  | { type: "CONTINUE_TRAINING" }
   | { type: "END_GAME_EARLY" }
   | { type: "GAME_OVER" }
   | GainPointsEvent
@@ -144,6 +146,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
 
     isJoystickActive: false,
     isJoystickEnabled: getJoystickEnabled(),
+    isTraining: false,
 
     state: CONFIG.API_URL ? undefined : OFFLINE_FARM,
 
@@ -277,6 +280,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
         {
           target: "noAttempts",
           cond: (context) => {
+            if (context.isTraining) return false;
             const farmId = !getUrl()
               ? 0
               : decodeToken(context.jwt as string).farmId;
@@ -295,6 +299,15 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
       on: {
         CONTINUE: {
           target: "starting",
+          actions: assign<Context>({
+            isTraining: false,
+          }) as any,
+        },
+        CONTINUE_TRAINING: {
+          target: "starting",
+          actions: assign<Context>({
+            isTraining: true,
+          }) as any,
         },
       },
     },
@@ -308,6 +321,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
             score: 0,
             lives: GAME_LIVES,
             state: (context: any) => {
+              if (context.isTraining) return context.state;
               startAttempt();
               return startMinigameAttempt({
                 state: context.state,
@@ -317,7 +331,10 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
                 },
               });
             },
-            attemptsLeft: (context: Context) => context.attemptsLeft - 1,
+            attemptsLeft: (context: Context) => {
+              if (context.isTraining) return context.attemptsLeft;
+              return context.attemptsLeft - 1;
+            },
           }) as any,
         },
       },
@@ -351,9 +368,11 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           actions: assign<Context, any>({
             endAt: () => Date.now(),
             lastScore: (context: Context) => {
+              if (context.isTraining) return context.lastScore;
               return context.score;
             },
             state: (context: Context) => {
+              if (context.isTraining) return context.state;
               submitScore({ score: context.score });
               return submitMinigameScore({
                 state: context.state as any,
@@ -371,9 +390,11 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "gameOver",
           actions: assign({
             lastScore: (context: any) => {
+              if (context.isTraining) return context.lastScore;
               return context.score;
             },
             state: (context: any) => {
+              if (context.isTraining) return context.state;
               submitScore({ score: context.score });
               return submitMinigameScore({
                 state: context.state,
@@ -392,6 +413,12 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
     gameOver: {
       always: [
         {
+          target: "introduction",
+          cond: (context) => {
+            return context.isTraining;
+          },
+        },
+        {
           // they have already completed the mission before
           target: "complete",
           cond: (context) => {
@@ -404,7 +431,6 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
             return false;
           },
         },
-
         {
           target: "winner",
           cond: (context) => {

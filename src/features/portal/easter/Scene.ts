@@ -54,7 +54,6 @@ export class Scene extends BaseScene {
   private balloonSpawnInterval!: Phaser.Time.TimerEvent;
   private balloonCounter = 0;
   private cyanBalloonInitCount = -1000;
-  private isJoystickEnabled = false;
   private leftButton!: Phaser.GameObjects.Image;
   private rightButton!: Phaser.GameObjects.Image;
 
@@ -64,12 +63,17 @@ export class Scene extends BaseScene {
   deflator!: Phaser.GameObjects.GameObject | undefined;
   topWall!: Phaser.GameObjects.Zone;
 
+  // Balloons
+  balloons!: Phaser.GameObjects.Group;
+
   // Darts
   darts!: Phaser.GameObjects.Group;
 
   // Festival-of-color-2025 Enemies
   bounceBro!: BounceBros;
+  bounceBrosGroup!: Phaser.GameObjects.Group;
   blastBros!: BlastBros;
+  blastBrosGroup!: Phaser.GameObjects.Group;
   // Idle Sprite
   blastBro1!: Phaser.GameObjects.Sprite;
   blastBro2!: Phaser.GameObjects.Sprite;
@@ -325,12 +329,15 @@ export class Scene extends BaseScene {
 
     // Basic config
     this.velocity = 0;
+    this.balloons = this.add.group();
     this.darts = this.add.group();
+    this.bounceBrosGroup = this.add.group();
+    this.blastBrosGroup = this.add.group();
     this.physics.world.drawDebug = false;
     this.initializeControls();
     this.initializeRetryEvent();
     this.initializeStartEvent();
-    this.initializeEndGameEarlyEvent();
+    this.initializeGameOverEvent();
     this.initializeFontFamily();
 
     // Game config
@@ -367,18 +374,9 @@ export class Scene extends BaseScene {
   update() {
     if (!this.currentPlayer) return;
 
-    const lives = this.portalService?.state.context.lives;
-
     if (this.isGameReady) {
       this.portalService?.send("START");
       this.velocity = WALKING_SPEED;
-    } else if (this.isGameIntroduction) {
-      this.velocity = 0;
-    } else if (lives === 0) {
-      this.gameOverAnimation();
-      this.time.delayedCall(1000, () => {
-        this.portalService?.send({ type: "GAME_OVER" });
-      });
     } else if (this.isGamePlaying) {
       // The game has started
       this.playAnimation();
@@ -493,66 +491,20 @@ export class Scene extends BaseScene {
   private initializeRetryEvent() {
     // reload scene when player hit retry
     const onRetry = (event: EventObject) => {
-      if (event.type === "RETRY") {
-        this.isCameraFading = true;
-        this.cameras.main.fadeOut(500);
+      if (event.type === "CONTINUE_TRAINING") {
         this.reset();
-        this.cameras.main.on(
-          "camerafadeoutcomplete",
-          () => {
-            this.cameras.main.fadeIn(500);
-            this.velocity = WALKING_SPEED;
-            this.isCameraFading = false;
-          },
-          this,
-        );
       }
     };
     this.portalService?.onEvent(onRetry);
   }
 
-  private initializeEndGameEarlyEvent() {
-    const onEndGameEarly = (event: EventObject) => {
-      if (event.type === "END_GAME_EARLY") {
-        this.gameOverAnimation();
+  private initializeGameOverEvent() {
+    const onGameOver = (event: EventObject) => {
+      if (event.type === "GAME_OVER") {
+        this.gameOver();
       }
     };
-    this.portalService?.onEvent(onEndGameEarly);
-  }
-
-  private gameOverAnimation() {
-    if (!this.currentPlayer) return;
-    this.currentPlayer.death();
-    this.balloonSpawnInterval.remove();
-    this.enemySpawnInterval.remove();
-    this.velocity = 0;
-  }
-
-  private setControls() {
-    const joystickEnabled = this.portalService?.state.context.isJoystickEnabled;
-    if (joystickEnabled) {
-      this.joystick?.setVisible(true);
-      this.leftButton?.setVisible(false);
-      this.rightButton?.setVisible(false);
-    } else {
-      this.joystick?.setVisible(false);
-      this.leftButton?.setVisible(true);
-      this.rightButton?.setVisible(true);
-    }
-  }
-
-  private reset() {
-    this.currentPlayer?.setPosition(
-      SPAWNS()[this.sceneId].default.x,
-      SPAWNS()[this.sceneId].default.y,
-    );
-    this.enemySpawnInterval.remove();
-    this.balloonSpawnInterval.remove();
-    this.balloonCounter = 0;
-    this.cyanBalloonInitCount = -1000;
-    this.currentPlayer?.setIsShooting(false);
-    this.currentPlayer?.setIsHurt(false);
-    this.currentEnemySpawnInterval = ENEMY_SPAWN_INTERVAL;
+    this.portalService?.onEvent(onGameOver);
   }
 
   private initializeStartEvent() {
@@ -583,6 +535,44 @@ export class Scene extends BaseScene {
         color: "#000000",
       })
       .setAlpha(0);
+  }
+
+  private gameOver() {
+    if (!this.currentPlayer) return;
+    this.balloonSpawnInterval.remove();
+    this.enemySpawnInterval.remove();
+    this.balloons.clear(true, true);
+    this.darts.clear(true, true);
+    this.bounceBrosGroup.clear(true, true);
+    this.blastBrosGroup.clear(true, true);
+    this.velocity = 0;
+  }
+
+  private setControls() {
+    const joystickEnabled = this.portalService?.state.context.isJoystickEnabled;
+    if (joystickEnabled) {
+      this.joystick?.setVisible(true);
+      this.leftButton?.setVisible(false);
+      this.rightButton?.setVisible(false);
+    } else {
+      this.joystick?.setVisible(false);
+      this.leftButton?.setVisible(true);
+      this.rightButton?.setVisible(true);
+    }
+  }
+
+  private reset() {
+    this.currentPlayer?.setPosition(
+      SPAWNS()[this.sceneId].default.x,
+      SPAWNS()[this.sceneId].default.y,
+    );
+    this.enemySpawnInterval.remove();
+    this.balloonSpawnInterval.remove();
+    this.balloonCounter = 0;
+    this.cyanBalloonInitCount = -1000;
+    this.currentPlayer?.setIsShooting(false);
+    this.currentPlayer?.setIsHurt(false);
+    this.currentEnemySpawnInterval = ENEMY_SPAWN_INTERVAL;
   }
 
   private createInvisibleWalls() {
@@ -655,7 +645,7 @@ export class Scene extends BaseScene {
   }
 
   private createBlueBalloon(x: number) {
-    new Balloon({
+    const balloon = new Balloon({
       x: x,
       y: -1,
       scene: this,
@@ -667,15 +657,13 @@ export class Scene extends BaseScene {
         balloon?.addLabel(1);
         this.sound.play("earn_point", { volume: PORTAL_VOLUME });
       },
-      onDebuff: () => {
-        this.portalService?.send("LOSE_LIFE");
-        this.currentPlayer?.hurt();
-      },
+      onDebuff: this.loseLife,
     });
+    this.balloons.add(balloon);
   }
 
   private createRedBalloon(x: number) {
-    new Balloon({
+    const balloon = new Balloon({
       x: x,
       y: -1,
       scene: this,
@@ -695,10 +683,11 @@ export class Scene extends BaseScene {
         this.sound.play("debuff_velocity", { volume: PORTAL_VOLUME });
       },
     });
+    this.balloons.add(balloon);
   }
 
   private createYellowBalloon(x: number) {
-    new Balloon({
+    const balloon = new Balloon({
       x: x,
       y: -1,
       scene: this,
@@ -711,15 +700,13 @@ export class Scene extends BaseScene {
         this.cyanBalloonInitCount = this.balloonCounter;
         this.sound.play("enable_special_balloons", { volume: PORTAL_VOLUME });
       },
-      onDebuff: () => {
-        this.portalService?.send("LOSE_LIFE");
-        this.currentPlayer?.hurt();
-      },
+      onDebuff: this.loseLife,
     });
+    this.balloons.add(balloon);
   }
 
   private createGreenBalloon(x: number) {
-    new Balloon({
+    const balloon = new Balloon({
       x: x,
       y: -1,
       scene: this,
@@ -729,15 +716,13 @@ export class Scene extends BaseScene {
         balloon?.addLabel(1, "", "heart");
         this.sound.play("earn_life", { volume: PORTAL_VOLUME });
       },
-      onDebuff: () => {
-        this.portalService?.send("LOSE_LIFE");
-        this.currentPlayer?.hurt();
-      },
+      onDebuff: this.loseLife,
     });
+    this.balloons.add(balloon);
   }
 
   private createCyanBalloon(x: number) {
-    new Balloon({
+    const balloon = new Balloon({
       x: x,
       y: -1,
       scene: this,
@@ -749,11 +734,18 @@ export class Scene extends BaseScene {
         balloon?.addLabel(2, "#ADFFFF");
         this.sound.play("earn_super_point", { volume: PORTAL_VOLUME });
       },
-      onDebuff: () => {
-        this.portalService?.send("LOSE_LIFE");
-        this.currentPlayer?.hurt();
-      },
+      onDebuff: this.loseLife,
     });
+    this.balloons.add(balloon);
+  }
+
+  private loseLife() {
+    if (!this.portalService) return;
+    this.portalService?.send("LOSE_LIFE");
+    this.currentPlayer?.hurt();
+    if (this.portalService.state.context.lives <= 0) {
+      this.portalService.send({ type: "GAME_OVER" });
+    }
   }
 
   private updateEnemySpawnInterval() {
@@ -818,6 +810,7 @@ export class Scene extends BaseScene {
         scene: this,
         player: this.currentPlayer,
       });
+      this.bounceBrosGroup.add(this.bounceBro);
     });
 
     this.time.delayedCall(1000 + PRE_ACTION_DELAY, () => {
@@ -863,6 +856,7 @@ export class Scene extends BaseScene {
         scene: this,
         player: this.currentPlayer,
       });
+      this.blastBrosGroup.add(this.blastBros);
     });
 
     this.time.delayedCall(1000 + PRE_ACTION_DELAY, () => {

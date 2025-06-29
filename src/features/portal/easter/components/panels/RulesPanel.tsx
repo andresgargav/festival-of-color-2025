@@ -15,6 +15,8 @@ interface Props {
   showExitButton: boolean;
   confirmButtonText: string;
   onConfirm: () => void;
+  trainingButtonText?: string;
+  onTraining?: () => void;
 }
 export const RulesPanel: React.FC<Props> = ({
   mode,
@@ -22,6 +24,8 @@ export const RulesPanel: React.FC<Props> = ({
   showExitButton,
   confirmButtonText,
   onConfirm,
+  trainingButtonText,
+  onTraining,
 }) => {
   const { t } = useAppTranslation();
   const [tab, setTab] = useState(0);
@@ -51,6 +55,8 @@ export const RulesPanel: React.FC<Props> = ({
             showExitButton={showExitButton}
             confirmButtonText={confirmButtonText}
             onConfirm={onConfirm}
+            trainingButtonText={trainingButtonText}
+            onTraining={onTraining}
           />
         )}
 

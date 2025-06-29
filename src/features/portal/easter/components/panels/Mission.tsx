@@ -27,6 +27,8 @@ interface Props {
   showExitButton: boolean;
   confirmButtonText: string;
   onConfirm: () => void;
+  trainingButtonText?: string;
+  onTraining?: () => void;
 }
 
 const _isJoystickActive = (state: PortalMachineState) =>
@@ -43,6 +45,8 @@ export const Mission: React.FC<Props> = ({
   showExitButton,
   confirmButtonText,
   onConfirm,
+  trainingButtonText,
+  onTraining,
 }) => {
   const { t } = useAppTranslation();
 
@@ -121,21 +125,53 @@ export const Mission: React.FC<Props> = ({
             </div>
           </div>
 
-          <div className="flex mt-1 space-x-1">
-            {showExitButton && (
-              <Button className="whitespace-nowrap capitalize" onClick={goHome}>
-                {t("exit")}
-              </Button>
-            )}
-            {confirmButtonText && (
-              <Button
-                className="whitespace-nowrap capitalize"
-                onClick={onConfirm}
-              >
-                {confirmButtonText}
-              </Button>
-            )}
-          </div>
+          {trainingButtonText ? (
+            <div className="flex flex-col gap-1 mt-1">
+              <div className="flex gap-1">
+                <Button
+                  className="whitespace-nowrap capitalize"
+                  onClick={onTraining}
+                >
+                  {trainingButtonText}
+                </Button>
+                {confirmButtonText && (
+                  <Button
+                    className="whitespace-nowrap capitalize"
+                    onClick={onConfirm}
+                  >
+                    {confirmButtonText}
+                  </Button>
+                )}
+              </div>
+              {showExitButton && (
+                <Button
+                  className="whitespace-nowrap capitalize"
+                  onClick={goHome}
+                >
+                  {t("exit")}
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="flex mt-1 space-x-1">
+              {showExitButton && (
+                <Button
+                  className="whitespace-nowrap capitalize"
+                  onClick={goHome}
+                >
+                  {t("exit")}
+                </Button>
+              )}
+              {confirmButtonText && (
+                <Button
+                  className="whitespace-nowrap capitalize"
+                  onClick={onConfirm}
+                >
+                  {confirmButtonText}
+                </Button>
+              )}
+            </div>
+          )}
         </>
       )}
       {/* {page === "achievements" && (
