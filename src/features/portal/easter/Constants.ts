@@ -40,10 +40,10 @@ export const SIGNAL_SPRITE_SCALE = 1.3;
 export const PRE_ACTION_DELAY = 1000;
 
 export const MACHINE_DECO_CONFIG = {
-  config1: {x: 240, y: 290},
-  config2: {x: 140, y: 180},
-  config3: {x: 550, y: 120},
-  config4: {x: 480, y: 230}
+  config1: { x: 235, y: 280 },
+  config2: { x: 140, y: 180 },
+  config3: { x: 550, y: 120 },
+  config4: { x: 480, y: 230 },
 };
 export const BALLOON_DECO_CONFIG = {x: 32.5, y: 5}
 
