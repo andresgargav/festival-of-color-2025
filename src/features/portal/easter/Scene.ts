@@ -363,10 +363,6 @@ export class Scene extends BaseScene {
     return this.portalService?.state.matches("playing") === true;
   }
 
-  private get isGameIntroduction() {
-    return this.portalService?.state.matches("introduction") === true;
-  }
-
   public get portalService() {
     return this.registry.get("portalService") as MachineInterpreter | undefined;
   }
@@ -510,6 +506,7 @@ export class Scene extends BaseScene {
   private initializeStartEvent() {
     const onStart = (event: EventObject) => {
       if (event.type === "START") {
+        this.reset();
         this.balloonSpawnInterval = this.time.addEvent({
           delay: BALLOON_SPAWN_INTERVAL,
           callback: () => this.createBalloon(),
@@ -566,8 +563,8 @@ export class Scene extends BaseScene {
       SPAWNS()[this.sceneId].default.x,
       SPAWNS()[this.sceneId].default.y,
     );
-    this.enemySpawnInterval.remove();
-    this.balloonSpawnInterval.remove();
+    this.enemySpawnInterval?.remove();
+    this.balloonSpawnInterval?.remove();
     this.balloonCounter = 0;
     this.cyanBalloonInitCount = -1000;
     this.currentPlayer?.setIsShooting(false);
