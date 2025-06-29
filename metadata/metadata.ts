@@ -4608,6 +4608,29 @@ export const OPEN_SEA_COLLECTIBLES: Record<InventoryItemName, Metadata> = {
       { trait_type: "Tradable", value: "Yes" },
     ],
   },
+  "Colors Token 2025": {
+    description: "Use this in the easter event shop before the event ends!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Coupon" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/757.webp",
+    name: "Colors Token 2025",
+  },
+  "Colors Ticket 2025": {
+    description:
+      "Hold this for a chance to win $FLOWER after the easter event ends!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Purpose", value: "Coupon" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/erc1155/images/2273.webp",
+    name: "Colors Ticket 2025",
+  },
   "Iron Idol": {
     description: "The Idol adds 1 iron every time you mine iron.",
     decimals: 0,
@@ -16034,14 +16057,14 @@ export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
   },
   "Bumpkin Crown": {
     description:
-      "A magestic crown with intricate design and eerie glowing games, fit for a Bumpkin Leader. Earn 25% more in SFL and Coin deliveries, and Earn +10% marks when pledged to this faction. Multiples of this item do not stack.",
+      "A magestic crown with intricate design and eerie glowing games, fit for a Bumpkin Leader. Earn 25% more in FLOWER and Coin deliveries, and Earn +10% marks when pledged to this faction. Multiples of this item do not stack.",
     decimals: 0,
     attributes: [
       { trait_type: "Part", value: "Hat" },
       { trait_type: "Tradable", value: "No" },
       {
         display_type: "boost_percentage",
-        trait_type: "Increase SFL gained from deliveries",
+        trait_type: "Increase FLOWER gained from deliveries",
         value: 25,
       },
       {
@@ -16062,14 +16085,14 @@ export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
   },
   "Goblin Crown": {
     description:
-      "A dark, jagged crown with glowing gems, ideal for the Goblin King. Earn 25% more in SFL and Coin deliveries, and Earn +10% marks when pledged to this faction. Multiples of this item do not stack.",
+      "A dark, jagged crown with glowing gems, ideal for the Goblin King. Earn 25% more in FLOWER and Coin deliveries, and Earn +10% marks when pledged to this faction. Multiples of this item do not stack.",
     decimals: 0,
     attributes: [
       { trait_type: "Part", value: "Hat" },
       { trait_type: "Tradable", value: "No" },
       {
         display_type: "boost_percentage",
-        trait_type: "Increase SFL gained from deliveries",
+        trait_type: "Increase FLOWER gained from deliveries",
         value: 25,
       },
       {
@@ -16090,14 +16113,14 @@ export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
   },
   "Nightshade Crown": {
     description:
-      "A midnight-black crown with deep purple and silver details, fitting for a leader whose presence commands respect and mystery. Earn 25% more in SFL and Coin deliveries, and Earn +10% marks when pledged to this faction. Multiples of this item do not stack.",
+      "A midnight-black crown with deep purple and silver details, fitting for a leader whose presence commands respect and mystery. Earn 25% more in FLOWER and Coin deliveries, and Earn +10% marks when pledged to this faction. Multiples of this item do not stack.",
     decimals: 0,
     attributes: [
       { trait_type: "Part", value: "Hat" },
       { trait_type: "Tradable", value: "No" },
       {
         display_type: "boost_percentage",
-        trait_type: "Increase SFL gained from deliveries",
+        trait_type: "Increase FLOWER gained from deliveries",
         value: 25,
       },
       {
@@ -16118,14 +16141,14 @@ export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
   },
   "Sunflorian Crown": {
     description:
-      "A majestic crown, adorned with a radiant ruby centerpiece and golden embellishments, it evokes the grandeur and authority of a leader. Earn 25% more in SFL and Coin deliveries, and Earn +10% marks when pledged to this faction. Multiples of this item do not stack.",
+      "A majestic crown, adorned with a radiant ruby centerpiece and golden embellishments, it evokes the grandeur and authority of a leader. Earn 25% more in FLOWER and Coin deliveries, and Earn +10% marks when pledged to this faction. Multiples of this item do not stack.",
     decimals: 0,
     attributes: [
       { trait_type: "Part", value: "Hat" },
       { trait_type: "Tradable", value: "No" },
       {
         display_type: "boost_percentage",
-        trait_type: "Increase SFL gained from deliveries",
+        trait_type: "Increase FLOWER gained from deliveries",
         value: 25,
       },
       {
@@ -17037,5 +17060,383 @@ export const OPEN_SEA_WEARABLES: Record<BumpkinItem, Metadata> = {
     external_url: "https://docs.sunflower-land.com/getting-started/about",
     image: "../public/wearables/images/437.png",
     name: "Flower Bouquet",
+  },
+  "Streamer Hat": {
+    description:
+      "A stylish hat adorned with a microphone, perfect for those who want to make a statement. +1 Love Charm for everyone who interacts with you.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/438.png",
+    name: "Streamer Hat",
+  },
+  "Dino Onesie": {
+    description:
+      "Stomp around in prehistoric style! Cozy, cute, and just fierce enough to remind everyone who rules the jungle.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Onesie" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/439.png",
+    name: "Dino Onesie",
+  },
+  "Golden Wings": {
+    description:
+      "Radiate with celestial grace as you soar through the skies, leaving a trail of golden light in your wake.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Wings" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/440.png",
+    name: "Golden Wings",
+  },
+  "Flower Mask": {
+    description:
+      "A blooming masterpiece that frames your face in petals of charm. +1 Geniseeds from deliveries, chores & bounties.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/441.png",
+    name: "Flower Mask",
+  },
+  "Luvvy Head": {
+    description:
+      "Head over heels in love! This heart-filled headpiece is all about spreading joy, affection, and a little bit of blush.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/442.png",
+    name: "Luvvy Head",
+  },
+  "Grumpy Cat": {
+    description:
+      "Perched atop your head, this feline friend judges your every move… but secretly enjoys the ride.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/443.png",
+    name: "Grumpy Cat",
+  },
+  "Love Puff Aura": {
+    description:
+      "A gentle poof of floating hearts that follows you wherever you go, because love should always be in the air.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Aura" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/444.png",
+    name: "Love Puff Aura",
+  },
+  "Carrot Pitchfork": {
+    description: "Looks tasty, but it was not made for you to eat!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Tool" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/445.png",
+    name: "Carrot Pitchfork",
+  },
+  "Handheld Bunny": {
+    description: "Now all that's missing is the top hat!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Tool" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/446.png",
+    name: "Handheld Bunny",
+  },
+  "Bunny Pants": {
+    description: "Leave mysterious footprints to fool the other bumpkins!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Pants" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/447.png",
+    name: "Bunny Pants",
+  },
+  "Bunny Mask": {
+    description: "Other easter bunnies will think you are one of them!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/448.png",
+    name: "Bunny Mask",
+  },
+  "Easter Apron": {
+    description: "Perfect for getting chocolate on!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Coat" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/449.png",
+    name: "Easter Apron",
+  },
+  "Bloomwarden Suit": {
+    description:
+      "Woven from enchanted petals and dawn's dew, this suit protects the fields and those who tend them.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Suit" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/450.png",
+    name: "Bloomwarden Suit",
+  },
+  "Embersteel Suit": {
+    description:
+      "Forged in volcanic heartfires, this armor blazes with the spirit of an unyielding defender.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Suit" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/451.png",
+    name: "Embersteel Suit",
+  },
+  "Amberfall Suit": {
+    description:
+      "Dripping with the golden hues of autumn, this suit whispers of fading leaves and hidden strength.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Suit" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/452.png",
+    name: "Amberfall Suit",
+  },
+  "Glacierguard Suit": {
+    description:
+      "Cold as the northern winds, this suit shields its wearer with ancient frostbound resilience.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Suit" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/453.png",
+    name: "Glacierguard Suit",
+  },
+  "Broccoli Hat": {
+    description:
+      " crunchy crown for the veggie lover — surprisingly comfortable and extremely nutritious-looking!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/454.png",
+    name: "Broccoli Hat",
+  },
+  "Frost Sword": {
+    description:
+      "Carved from eternal ice, this blade chills foes to their core with a single graceful swing.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Tool" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/455.png",
+    name: "Frost Sword",
+  },
+  "Medic Apron": {
+    description:
+      "Worn by the caretakers of the sick and small, this apron carries the scent of healing herbs and kindness.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Coat" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/456.png",
+    name: "Medic Apron",
+  },
+  "Obsidian Necklace": {
+    description:
+      "A shard of molten earth turned elegant charm, pulsing softly with ancient, dormant power.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Necklace" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/457.png",
+    name: "Obsidian Necklace",
+  },
+  "Red Pepper Onesie": {
+    description:
+      "Spicy, snuggly, and absolutely sizzling with personality — it’s the hottest onesie in the land!",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Onesie" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/458.png",
+    name: "Red Pepper Onesie",
+  },
+  "Love Charm Shirt": {
+    description:
+      "Woven with affection and stitched with sparkles. +1 Geniseeds from deliveries, chores & bounties.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Shirt" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/459.png",
+    name: "Love Charm Shirt",
+  },
+  "Sky Island Background": {
+    description:
+      "High above the clouds lies a floating haven of peace, mystery, and boundless imagination.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Background" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/460.png",
+    name: "Sky Island Background",
+  },
+  "Oracle Syringe": {
+    description:
+      "Infused with the Barn Delight, this curious tool channels healing to every ailing animals with a burst of magical care.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Wings" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/461.png",
+    name: "Oracle Syringe",
+  },
+  "Coin Head": {
+    description:
+      "Proof you put your tokens where your flowers are. Now you’ve got the hat to prove it.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/462.png",
+    name: "Coin Head",
+  },
+  "Paint Splattered Hair": {
+    description:
+      "Each streak tells a story—of bold brushes, happy accidents, and a day well spent in color",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hair" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/463.webp",
+    name: "Paint Splattered Hair",
+  },
+  "Paint Splattered Shirt": {
+    description:
+      "This shirt has seen things—brilliant ideas, wild inspiration, and maybe a little paint fight or two.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Shirt" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/464.webp",
+    name: "Paint Splattered Shirt",
+  },
+  "Paint Splattered Overalls": {
+    description:
+      "Once clean and proper, now a proud canvas of your artistic chaos. Every stain is a memory.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Pants" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/465.webp",
+    name: "Paint Splattered Overalls",
+  },
+  "Paint Spray Can": {
+    description:
+      "A favorite tool of rebellious artists —shake it and the air tingles with creativity.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Tool" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/466.webp",
+    name: "Paint Spray Can",
+  },
+  "Slime Hat": {
+    description:
+      "It crawled onto your head and refused to leave. Now you’re bonded for life... probably.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Hat" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/467.webp",
+    name: "Slime Hat",
+  },
+  "Slime Wings": {
+    description: "Delightfully gooey and questionably aerodynamic",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Wings" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/468.webp",
+    name: "Slime Wings",
+  },
+  "Slime Aura": {
+    description:
+      "A squishy shimmer surrounds you, as if a mischievous slime chose you as its best friend.",
+    decimals: 0,
+    attributes: [
+      { trait_type: "Part", value: "Aura" },
+      { trait_type: "Tradable", value: "No" },
+    ],
+    external_url: "https://docs.sunflower-land.com/getting-started/about",
+    image: "../public/wearables/images/469.webp",
+    name: "Slime Aura",
   },
 };

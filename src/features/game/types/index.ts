@@ -1000,6 +1000,8 @@ export const KNOWN_IDS: Record<InventoryItemName, number> = {
   Jellyfish: 2203,
   "Rhubarb Tart": 2204,
   Jin: 2205,
+  "Colors Token 2025": 761,
+  "Colors Ticket 2025": 2273,
 };
 
 // The reverse of above

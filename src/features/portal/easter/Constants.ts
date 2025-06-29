@@ -1,6 +1,5 @@
 import { Equipped } from "features/game/types/bumpkin";
 import { translate as t } from "lib/i18n/translate";
-import { NPC_WEARABLES } from "lib/npcs";
 import { SPAWNS } from "features/world/lib/spawn";
 
 // Festival of color
@@ -9,28 +8,28 @@ import dart from "public/world/dart.gif";
 import slime from "public/world/slime.gif";
 import airballoon_slime from "public/world/airballoon_slime_shooting.gif";
 import ground_slime from "public/world/ground_slime_shooting.gif";
-import red_balloon from "public/world/balloon-falling-red.png"
-import blue_balloon from "public/world/balloon-falling-blue.png"
-import green_balloon from "public/world/balloon-falling-green.png"
-import yellow_balloon from "public/world/balloon-falling-yellow.png"
-import cyan_balloon from "public/world/balloon-falling-cyan.png"
+import red_balloon from "public/world/balloon-falling-red.png";
+import blue_balloon from "public/world/balloon-falling-blue.png";
+import green_balloon from "public/world/balloon-falling-green.png";
+import yellow_balloon from "public/world/balloon-falling-yellow.png";
+import cyan_balloon from "public/world/balloon-falling-cyan.png";
 
 export const PORTAL_NAME = "festival-of-colors-2025";
 
 // Dart
-export const DART_SHOOTING_DELAY = 300;
-export const DART_VELOCITY = 100;
+export const DART_SHOOTING_DELAY = 650;
+export const DART_VELOCITY = 150;
 
 // Balloons
-export const BALLOON_SPAWN_INTERVAL = 2000;
+export const BALLOON_SPAWN_INTERVAL = 1200;
 export const BALLOON_SPAWN_LEFT_LIMIT = 293;
 export const BALLOON_SPAWN_RIGHT_LIMIT = 426;
 export const AMOUNT_CYAN_BALLOONS = 3;
 
 // Enemies
-export const ENEMY_SPAWN_INTERVAL = 10000;
-export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 3500;
-export const MINIMUM_ENEMY_SPAWN_INTERVAL = 3000;
+export const ENEMY_SPAWN_INTERVAL = 8000;
+export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 5500;
+export const MINIMUM_ENEMY_SPAWN_INTERVAL = 2500;
 
 // Festival of Color
 export const Y_AXIS = SPAWNS()[PORTAL_NAME].default.y - 6;
@@ -45,7 +44,7 @@ export const MACHINE_DECO_CONFIG = {
   config3: { x: 550, y: 120 },
   config4: { x: 480, y: 230 },
 };
-export const BALLOON_DECO_CONFIG = {x: 32.5, y: 5}
+export const BALLOON_DECO_CONFIG = { x: 32.5, y: 5 };
 
 // Stone and sprites configuration
 export const STONE_CONFIGURATION = { RtoL: 457, LtoR: 260 };
@@ -67,19 +66,21 @@ export const BOUNCING_CONFIGURATION = {
 };
 
 // Player
-export const WALKING_SPEED = 60;
+export const WALKING_SPEED = 75;
 export const PLAYER_JUMP_VELOCITY_Y = -165;
 export const PLAYER_PERCENTAGE_DEBUFF_VELOCITY = 0.5;
 export const TIME_DEBUFF_VELOCITY = 5000;
 
 // Game config
-export const GAME_SECONDS = 180;
-export const GAME_LIVES = 3;
+export const GAME_SECONDS = 120;
+export const GAME_LIVES = 4;
 export const GRAVITY = 450;
 
 // Attempts
+export const INITIAL_DATE = "2025-06-30";
+export const ATTEMPTS_BETA_TESTERS = 100;
 export const UNLIMITED_ATTEMPTS_SFL = 150; // If this value is less than 0, the option disappears
-export const DAILY_ATTEMPTS = 1;
+export const FREE_DAILY_ATTEMPTS = 1;
 export const RESTOCK_ATTEMPTS = [
   { attempts: 1, sfl: 3 },
   { attempts: 3, sfl: 7 },
@@ -88,10 +89,20 @@ export const RESTOCK_ATTEMPTS = [
 ];
 
 // Panel
-export const PANEL_NPC_WEARABLES: Equipped = NPC_WEARABLES["hopper"];
+export const PANEL_NPC_WEARABLES: Equipped = {
+  background: "Farm Background",
+  body: "Beige Farmer Potion",
+  hair: "Paint Splattered Hair",
+  shoes: "Black Farmer Boots",
+  pants: "Paint Splattered Overalls",
+  tool: "Paint Spray Can",
+  shirt: "Paint Splattered Shirt",
+  hat: "Slime Hat",
+  wings: "Slime Wings",
+};
 
 //Sound
-export const NEW_BALLOON_TIME_DELAY = 2500;
+export const NEW_BALLOON_TIME_DELAY = 2000;
 export const PORTAL_VOLUME = 0.5;
 export const PORTAL_BACKGROUND_VOLUME = 0.2;
 
@@ -163,4 +174,9 @@ export const ENEMIES_TABLE: {
     image: red_balloon,
     description: t(`${PORTAL_NAME}.enemy3`),
   },
+];
+
+export const BETA_TESTERS = [
+  29, 9609, 49035, 155026, 1181, 151471, 49035, 86, 79871, 2299, 21303, 206876,
+  9239, 36214, 55626, 3249, 128122,
 ];

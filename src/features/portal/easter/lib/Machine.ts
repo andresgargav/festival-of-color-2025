@@ -4,10 +4,10 @@ import { CONFIG } from "lib/config";
 import { decodeToken } from "features/auth/actions/login";
 import {
   UNLIMITED_ATTEMPTS_SFL,
-  DAILY_ATTEMPTS,
   GAME_SECONDS,
   GAME_LIVES,
   PORTAL_NAME,
+  FREE_DAILY_ATTEMPTS,
 } from "../Constants";
 import { GameState } from "features/game/types/game";
 import { purchaseMinigameItem } from "features/game/events/minigames/purchaseMinigameItem";
@@ -22,6 +22,7 @@ import { getUrl, loadPortal } from "features/portal/actions/loadPortal";
 import { getAttemptsLeft } from "./Utils";
 import { unlockMinigameAchievements } from "features/game/events/minigames/unlockMinigameAchievements";
 import { AchievementsName } from "../Achievements";
+import { JOYSTICK_LOCAL_STORAGE_KEY } from "../components/panels/Controls";
 
 const getJWT = () => {
   const code = new URLSearchParams(window.location.search).get("jwt");
@@ -37,6 +38,7 @@ export interface Context {
   score: number;
   lastScore: number;
   endAt: number;
+  isTraining: boolean;
   attemptsLeft: number;
   lives: number;
 }
@@ -84,6 +86,7 @@ export type PortalEvent =
   | { type: "PURCHASED_UNLIMITED" }
   | { type: "RETRY" }
   | { type: "CONTINUE" }
+  | { type: "CONTINUE_TRAINING" }
   | { type: "END_GAME_EARLY" }
   | { type: "GAME_OVER" }
   | GainPointsEvent
@@ -129,6 +132,11 @@ const resetGameTransition = {
   },
 };
 
+const getJoystickEnabled = () => {
+  const cached = localStorage.getItem(JOYSTICK_LOCAL_STORAGE_KEY);
+  return cached ? JSON.parse(cached) : false;
+};
+
 export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
   id: "portalMachine",
   initial: "initialising",
@@ -137,7 +145,8 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
     jwt: getJWT(),
 
     isJoystickActive: false,
-    isJoystickEnabled: true,
+    isJoystickEnabled: getJoystickEnabled(),
+    isTraining: false,
 
     state: CONFIG.API_URL ? undefined : OFFLINE_FARM,
 
@@ -196,7 +205,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
       invoke: {
         src: async (context) => {
           if (!getUrl()) {
-            return { game: OFFLINE_FARM, attemptsLeft: DAILY_ATTEMPTS };
+            return { game: OFFLINE_FARM, attemptsLeft: FREE_DAILY_ATTEMPTS };
           }
 
           const { farmId } = decodeToken(context.jwt as string);
@@ -208,7 +217,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           });
 
           const minigame = game.minigames.games[PORTAL_NAME];
-          const attemptsLeft = getAttemptsLeft(minigame);
+          const attemptsLeft = getAttemptsLeft(minigame, farmId);
 
           return { game, farmId, attemptsLeft };
         },
@@ -271,8 +280,12 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
         {
           target: "noAttempts",
           cond: (context) => {
+            if (context.isTraining) return false;
+            const farmId = !getUrl()
+              ? 0
+              : decodeToken(context.jwt as string).farmId;
             const minigame = context.state?.minigames.games[PORTAL_NAME];
-            const attemptsLeft = getAttemptsLeft(minigame);
+            const attemptsLeft = getAttemptsLeft(minigame, farmId);
             return attemptsLeft <= 0;
           },
         },
@@ -286,6 +299,15 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
       on: {
         CONTINUE: {
           target: "starting",
+          actions: assign<Context>({
+            isTraining: false,
+          }) as any,
+        },
+        CONTINUE_TRAINING: {
+          target: "starting",
+          actions: assign<Context>({
+            isTraining: true,
+          }) as any,
         },
       },
     },
@@ -299,6 +321,7 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
             score: 0,
             lives: GAME_LIVES,
             state: (context: any) => {
+              if (context.isTraining) return context.state;
               startAttempt();
               return startMinigameAttempt({
                 state: context.state,
@@ -308,7 +331,10 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
                 },
               });
             },
-            attemptsLeft: (context: Context) => context.attemptsLeft - 1,
+            attemptsLeft: (context: Context) => {
+              if (context.isTraining) return context.attemptsLeft;
+              return context.attemptsLeft - 1;
+            },
           }) as any,
         },
       },
@@ -342,9 +368,11 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           actions: assign<Context, any>({
             endAt: () => Date.now(),
             lastScore: (context: Context) => {
+              if (context.isTraining) return context.lastScore;
               return context.score;
             },
             state: (context: Context) => {
+              if (context.isTraining) return context.state;
               submitScore({ score: context.score });
               return submitMinigameScore({
                 state: context.state as any,
@@ -362,9 +390,11 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
           target: "gameOver",
           actions: assign({
             lastScore: (context: any) => {
+              if (context.isTraining) return context.lastScore;
               return context.score;
             },
             state: (context: any) => {
+              if (context.isTraining) return context.state;
               submitScore({ score: context.score });
               return submitMinigameScore({
                 state: context.state,
@@ -383,18 +413,24 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
     gameOver: {
       always: [
         {
+          target: "introduction",
+          cond: (context) => {
+            return context.isTraining;
+          },
+        },
+        {
           // they have already completed the mission before
           target: "complete",
           cond: (context) => {
-            const dateKey = new Date().toISOString().slice(0, 10);
+            // const dateKey = new Date().toISOString().slice(0, 10);
 
-            const minigame = context.state?.minigames.games[PORTAL_NAME];
-            const history = minigame?.history ?? {};
+            // const minigame = context.state?.minigames.games[PORTAL_NAME];
+            // const history = minigame?.history ?? {};
 
-            return !!history[dateKey]?.prizeClaimedAt;
+            // return !!history[dateKey]?.prizeClaimedAt;
+            return false;
           },
         },
-
         {
           target: "winner",
           cond: (context) => {

@@ -121,6 +121,8 @@ export const Portal: React.FC = () => {
             showExitButton={true}
             confirmButtonText={t("start")}
             onConfirm={() => portalService.send("CONTINUE")}
+            trainingButtonText={t("start.training")}
+            onTraining={() => portalService.send("CONTINUE_TRAINING")}
           />
         </Modal>
       )}

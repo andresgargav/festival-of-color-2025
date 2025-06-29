@@ -6,21 +6,20 @@ import { useSelector } from "@xstate/react";
 import { PortalContext } from "../../lib/PortalProvider";
 import { Label } from "components/ui/Label";
 import { Attempts } from "./Attempts";
-import { getAttemptsLeft } from "../../lib/Utils";
+import { getAttemptsLeft, isWithinRange } from "../../lib/Utils";
 import { goHome } from "features/portal/lib/portalUtil";
 import { PortalMachineState } from "../../lib/Machine";
 import { Guide } from "./Guide";
-import { SquareIcon } from "components/ui/SquareIcon";
 import { PORTAL_NAME } from "../../Constants";
-import { ITEM_DETAILS } from "features/game/types/images";
 // import { hasFeatureAccess } from "lib/flags";
 // import { Prize } from "./Prize";
 // import { AchievementsList } from "./AchievementsList";
 import { OuterPanel } from "../../../../../components/ui/Panel";
 import { Controls } from "./Controls";
-import { isTouchDevice } from "features/world/lib/device";
 
 import key from "public/world/key.png";
+import { decodeToken } from "features/auth/actions/login";
+import { getUrl } from "features/portal/actions/loadPortal";
 
 interface Props {
   mode: "introduction" | "success" | "failed";
@@ -28,6 +27,8 @@ interface Props {
   showExitButton: boolean;
   confirmButtonText: string;
   onConfirm: () => void;
+  trainingButtonText?: string;
+  onTraining?: () => void;
 }
 
 const _isJoystickActive = (state: PortalMachineState) =>
@@ -44,6 +45,8 @@ export const Mission: React.FC<Props> = ({
   showExitButton,
   confirmButtonText,
   onConfirm,
+  trainingButtonText,
+  onTraining,
 }) => {
   const { t } = useAppTranslation();
 
@@ -55,7 +58,8 @@ export const Mission: React.FC<Props> = ({
   const jwt = useSelector(portalService, _jwt);
   // const state = useSelector(portalService, _state);
 
-  const attemptsLeft = getAttemptsLeft(minigame);
+  const farmId = !getUrl() ? 0 : decodeToken(jwt as string).farmId;
+  const attemptsLeft = getAttemptsLeft(minigame, farmId);
 
   const dateKey = new Date().toISOString().slice(0, 10);
 
@@ -109,8 +113,11 @@ export const Mission: React.FC<Props> = ({
               <OuterPanel className="w-full flex flex-col items-center">
                 <Label type="default">{t(`${PORTAL_NAME}.bestAllTime`)}</Label>
                 <div>
-                  {Object.values(minigame?.history ?? {}).reduce(
-                    (acc, { highscore }) => Math.max(acc, highscore),
+                  {Object.entries(minigame?.history ?? {}).reduce(
+                    (acc, [date, entry]) => {
+                      if (!isWithinRange(date)) return acc;
+                      return Math.max(acc, entry.highscore);
+                    },
                     0,
                   )}
                 </div>
@@ -118,21 +125,53 @@ export const Mission: React.FC<Props> = ({
             </div>
           </div>
 
-          <div className="flex mt-1 space-x-1">
-            {showExitButton && (
-              <Button className="whitespace-nowrap capitalize" onClick={goHome}>
-                {t("exit")}
-              </Button>
-            )}
-            {confirmButtonText && (
-              <Button
-                className="whitespace-nowrap capitalize"
-                onClick={onConfirm}
-              >
-                {confirmButtonText}
-              </Button>
-            )}
-          </div>
+          {trainingButtonText ? (
+            <div className="flex flex-col gap-1 mt-1">
+              <div className="flex gap-1">
+                <Button
+                  className="whitespace-nowrap capitalize"
+                  onClick={onTraining}
+                >
+                  {trainingButtonText}
+                </Button>
+                {confirmButtonText && (
+                  <Button
+                    className="whitespace-nowrap capitalize"
+                    onClick={onConfirm}
+                  >
+                    {confirmButtonText}
+                  </Button>
+                )}
+              </div>
+              {showExitButton && (
+                <Button
+                  className="whitespace-nowrap capitalize"
+                  onClick={goHome}
+                >
+                  {t("exit")}
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="flex mt-1 space-x-1">
+              {showExitButton && (
+                <Button
+                  className="whitespace-nowrap capitalize"
+                  onClick={goHome}
+                >
+                  {t("exit")}
+                </Button>
+              )}
+              {confirmButtonText && (
+                <Button
+                  className="whitespace-nowrap capitalize"
+                  onClick={onConfirm}
+                >
+                  {confirmButtonText}
+                </Button>
+              )}
+            </div>
+          )}
         </>
       )}
       {/* {page === "achievements" && (

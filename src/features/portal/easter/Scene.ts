@@ -3,7 +3,7 @@ import tilesetconfig from "assets/map/festival_of_colors_tileset.json";
 import { SceneId } from "features/world/mmoMachine";
 import { BaseScene } from "features/world/scenes/BaseScene";
 import { MachineInterpreter } from "./lib/Machine";
-import { EventObject, Machine } from "xstate";
+import { EventObject } from "xstate";
 import { SPAWNS } from "features/world/lib/spawn";
 import { isTouchDevice } from "features/world/lib/device";
 import VirtualJoystick from "phaser3-rex-plugins/plugins/virtualjoystick.js";
@@ -54,7 +54,6 @@ export class Scene extends BaseScene {
   private balloonSpawnInterval!: Phaser.Time.TimerEvent;
   private balloonCounter = 0;
   private cyanBalloonInitCount = -1000;
-  private isJoystickEnabled = false;
   private leftButton!: Phaser.GameObjects.Image;
   private rightButton!: Phaser.GameObjects.Image;
 
@@ -62,13 +61,19 @@ export class Scene extends BaseScene {
   leftWall!: Phaser.GameObjects.GameObject | undefined;
   rightWall!: Phaser.GameObjects.GameObject | undefined;
   deflator!: Phaser.GameObjects.GameObject | undefined;
+  topWall!: Phaser.GameObjects.Zone;
+
+  // Balloons
+  balloons!: Phaser.GameObjects.Group;
 
   // Darts
   darts!: Phaser.GameObjects.Group;
 
   // Festival-of-color-2025 Enemies
   bounceBro!: BounceBros;
+  bounceBrosGroup!: Phaser.GameObjects.Group;
   blastBros!: BlastBros;
+  blastBrosGroup!: Phaser.GameObjects.Group;
   // Idle Sprite
   blastBro1!: Phaser.GameObjects.Sprite;
   blastBro2!: Phaser.GameObjects.Sprite;
@@ -220,12 +225,10 @@ export class Scene extends BaseScene {
 
     // Decorations
     this.load.image("river", "world/river.png");
-    this.load.spritesheet("balloon_machine", "world/balloonMachine.png", 
-      {
-        frameWidth: 52,
-        frameHeight: 55,
-      }
-    );
+    this.load.spritesheet("balloon_machine", "world/balloonMachine.png", {
+      frameWidth: 52,
+      frameHeight: 55,
+    });
 
     const machineBalloons = ["red", "blue", "green", "yellow"];
     machineBalloons.forEach((colors) => {
@@ -235,10 +238,10 @@ export class Scene extends BaseScene {
         {
           frameWidth: 16,
           frameHeight: 25,
-        }
-      )
-    })
-    
+        },
+      );
+    });
+
     // Slime and sotne sound effects
     this.load.audio(
       "ground_slime_shoot",
@@ -265,23 +268,56 @@ export class Scene extends BaseScene {
     this.load.audio("sword", "world/sound-effects/sword.mp3");
     this.load.audio("lose_life", "world/sound-effects/lose_life.mp3");
     this.load.audio("ambience", "world/sound-effects/ambience.mp3");
-    this.load.audio("shoot", "world/Festival-of-color-sound-effects/shoot.wav",);
+    this.load.audio("shoot", "world/Festival-of-color-sound-effects/shoot.wav");
 
     // Balloons sound effects
-    this.load.audio("new_balloon", "world/Festival-of-color-sound-effects/new_balloon.wav",);
-    this.load.audio("burst_balloon", "world/Festival-of-color-sound-effects/burst_balloon.wav",);
-    this.load.audio("deflating_balloon", "world/Festival-of-color-sound-effects/deflating_balloon.mp3",);
-    this.load.audio("debuff_velocity", "world/Festival-of-color-sound-effects/debuff.wav",);
-    this.load.audio("earn_life", "world/Festival-of-color-sound-effects/earn_life.mp3",);
-    this.load.audio("enable_special_balloons", "world/Festival-of-color-sound-effects/plus3.wav",);
-    this.load.audio("earn_point", "world/Festival-of-color-sound-effects/plus1.wav",);
-    this.load.audio("earn_super_point", "world/Festival-of-color-sound-effects/plus2.wav",);
-    this.load.audio("minus_point", "world/Festival-of-color-sound-effects/minus1.wav",);
+    this.load.audio(
+      "new_balloon",
+      "world/Festival-of-color-sound-effects/new_balloon.wav",
+    );
+    this.load.audio(
+      "burst_balloon",
+      "world/Festival-of-color-sound-effects/burst_balloon.wav",
+    );
+    this.load.audio(
+      "deflating_balloon",
+      "world/Festival-of-color-sound-effects/deflating_balloon.mp3",
+    );
+    this.load.audio(
+      "debuff_velocity",
+      "world/Festival-of-color-sound-effects/debuff.wav",
+    );
+    this.load.audio(
+      "earn_life",
+      "world/Festival-of-color-sound-effects/earn_life.mp3",
+    );
+    this.load.audio(
+      "enable_special_balloons",
+      "world/Festival-of-color-sound-effects/plus3.wav",
+    );
+    this.load.audio(
+      "earn_point",
+      "world/Festival-of-color-sound-effects/plus1.wav",
+    );
+    this.load.audio(
+      "earn_super_point",
+      "world/Festival-of-color-sound-effects/plus2.wav",
+    );
+    this.load.audio(
+      "minus_point",
+      "world/Festival-of-color-sound-effects/minus1.wav",
+    );
+
+    // Target reached sound
+    this.load.audio(
+      "target_reached",
+      "world/Festival-of-color-sound-effects/target_reached.mp3",
+    );
 
     // Background music
     this.load.audio(
       "background_music",
-      "world/Festival-of-color-sound-effects/background_music_1.mp3",
+      "world/Festival-of-color-sound-effects/country_fair.mp3",
     );
   }
 
@@ -293,22 +329,22 @@ export class Scene extends BaseScene {
 
     // Basic config
     this.velocity = 0;
+    this.balloons = this.add.group();
     this.darts = this.add.group();
+    this.bounceBrosGroup = this.add.group();
+    this.blastBrosGroup = this.add.group();
     this.physics.world.drawDebug = false;
     this.initializeControls();
     this.initializeRetryEvent();
     this.initializeStartEvent();
-    this.initializeEndGameEarlyEvent();
+    this.initializeGameOverEvent();
     this.initializeFontFamily();
 
     // Game config
     this.currentPlayer?.createLauncher();
     this.input.addPointer(3);
     this.physics.world.gravity.y = GRAVITY;
-    this.ground = this.colliders?.children.entries[0];
-    this.leftWall = this.colliders?.children.entries[1];
-    this.rightWall = this.colliders?.children.entries[2];
-    this.deflator = this.colliders?.children.entries[3];
+    this.createInvisibleWalls();
 
     // Festival of color 2025 idle
     this.festivalOfColorIdle();
@@ -327,10 +363,6 @@ export class Scene extends BaseScene {
     return this.portalService?.state.matches("playing") === true;
   }
 
-  private get isGameIntroduction() {
-    return this.portalService?.state.matches("introduction") === true;
-  }
-
   public get portalService() {
     return this.registry.get("portalService") as MachineInterpreter | undefined;
   }
@@ -338,18 +370,9 @@ export class Scene extends BaseScene {
   update() {
     if (!this.currentPlayer) return;
 
-    const lives = this.portalService?.state.context.lives;
-
     if (this.isGameReady) {
       this.portalService?.send("START");
       this.velocity = WALKING_SPEED;
-    } else if (this.isGameIntroduction) {
-      this.velocity = 0;
-    } else if (lives === 0) {
-      this.gameOverAnimation();
-      this.time.delayedCall(1000, () => {
-        this.portalService?.send({ type: "GAME_OVER" });
-      });
     } else if (this.isGamePlaying) {
       // The game has started
       this.playAnimation();
@@ -410,7 +433,7 @@ export class Scene extends BaseScene {
 
       this.rightButton.flipX = true;
 
-      // Jump
+      // Shoot
       const jumpButton = this.add
         .image(leftButtonX, buttonY, "red_button")
         .setInteractive()
@@ -444,10 +467,10 @@ export class Scene extends BaseScene {
           window.innerWidth / (2 * this.zoom) +
           +15 +
           2.5 * SQUARE_WIDTH,
-        y: (this.map.height * this.zoom * SQUARE_WIDTH) / 2 + 175,
+        y: (this.map.height * this.zoom * SQUARE_WIDTH) / 2 + 180,
         radius: 15,
-        base: this.add.circle(0, 0, 20, 0x000000, 0.7).setDepth(1000000000),
-        thumb: this.add.circle(0, 0, 10, 0xffffff, 0.7).setDepth(1000000000),
+        base: this.add.circle(0, 0, 27, 0x000000, 0.5).setDepth(1000000000),
+        thumb: this.add.circle(0, 0, 12, 0xffffff, 0.5).setDepth(1000000000),
         forceMin: 2,
       }).setVisible(false);
 
@@ -464,71 +487,26 @@ export class Scene extends BaseScene {
   private initializeRetryEvent() {
     // reload scene when player hit retry
     const onRetry = (event: EventObject) => {
-      if (event.type === "RETRY") {
-        this.isCameraFading = true;
-        this.cameras.main.fadeOut(500);
+      if (event.type === "CONTINUE_TRAINING") {
         this.reset();
-        this.cameras.main.on(
-          "camerafadeoutcomplete",
-          () => {
-            this.cameras.main.fadeIn(500);
-            this.velocity = WALKING_SPEED;
-            this.isCameraFading = false;
-          },
-          this,
-        );
       }
     };
     this.portalService?.onEvent(onRetry);
   }
 
-  private initializeEndGameEarlyEvent() {
-    const onEndGameEarly = (event: EventObject) => {
-      if (event.type === "END_GAME_EARLY") {
-        this.gameOverAnimation();
+  private initializeGameOverEvent() {
+    const onGameOver = (event: EventObject) => {
+      if (event.type === "GAME_OVER") {
+        this.gameOver();
       }
     };
-    this.portalService?.onEvent(onEndGameEarly);
-  }
-
-  private gameOverAnimation() {
-    if (!this.currentPlayer) return;
-    this.currentPlayer.death();
-    this.balloonSpawnInterval.remove();
-    this.enemySpawnInterval.remove();
-    this.velocity = 0;
-  }
-
-  private setControls() {
-    const joystickEnabled = this.portalService?.state.context.isJoystickEnabled;
-    if (joystickEnabled) {
-      this.joystick?.setVisible(true);
-      this.leftButton?.setVisible(false);
-      this.rightButton?.setVisible(false);
-    } else {
-      this.joystick?.setVisible(false);
-      this.leftButton?.setVisible(true);
-      this.rightButton?.setVisible(true);
-    }
-  }
-
-  private reset() {
-    this.currentPlayer?.setPosition(
-      SPAWNS()[this.sceneId].default.x,
-      SPAWNS()[this.sceneId].default.y,
-    );
-    this.enemySpawnInterval.remove();
-    this.balloonSpawnInterval.remove();
-    this.balloonCounter = 0;
-    this.cyanBalloonInitCount = -1000;
-    this.currentPlayer?.setIsShooting(false);
-    this.currentPlayer?.setIsHurt(false);
-    this.currentEnemySpawnInterval = ENEMY_SPAWN_INTERVAL;
+    this.portalService?.onEvent(onGameOver);
   }
 
   private initializeStartEvent() {
     const onStart = (event: EventObject) => {
       if (event.type === "START") {
+        this.reset();
         this.balloonSpawnInterval = this.time.addEvent({
           delay: BALLOON_SPAWN_INTERVAL,
           callback: () => this.createBalloon(),
@@ -554,6 +532,54 @@ export class Scene extends BaseScene {
         color: "#000000",
       })
       .setAlpha(0);
+  }
+
+  private gameOver() {
+    if (!this.currentPlayer) return;
+    this.balloonSpawnInterval.remove();
+    this.enemySpawnInterval.remove();
+    this.balloons.clear(true, true);
+    this.darts.clear(true, true);
+    this.bounceBrosGroup.clear(true, true);
+    this.blastBrosGroup.clear(true, true);
+    this.velocity = 0;
+  }
+
+  private setControls() {
+    const joystickEnabled = this.portalService?.state.context.isJoystickEnabled;
+    if (joystickEnabled) {
+      this.joystick?.setVisible(true);
+      this.leftButton?.setVisible(false);
+      this.rightButton?.setVisible(false);
+    } else {
+      this.joystick?.setVisible(false);
+      this.leftButton?.setVisible(true);
+      this.rightButton?.setVisible(true);
+    }
+  }
+
+  private reset() {
+    this.currentPlayer?.setPosition(
+      SPAWNS()[this.sceneId].default.x,
+      SPAWNS()[this.sceneId].default.y,
+    );
+    this.enemySpawnInterval?.remove();
+    this.balloonSpawnInterval?.remove();
+    this.balloonCounter = 0;
+    this.cyanBalloonInitCount = -1000;
+    this.currentPlayer?.setIsShooting(false);
+    this.currentPlayer?.setIsHurt(false);
+    this.currentEnemySpawnInterval = ENEMY_SPAWN_INTERVAL;
+  }
+
+  private createInvisibleWalls() {
+    this.ground = this.colliders?.children.entries[0];
+    this.leftWall = this.colliders?.children.entries[1];
+    this.rightWall = this.colliders?.children.entries[2];
+    this.deflator = this.colliders?.children.entries[3];
+    this.topWall = this.add.zone(0, 0, this.map.widthInPixels * 2, 30);
+    this.physics.world.enable(this.topWall);
+    (this.topWall.body as Phaser.Physics.Arcade.Body)?.setAllowGravity(false);
   }
 
   private playAnimation() {
@@ -616,33 +642,35 @@ export class Scene extends BaseScene {
   }
 
   private createBlueBalloon(x: number) {
-    new Balloon({
+    const balloon = new Balloon({
       x: x,
       y: -1,
       scene: this,
       spriteName: "balloon_blue",
-      onPop: () => {
+      onPop: (balloon?: Balloon) => {
         this.portalService?.send("GAIN_POINTS", {
           points: 1,
         });
-        this.currentPlayer?.addLabel(1);
+        balloon?.addLabel(1);
         this.sound.play("earn_point", { volume: PORTAL_VOLUME });
       },
+      onDebuff: this.loseLife,
     });
+    this.balloons.add(balloon);
   }
 
   private createRedBalloon(x: number) {
-    new Balloon({
+    const balloon = new Balloon({
       x: x,
       y: -1,
       scene: this,
       spriteName: "balloon_red",
-      onPop: () => {
+      onPop: (balloon?: Balloon) => {
         this.sound.play("minus_point", { volume: PORTAL_VOLUME });
         this.portalService?.send("GAIN_POINTS", {
           points: -1,
         });
-        this.currentPlayer?.addLabel(-1);
+        balloon?.addLabel(-1, "#F5B7BA");
       },
       onDebuff: () => {
         this.velocity = WALKING_SPEED * PLAYER_PERCENTAGE_DEBUFF_VELOCITY;
@@ -652,53 +680,69 @@ export class Scene extends BaseScene {
         this.sound.play("debuff_velocity", { volume: PORTAL_VOLUME });
       },
     });
+    this.balloons.add(balloon);
   }
 
   private createYellowBalloon(x: number) {
-    new Balloon({
+    const balloon = new Balloon({
       x: x,
       y: -1,
       scene: this,
       spriteName: "balloon_yellow",
-      onPop: () => {
+      onPop: (balloon?: Balloon) => {
         this.portalService?.send("GAIN_POINTS", {
           points: 3,
         });
-        this.currentPlayer?.addLabel(3, "#DCD42F");
+        balloon?.addLabel(3, "#FDF787");
         this.cyanBalloonInitCount = this.balloonCounter;
         this.sound.play("enable_special_balloons", { volume: PORTAL_VOLUME });
       },
+      onDebuff: this.loseLife,
     });
+    this.balloons.add(balloon);
   }
 
   private createGreenBalloon(x: number) {
-    new Balloon({
+    const balloon = new Balloon({
       x: x,
       y: -1,
       scene: this,
       spriteName: "balloon_green",
-      onPop: () => {
+      onPop: (balloon?: Balloon) => {
         this.portalService?.send("GAIN_LIFE");
-        this.currentPlayer?.addLabel(1, "", "heart");
+        balloon?.addLabel(1, "", "heart");
         this.sound.play("earn_life", { volume: PORTAL_VOLUME });
       },
+      onDebuff: this.loseLife,
     });
+    this.balloons.add(balloon);
   }
 
   private createCyanBalloon(x: number) {
-    new Balloon({
+    const balloon = new Balloon({
       x: x,
       y: -1,
       scene: this,
       spriteName: "balloon_cyan",
-      onPop: () => {
+      onPop: (balloon?: Balloon) => {
         this.portalService?.send("GAIN_POINTS", {
           points: 2,
         });
-        this.currentPlayer?.addLabel(2, "#ADFFFF");
+        balloon?.addLabel(2, "#ADFFFF");
         this.sound.play("earn_super_point", { volume: PORTAL_VOLUME });
       },
+      onDebuff: this.loseLife,
     });
+    this.balloons.add(balloon);
+  }
+
+  private loseLife() {
+    if (!this.portalService) return;
+    this.portalService?.send("LOSE_LIFE");
+    this.currentPlayer?.hurt();
+    if (this.portalService.state.context.lives <= 0) {
+      this.portalService.send({ type: "GAME_OVER" });
+    }
   }
 
   private updateEnemySpawnInterval() {
@@ -763,6 +807,7 @@ export class Scene extends BaseScene {
         scene: this,
         player: this.currentPlayer,
       });
+      this.bounceBrosGroup.add(this.bounceBro);
     });
 
     this.time.delayedCall(1000 + PRE_ACTION_DELAY, () => {
@@ -808,6 +853,7 @@ export class Scene extends BaseScene {
         scene: this,
         player: this.currentPlayer,
       });
+      this.blastBrosGroup.add(this.blastBros);
     });
 
     this.time.delayedCall(1000 + PRE_ACTION_DELAY, () => {
@@ -840,55 +886,60 @@ export class Scene extends BaseScene {
       red: "machine_balloon_red",
       blue: "machine_balloon_blue",
       green: "machine_balloon_green",
-      yellow: "machine_balloon_yellow"
+      yellow: "machine_balloon_yellow",
     };
 
     type MachineConfigKey = keyof typeof MACHINE_DECO_CONFIG;
     // Define keys used
-    const configKeys: MachineConfigKey[] = ["config1", "config2", "config3", "config4"];
+    const configKeys: MachineConfigKey[] = [
+      "config1",
+      "config2",
+      "config3",
+      "config4",
+    ];
 
     // Map each machine config to a specific balloon color
-    const machineBalloonColors: Record<MachineConfigKey, "red" | "blue" | "green" | "yellow"> = {
+    const machineBalloonColors: Record<
+      MachineConfigKey,
+      "red" | "blue" | "green" | "yellow"
+    > = {
       config1: "red",
       config2: "blue",
       config3: "green",
-      config4: "yellow"
+      config4: "yellow",
     };
-    
+
     configKeys.forEach((key) => {
       const machineConfig = MACHINE_DECO_CONFIG[key];
-    
+
       // Add the base machine sprite
       const balloon_machine_name = "balloon_machine";
-      const balloon_machine = this.add.sprite(
-        machineConfig.x,
-        machineConfig.y,
-        balloon_machine_name
-      ).setOrigin(0).setDepth(100000000);
-    
+      const balloon_machine = this.add
+        .sprite(machineConfig.x, machineConfig.y, balloon_machine_name)
+        .setOrigin(0)
+        .setDepth(100000000);
+
       this.createAnimation(balloon_machine, balloon_machine_name, 0, 8);
-    
+
       // Get the balloon color for this machine
       const balloonColor = machineBalloonColors[key];
       const balloonName = balloonNames[balloonColor];
-    
+
       const balloonConfig = {
         x: machineConfig.x + BALLOON_DECO_CONFIG.x,
-        y: machineConfig.y + BALLOON_DECO_CONFIG.y
+        y: machineConfig.y + BALLOON_DECO_CONFIG.y,
       };
-    
-      const balloonSprite = this.add.sprite(
-        balloonConfig.x,
-        balloonConfig.y,
-        balloonName
-      ).setOrigin(0).setDepth(1000000000).setScale(0.8);
 
-      console.log(balloonName, balloonNames)
-    
+      const balloonSprite = this.add
+        .sprite(balloonConfig.x, balloonConfig.y, balloonName)
+        .setOrigin(0)
+        .setDepth(1000000000)
+        .setScale(0.8);
+
       this.createAnimation(balloonSprite, balloonName, 0, 17);
-    });    
+    });
 
-    // Sprite    
+    // Sprite
     this.add.sprite(1, 1, riverName).setOrigin(0).setDepth(1000);
     this.blastBro1 = this.add
       .sprite(STONE_CONFIGURATION.LtoR, Y_AXIS - 230, blastBrosName)
