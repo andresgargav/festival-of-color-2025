@@ -31,6 +31,8 @@ import {
   AMOUNT_CYAN_BALLOONS,
   MACHINE_DECO_CONFIG,
   BALLOON_DECO_CONFIG,
+  ENEMY_SPAWN_INTERVAL_HARD_MODE,
+  PLAYER_PERCENTAGE_DEBUFF_VELOCITY_HARD_MODE,
 } from "./Constants";
 import { SUNNYSIDE } from "assets/sunnyside";
 import { SQUARE_WIDTH } from "features/game/lib/constants";
@@ -56,6 +58,8 @@ export class Scene extends BaseScene {
   private cyanBalloonInitCount = -1000;
   private leftButton!: Phaser.GameObjects.Image;
   private rightButton!: Phaser.GameObjects.Image;
+  private timeRedBalloonDebuff!: Phaser.Time.TimerEvent | null;
+  private hasShownHardModeTitle = false;
 
   ground!: Phaser.GameObjects.GameObject | undefined;
   leftWall!: Phaser.GameObjects.GameObject | undefined;
@@ -376,6 +380,10 @@ export class Scene extends BaseScene {
     } else if (this.isGamePlaying) {
       // The game has started
       this.playAnimation();
+      if (this.isHardMode && !this.hasShownHardModeTitle) {
+        this.showHardModeTitle();
+        this.hasShownHardModeTitle = true;
+      }
     }
 
     // Controls
@@ -567,6 +575,9 @@ export class Scene extends BaseScene {
     this.balloonSpawnInterval?.remove();
     this.balloonCounter = 0;
     this.cyanBalloonInitCount = -1000;
+    this.timeRedBalloonDebuff = null;
+    this.hasShownHardModeTitle = false;
+    this.sound.setRate(1);
     this.currentPlayer?.setIsShooting(false);
     this.currentPlayer?.setIsHurt(false);
     this.currentEnemySpawnInterval = ENEMY_SPAWN_INTERVAL;
@@ -619,6 +630,51 @@ export class Scene extends BaseScene {
     this.darts.add(dart);
   }
 
+  private showHardModeTitle() {
+    this.sound.setRate(1.5);
+    const hardModeTitle = this.add
+      .text(
+        (this.map.width * SQUARE_WIDTH) / 2,
+        (this.map.height * SQUARE_WIDTH) / 2 + 20,
+        "Hard Mode",
+        {
+          // fontSize: "15px",
+          fontFamily: "Teeny",
+          color: "#FFFFFF",
+          resolution: 10,
+          padding: { x: 2, y: 2 },
+        },
+      )
+      .setFontSize(0)
+      .setOrigin(0.5);
+
+    hardModeTitle.setShadow(4, 4, "#161424", 0, true, true);
+
+    const fadeDestroy = () => {
+      this.tweens?.add({
+        targets: hardModeTitle,
+        alpha: 0,
+        duration: 1000,
+        onComplete: () => {
+          hardModeTitle.destroy();
+        },
+      });
+    };
+
+    this.tweens.addCounter({
+      from: 0,
+      to: 15,
+      duration: 1000,
+      onUpdate: (tween) => {
+        const value = tween.getValue();
+        hardModeTitle.setFontSize(value);
+      },
+      onComplete: () => {
+        this.time.delayedCall(2000, () => fadeDestroy());
+      },
+    });
+  }
+
   private createBalloon() {
     this.balloonCounter += 1;
     const minX = BALLOON_SPAWN_LEFT_LIMIT;
@@ -634,7 +690,11 @@ export class Scene extends BaseScene {
       this.createGreenBalloon(randomX);
     } else if ((this.balloonCounter - 10) % 20 === 0) {
       this.createYellowBalloon(randomX);
-    } else if (this.balloonCounter % 20 === 0) {
+    } else if (
+      this.balloonCounter % 20 === 0 ||
+      (this.isHardMode && (this.balloonCounter - 13) % 20 === 0) ||
+      (this.isHardMode && (this.balloonCounter - 9) % 20 === 0)
+    ) {
       this.createRedBalloon(randomX);
     } else {
       this.createBlueBalloon(randomX);
@@ -654,7 +714,7 @@ export class Scene extends BaseScene {
         balloon?.addLabel(1);
         this.sound.play("earn_point", { volume: PORTAL_VOLUME });
       },
-      onDebuff: this.loseLife,
+      onDebuff: () => this.loseLife(),
     });
     this.balloons.add(balloon);
   }
@@ -673,10 +733,20 @@ export class Scene extends BaseScene {
         balloon?.addLabel(-1, "#F5B7BA");
       },
       onDebuff: () => {
-        this.velocity = WALKING_SPEED * PLAYER_PERCENTAGE_DEBUFF_VELOCITY;
-        this.time.delayedCall(TIME_DEBUFF_VELOCITY, () => {
-          this.velocity = WALKING_SPEED;
-        });
+        if (this.timeRedBalloonDebuff) {
+          this.timeRedBalloonDebuff.remove(false);
+          this.timeRedBalloonDebuff = null;
+        }
+        const percentageDebuff = this.isHardMode
+          ? PLAYER_PERCENTAGE_DEBUFF_VELOCITY_HARD_MODE
+          : PLAYER_PERCENTAGE_DEBUFF_VELOCITY;
+        this.velocity = WALKING_SPEED * (1 + percentageDebuff);
+        this.timeRedBalloonDebuff = this.time.delayedCall(
+          TIME_DEBUFF_VELOCITY,
+          () => {
+            this.velocity = WALKING_SPEED;
+          },
+        );
         this.sound.play("debuff_velocity", { volume: PORTAL_VOLUME });
       },
     });
@@ -697,7 +767,7 @@ export class Scene extends BaseScene {
         this.cyanBalloonInitCount = this.balloonCounter;
         this.sound.play("enable_special_balloons", { volume: PORTAL_VOLUME });
       },
-      onDebuff: this.loseLife,
+      onDebuff: () => this.loseLife(),
     });
     this.balloons.add(balloon);
   }
@@ -713,7 +783,7 @@ export class Scene extends BaseScene {
         balloon?.addLabel(1, "", "heart");
         this.sound.play("earn_life", { volume: PORTAL_VOLUME });
       },
-      onDebuff: this.loseLife,
+      onDebuff: () => this.loseLife(),
     });
     this.balloons.add(balloon);
   }
@@ -731,14 +801,15 @@ export class Scene extends BaseScene {
         balloon?.addLabel(2, "#ADFFFF");
         this.sound.play("earn_super_point", { volume: PORTAL_VOLUME });
       },
-      onDebuff: this.loseLife,
+      onDebuff: () => this.loseLife(),
     });
     this.balloons.add(balloon);
   }
 
   private loseLife() {
     if (!this.portalService) return;
-    this.portalService?.send("LOSE_LIFE");
+    const loseLives = this.isHardMode ? 2 : 1;
+    this.portalService?.send("LOSE_LIFE", { lives: loseLives });
     this.currentPlayer?.hurt();
     if (this.portalService.state.context.lives <= 0) {
       this.portalService.send({ type: "GAME_OVER" });
@@ -747,10 +818,13 @@ export class Scene extends BaseScene {
 
   private updateEnemySpawnInterval() {
     const minutesElapsed = Math.floor(this.secondsElapsed / 60);
-    const newEnemySpawnInterval = Math.max(
+    let newEnemySpawnInterval = Math.max(
       ENEMY_SPAWN_INTERVAL - minutesElapsed * ENEMY_SPAWN_REDUCTION_PER_MINUTE,
       MINIMUM_ENEMY_SPAWN_INTERVAL,
     );
+    if (this.isHardMode) {
+      newEnemySpawnInterval = ENEMY_SPAWN_INTERVAL_HARD_MODE;
+    }
     if (this.currentEnemySpawnInterval !== newEnemySpawnInterval) {
       this.currentEnemySpawnInterval = newEnemySpawnInterval;
       this.enemySpawnInterval.remove();
@@ -872,6 +946,16 @@ export class Scene extends BaseScene {
 
   private get secondsElapsed() {
     return GAME_SECONDS - this.secondsLeft;
+  }
+
+  public get isHardMode() {
+    const dateKey = new Date().toISOString().slice(0, 10);
+    const initialDateHardMode = "2025-07-02";
+    return (
+      dateKey >= initialDateHardMode &&
+      this.secondsLeft >= 0 &&
+      this.secondsLeft <= 30
+    );
   }
 
   // Festival-of-color-2025 Idle

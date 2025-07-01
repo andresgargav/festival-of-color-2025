@@ -9,6 +9,7 @@ import {
   ENEMIES_TABLE,
   PORTAL_NAME,
   INSTRUCTIONS,
+  HARD_MODE_TABLE,
 } from "../../Constants";
 import { PIXEL_SCALE } from "features/game/lib/constants";
 import { useSound } from "lib/utils/hooks/useSound";
@@ -27,34 +28,7 @@ export const Guide: React.FC<Props> = ({ onBack }) => {
       {/* title */}
       <div className="flex flex-col gap-1">
         <div className="flex text-center">
-          {/* <div
-            className="flex-none"
-            style={{
-              width: `${PIXEL_SCALE * 11}px`,
-              marginLeft: `${PIXEL_SCALE * 2}px`,
-            }}
-          >
-            <img
-              src={SUNNYSIDE.icons.arrow_left}
-              className="cursor-pointer"
-              onClick={() => {
-                button.play();
-                onBack?.();
-              }}
-              style={{
-                width: `${PIXEL_SCALE * 11}px`,
-              }}
-            />
-          </div> */}
           <div className="grow mb-3 text-lg">{t(`${PORTAL_NAME}.guide`)}</div>
-          {/* <div className="flex-none">
-            <div
-              style={{
-                width: `${PIXEL_SCALE * 11}px`,
-                marginRight: `${PIXEL_SCALE * 2}px`,
-              }}
-            />
-          </div> */}
         </div>
       </div>
 
@@ -126,6 +100,34 @@ export const Guide: React.FC<Props> = ({ onBack }) => {
                 </td>
               </tr>
             ))}
+          </tbody>
+        </table>
+        {/* Hard Mode */}
+        <Label type="default">{t(`${PORTAL_NAME}.hardMode`)}</Label>
+        <table className="w-full text-xs table-fixed border-collapse">
+          <tbody>
+            {HARD_MODE_TABLE.map(
+              ({ image, description, width = 13 }, index) => (
+                <tr key={index}>
+                  <td
+                    style={{ border: "1px solid #b96f50" }}
+                    className="p-1.5 w-1/6"
+                  >
+                    <div className="flex items-center justify-center">
+                      {<SquareIcon icon={image} width={width} />}
+                    </div>
+                  </td>
+                  <td
+                    style={{ border: "1px solid #b96f50" }}
+                    className="p-1.5 w-5/6"
+                  >
+                    {t(`${PORTAL_NAME}.guideDescription`, {
+                      description: description,
+                    })}
+                  </td>
+                </tr>
+              ),
+            )}
           </tbody>
         </table>
       </div>

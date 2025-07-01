@@ -70,6 +70,7 @@ type GainPointsEvent = {
 
 type LoseLifeEvent = {
   type: "LOSE_LIFE";
+  lives: number;
 };
 
 type GainLifeEvent = {
@@ -359,8 +360,9 @@ export const portalMachine = createMachine<Context, PortalEvent, PortalState>({
         },
         LOSE_LIFE: {
           actions: assign<Context, any>({
-            lives: (context: Context) => {
-              return context.lives - 1;
+            lives: (context: Context, event: LoseLifeEvent) => {
+              const { lives = 1 } = event;
+              return context.lives - lives;
             },
           }),
         },

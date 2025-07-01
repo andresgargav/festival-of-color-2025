@@ -1,6 +1,7 @@
 import { Equipped } from "features/game/types/bumpkin";
 import { translate as t } from "lib/i18n/translate";
 import { SPAWNS } from "features/world/lib/spawn";
+import { SUNNYSIDE } from "assets/sunnyside";
 
 // Festival of color
 import cyanBalloon from "public/world/balloon-falling-cyan.png";
@@ -30,6 +31,7 @@ export const AMOUNT_CYAN_BALLOONS = 3;
 export const ENEMY_SPAWN_INTERVAL = 8000;
 export const ENEMY_SPAWN_REDUCTION_PER_MINUTE = 5500;
 export const MINIMUM_ENEMY_SPAWN_INTERVAL = 2500;
+export const ENEMY_SPAWN_INTERVAL_HARD_MODE = 1500;
 
 // Festival of Color
 export const Y_AXIS = SPAWNS()[PORTAL_NAME].default.y - 6;
@@ -68,7 +70,8 @@ export const BOUNCING_CONFIGURATION = {
 // Player
 export const WALKING_SPEED = 75;
 export const PLAYER_JUMP_VELOCITY_Y = -165;
-export const PLAYER_PERCENTAGE_DEBUFF_VELOCITY = 0.5;
+export const PLAYER_PERCENTAGE_DEBUFF_VELOCITY = -0.5;
+export const PLAYER_PERCENTAGE_DEBUFF_VELOCITY_HARD_MODE = -0.75;
 export const TIME_DEBUFF_VELOCITY = 5000;
 
 // Game config
@@ -173,6 +176,25 @@ export const ENEMIES_TABLE: {
   {
     image: red_balloon,
     description: t(`${PORTAL_NAME}.enemy3`),
+  },
+];
+
+export const HARD_MODE_TABLE: {
+  image: string;
+  description: string;
+  width?: number;
+}[] = [
+  {
+    image: ground_slime,
+    description: t(`${PORTAL_NAME}.hardMode1`),
+  },
+  {
+    image: SUNNYSIDE.icons.heart,
+    description: t(`${PORTAL_NAME}.hardMode2`),
+  },
+  {
+    image: red_balloon,
+    description: t(`${PORTAL_NAME}.hardMode3`),
   },
 ];
 

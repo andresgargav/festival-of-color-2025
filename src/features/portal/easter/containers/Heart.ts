@@ -1,10 +1,10 @@
 import { BumpkinContainer } from "features/world/containers/BumpkinContainer";
-import { BaseScene } from "features/world/scenes/BaseScene";
+import { Scene } from "../Scene";
 
 interface Props {
   x: number;
   y: number;
-  scene: BaseScene;
+  scene: Scene;
   player?: BumpkinContainer;
   removedAnim?: boolean;
 }
@@ -13,7 +13,7 @@ export class Heart extends Phaser.GameObjects.Container {
   private player?: BumpkinContainer;
   private sprite: Phaser.GameObjects.Sprite;
 
-  scene: BaseScene;
+  scene: Scene;
 
   constructor({ x, y, scene, player, removedAnim = false }: Props) {
     super(scene, x, y);
@@ -27,7 +27,9 @@ export class Heart extends Phaser.GameObjects.Container {
     if (removedAnim) {
       this.sprite.setScale(0.6).setOrigin(0.5);
 
-      const label = this.scene.add.text(-11, -4, "-1", {
+      const amount = this.scene.isHardMode ? "-2" : "-1";
+
+      const label = this.scene.add.text(-11, -4, amount, {
         fontSize: "3.5px",
         fontFamily: "Teeny",
         color: "#FFFFFF",

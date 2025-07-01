@@ -221,7 +221,8 @@ export class BlastBros extends Phaser.GameObjects.Container {
     if (this.portalService) {
       const currentLives = this.portalService?.state.context.lives;
       if (currentLives > 0) {
-        this.portalService?.send({ type: "LOSE_LIFE" });
+        const loseLives = this.scene?.isHardMode ? 2 : 1;
+        this.portalService?.send("LOSE_LIFE", { lives: loseLives });
         this.player?.hurt();
         if (this.portalService?.state.context.lives <= 0) {
           this.portalService?.send({ type: "GAME_OVER" });
