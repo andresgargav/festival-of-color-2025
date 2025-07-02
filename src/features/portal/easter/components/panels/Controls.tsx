@@ -14,6 +14,7 @@ import Switch from "components/ui/Switch";
 import moveControls1 from "public/world/move_controls_1.png";
 import moveControls2 from "public/world/move_controls_2.png";
 import jumpControls from "public/world/jump_controls.png";
+import shootZControl from "public/world/shoot_z.png";
 import shootButton from "public/world/red_button.png";
 import leftButton from "public/world/left_button.png";
 import joystick from "public/world/joystick.png";
@@ -126,7 +127,10 @@ export const Controls: React.FC<Props> = ({ onBack }) => {
               {isTouchDevice() ? (
                 <img src={shootButton} className="h-10" />
               ) : (
-                <img src={jumpControls} className="h-10" />
+                <>
+                  <img src={jumpControls} className="h-10" />
+                  <img src={shootZControl} className="h-10" />
+                </>
               )}
             </div>
           </OuterPanel>

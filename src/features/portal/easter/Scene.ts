@@ -606,7 +606,9 @@ export class Scene extends BaseScene {
 
     // Throw dart
     if (
-      (this.cursorKeys?.space.isDown || this.mobileKeys.space) &&
+      (this.cursorKeys?.space.isDown ||
+        this.cursorKeys?.z?.isDown ||
+        this.mobileKeys.space) &&
       !this.currentPlayer.isShooting
     ) {
       this.shootDart();
