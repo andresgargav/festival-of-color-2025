@@ -20,6 +20,7 @@ import {
   DART_SHOOTING_DELAY,
   PORTAL_VOLUME,
 } from "features/portal/easter/Constants";
+import { Scene } from "features/portal/easter/Scene";
 
 const NAME_ALIASES: Partial<Record<NPCName, string>> = {
   "pumpkin' pete": "pete",
@@ -1161,7 +1162,7 @@ export class BumpkinContainer extends Phaser.GameObjects.Container {
     new Heart({
       x: this.x,
       y: this.y,
-      scene: this.scene as BaseScene,
+      scene: this.scene as Scene,
       removedAnim: true,
     });
   }
