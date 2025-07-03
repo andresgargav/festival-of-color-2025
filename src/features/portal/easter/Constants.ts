@@ -192,10 +192,6 @@ export const HARD_MODE_TABLE: {
     image: SUNNYSIDE.icons.heart,
     description: t(`${PORTAL_NAME}.hardMode2`),
   },
-  {
-    image: red_balloon,
-    description: t(`${PORTAL_NAME}.hardMode3`),
-  },
 ];
 
 export const BETA_TESTERS = [

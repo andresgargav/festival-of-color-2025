@@ -742,7 +742,17 @@ export class Scene extends BaseScene {
         const percentageDebuff = this.isHardMode
           ? PLAYER_PERCENTAGE_DEBUFF_VELOCITY_HARD_MODE
           : PLAYER_PERCENTAGE_DEBUFF_VELOCITY;
-        this.velocity = WALKING_SPEED * (1 + percentageDebuff);
+
+        const dateKey = new Date().toISOString().slice(0, 10);
+        const initialDate = "2025-07-04";
+
+        if (dateKey >= initialDate) {
+          this.velocity =
+            WALKING_SPEED * (1 + PLAYER_PERCENTAGE_DEBUFF_VELOCITY);
+        } else {
+          this.velocity = WALKING_SPEED * (1 + percentageDebuff);
+        }
+
         this.timeRedBalloonDebuff = this.time.delayedCall(
           TIME_DEBUFF_VELOCITY,
           () => {
@@ -951,13 +961,7 @@ export class Scene extends BaseScene {
   }
 
   public get isHardMode() {
-    const dateKey = new Date().toISOString().slice(0, 10);
-    const initialDateHardMode = "2025-07-02";
-    return (
-      dateKey >= initialDateHardMode &&
-      this.secondsLeft >= 0 &&
-      this.secondsLeft <= 30
-    );
+    return this.secondsLeft >= 0 && this.secondsLeft <= 30;
   }
 
   // Festival-of-color-2025 Idle
